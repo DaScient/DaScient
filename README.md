@@ -2,6 +2,21 @@
 ### Founder & Principal at [DaScient, LLC](https://dascient.com)
 
 <div align="center">
+  <h3>📡 DaScient Transmissions</h3>
+  
+  <table border="0">
+    <tr>
+      <td width="50%" valign="top">
+        <h4>🎙️ Quantum Intelligence Podcast</h4>
+        </td>
+      <td width="50%" valign="top">
+        <h4>⚡ GoZaddy Updates</h4>
+        </td>
+    </tr>
+  </table>
+</div>
+
+<div align="center">
   <a href="https://github.com/ryo-ma/github-profile-trophy">
     <img src="https://github-profile-trophy.vercel.app/?username=dascient&theme=onedark&no-frame=true&no-bg=true&margin-w=4" alt="DaScient Trophies" />
   </a>
@@ -39,21 +54,6 @@
     <img src="https://img.shields.io/badge/Notebooks-Expert-gold?style=for-the-badge&logo=jupyter" alt="Notebooks Expert" />
     <img src="https://img.shields.io/badge/Followers-16+-lightgrey?style=for-the-badge&logo=kaggler" alt="Followers" />
   </a>
-</div>
-
-<div align="center">
-  <h3>📡 DaScient Transmissions</h3>
-  
-  <table border="0">
-    <tr>
-      <td width="50%" valign="top">
-        <h4>🎙️ Quantum Intelligence Podcast</h4>
-        </td>
-      <td width="50%" valign="top">
-        <h4>⚡ GoZaddy Updates</h4>
-        </td>
-    </tr>
-  </table>
 </div>
 
 ## 🔭 About Me
