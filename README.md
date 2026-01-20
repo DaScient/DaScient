@@ -26,12 +26,12 @@
 </div>
 
 ## 🔭 About Me
-Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **RoboVet™** and **GoZaddy.ai™**.
+Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™]((https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
 
 ## 📊 Stats & Impact
 * **DaScient Press, Ltd.:** [DaScient, LLC](https://dascient.com/press) — Specializing in AI/ML & IoT.
 * **Open Source:** Committed to building reproducible and transparent data science workflows.
-* **Shop:** "[Accessible Intelligence™](https://dascient.com/shop/ols/products)" — View latest products in our AI literature and textbooks line.
+* **Shop:** [Accessible Intelligence™](https://dascient.com/shop/ols/products) — View latest products in our literature, workbooks, and textbooks line.
 
 ## 📫 Get in Touch
 - **LinkedIn:** [linkedin.com/in/dontadaya](https://linkedin.com/in/dontadaya)
