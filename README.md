@@ -1,24 +1,33 @@
 # Don Tadaya
 ### Founder & Principal at [DaScient, LLC](https://dascient.com)
+<div align="center">
+  <a href="https://github.com/ryo-ma/github-profile-trophy">
+    <img src="https://github-profile-trophy.vercel.app/?username=dascient&theme=onedark&no-frame=true&no-bg=true&margin-w=4" alt="DaScient Trophies" />
+  </a>
+</div>
 
-[![GitHub Streak](http://github-readme-streak-stats.herokuapp.com?user=dascient&theme=onedark_duo&date_format=M%20j%5B%2C%20Y%5D)](https://git.io/streak-stats)
-[![DaScient's GitHub stats](https://github-readme-stats.vercel.app/api?username=dascient&theme=onedark)](https://github.com/anuraghazra/github-readme-stats)
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=dascient&layout=compact&theme=vision-friendly-dark&hide=html)](https://github.com/anuraghazra/github-readme-stats)
+<br/>
+
+<div align="center">
+  <img src="https://metrics.lecoq.io/dascient?template=classic&base=header,activity,community,repositories,metadata&config.timezone=America%2FDenver&plugins.lines=yes&plugins.habits=yes&plugins.habits.from=200&plugins.habits.days=14&plugins.languages=yes&plugins.languages.ignored=html,css&plugins.traffic=yes&theme=dark" alt="DaScient Engineering Metrics" width="100%">
+</div>
+
+<br/>
+
+<div align="center">
+  <img src="https://github-readme-streak-stats.herokuapp.com?user=dascient&theme=dark&background=0D1117&date_format=M%20j%5B%2C%20Y%5D&mode=weekly" alt="GitHub Streak" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=dascient&layout=compact&theme=dark&hide_border=true&bg_color=0D1117&hide=html,css,jupyter%20notebook" alt="Top Languages" />
+</div>
+
+<div align="center">
+  <br />
+  <code>Strategic Intelligence • MLOps • Quantum-Ready Engineering</code>
+  <br />
+  <a href="https://dascient.com">dascient.com</a>
+</div>
 
 ## 🔭 About Me
 Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **RoboVet™** and **GoZaddy.ai™**.
-
-- 🛠️ **Currently Building:** Scalable MLOps pipelines and "Accessible Intelligence™" frameworks.
-- 🧪 **Research Interests:** Data reliability, reproducibility in AI, and high-frequency data anomalies.
-- 🚀 **Mission:** Empowering organizations through ADSaaS (Artificial Intelligence & Data Science as a Service).
-
-## 🛠 Tech Stack & Key Areas
-| Category | Tools & Technologies |
-| :--- | :--- |
-| **Languages** | Python, Javascript, SQL, R, Bash, CSS, C++ |
-| **Data & ML** | pandas, scikit-learn, PyTorch, TensorFlow, Keras |
-| **Ops & Infrastructure** | Docker, Kubernetes, Airflow, CI/CD, AWS/GCP |
-| **Specializations** | MLOps, IoT Integration, Quantum-Ready AI, Strategic Intelligence |
 
 ## 📊 Stats & Impact
 * **DaScient Press, Ltd.:** [DaScient, LLC](https://dascient.com/press) — Specializing in AI/ML & IoT.
