@@ -57,7 +57,7 @@ Mathematician, Engineer, and Data Scientist with over a decade of contributions 
 * **Shop:** [Accessible Intelligence™](https://dascient.com/shop/ols/products) — View latest products in our literature, workbooks, and textbooks line.
 
 ## 📫 Get in Touch
-- **LinkedIn:** [linkedin.com/in/dontadaya](https://www.linkedin.com/company/dascient/)
+- **LinkedIn:** [@DaScient](https://www.linkedin.com/company/dascient/)
 - **Email:** [github@dascient.com](mailto:github@dascient.com)
 - **Website:** [dascient.com](https://dascient.com)
 - **Medium:** [@DaScient](https://medium.com/@dascient)
