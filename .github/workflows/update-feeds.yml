@@ -1,0 +1,36 @@
+name: Update Transmissions Log
+
+on:
+  schedule:
+    # Runs every hour
+    - cron: '0 * * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  update-readme-with-rss:
+    name: Update Feed Display
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      # 1. Fetch The Podcast Feed
+      - name: Pull Podcast RSS
+        uses: gautamkrishnar/blog-post-workflow@v1
+        with:
+          comment_tag_name: "PODCAST-LIST"
+          feed_list: "https://media.rss.com/dascient/feed.xml" 
+          # Note: I converted your landing page to the likely raw XML feed. 
+          # If this fails, swap with your specific .xml link.
+          max_post_count: 3
+          template: "$emoji <a href='$url'>$title</a> <br/> <time style='font-size:10px; color: #8b949e;'>$date</time>"
+          date_format: "yyyy-mm-dd"
+
+      # 2. Fetch the GoZaddy/Worker Feed
+      - name: Pull GoZaddy RSS
+        uses: gautamkrishnar/blog-post-workflow@v1
+        with:
+          comment_tag_name: "BLOG-LIST"
+          feed_list: "https://gozaddy-rss.aristocles24.workers.dev"
+          max_post_count: 3
+          template: "Target: <a href='$url'>$title</a> <br/> <time style='font-size:10px; color: #8b949e;'>$date</time>"
+          date_format: "yyyy-mm-dd"
