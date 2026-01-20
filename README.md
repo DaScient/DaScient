@@ -65,5 +65,5 @@ Mathematician, Engineer, and Data Scientist with over a decade of contributions 
 - **Kaggle:** [@dascient](https://www.kaggle.com/dascient/code)
 
 ---
-<br/>
 *“Strategic Intelligence for the Quantum Era.”*
+Copyright © 2017-2026 | DaScient, LLC - All Rights Reserved.
