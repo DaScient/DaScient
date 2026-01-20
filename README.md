@@ -25,7 +25,6 @@
 </div>
 
 <div align="center">
-  <br/>
   <h3>🛰️ Kaggle Intelligence</h3>
   
   <a href="https://www.kaggle.com/dascient">
