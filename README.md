@@ -1,5 +1,6 @@
 # Don Tadaya
 ### Founder & Principal at [DaScient, LLC](https://dascient.com)
+
 <div align="center">
   <a href="https://github.com/ryo-ma/github-profile-trophy">
     <img src="https://github-profile-trophy.vercel.app/?username=dascient&theme=onedark&no-frame=true&no-bg=true&margin-w=4" alt="DaScient Trophies" />
@@ -9,14 +10,12 @@
 <br/>
 
 <div align="center">
-  <img src="https://metrics.lecoq.io/dascient?template=classic&base=header,activity,community,repositories,metadata&config.timezone=America%2FDenver&plugins.lines=yes&plugins.habits=yes&plugins.habits.from=200&plugins.habits.days=14&plugins.languages=yes&plugins.languages.ignored=html,css&plugins.traffic=yes&theme=dark" alt="DaScient Engineering Metrics" width="100%">
+  <img src="https://github-readme-stats.vercel.app/api?username=dascient&show_icons=true&count_private=true&theme=dark&hide_border=true&bg_color=0D1117&rank_icon=github" alt="DaScient Stats" height="180" />
+  <img src="https://streak-stats.demolab.com?user=dascient&theme=dark&background=0D1117&date_format=M%20j%5B%2C%20Y%5D&hide_border=true" alt="GitHub Streak" height="180" />
 </div>
 
-<br/>
-
 <div align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com?user=dascient&theme=dark&background=0D1117&date_format=M%20j%5B%2C%20Y%5D&mode=weekly" alt="GitHub Streak" />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=dascient&layout=compact&theme=dark&hide_border=true&bg_color=0D1117&hide=html,css,jupyter%20notebook" alt="Top Languages" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=dascient&layout=compact&theme=dark&hide_border=true&bg_color=0D1117&hide=html,css,jupyter%20notebook" alt="Top Languages" height="180" />
 </div>
 
 <div align="center">
