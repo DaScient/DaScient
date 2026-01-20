@@ -41,6 +41,21 @@
   </a>
 </div>
 
+<div align="center">
+  <h3>📡 DaScient Transmissions</h3>
+  
+  <table border="0">
+    <tr>
+      <td width="50%" valign="top">
+        <h4>🎙️ Quantum Intelligence Podcast</h4>
+        </td>
+      <td width="50%" valign="top">
+        <h4>⚡ GoZaddy Updates</h4>
+        </td>
+    </tr>
+  </table>
+</div>
+
 ## 🔭 About Me
 Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
 
