@@ -25,13 +25,6 @@
 </div>
 
 <div align="center">
-  <br />
-  <code>Strategic Intelligence • MLOps • Quantum-Ready Engineering</code>
-  <br />
-  <a href="https://dascient.com">dascient.com</a>
-</div>
-
-<div align="center">
   <br/>
   <h3>🛰️ Kaggle Intelligence</h3>
   
@@ -46,6 +39,15 @@
     <img src="https://img.shields.io/badge/Followers-16+-lightgrey?style=for-the-badge&logo=kaggler" alt="Followers" />
   </a>
 </div>
+
+<div align="center">
+  <br />
+  <code>Strategic Intelligence • MLOps • Quantum-Ready Engineering</code>
+  <br />
+  <a href="https://dascient.com">dascient.com</a>
+</div>
+
+<br/>
 
 ## 🔭 About Me
 Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
