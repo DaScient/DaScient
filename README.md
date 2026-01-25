@@ -41,23 +41,23 @@
 
 <div align="center">
   <br />
-  <code>Strategic Intelligence • MLOps • Quantum-Ready Engineering</code>
+  <code>Strategic Intelligence • MLOps • Quantum Engineering</code>
   <br />
   <a href="https://dascient.com">dascient.com</a>
 </div>
 
 <br/>
 
-## 🔭 About Me
+## About Me
 Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
 
-## 📊 Impact
+## Impact
 * **DaScient Press, Ltd.:** [DaScient Press](https://dascient.com/press) — Our mission in the literacy space.
 * **Open Source:** Committed to building reproducible and transparent data science workflows.
 * **[Stocks](https://donutz.ai/stocks) & [Crypto](https://donutz.ai/crypto)** 
 * **Shop:** [Accessible Intelligence™](https://dascient.com/shop/ols/products) — View latest products in our literature, workbooks, and textbooks line.
 
-## 📫 Get in Touch
+## Get in Touch
 - **LinkedIn:** [@DaScient](https://www.linkedin.com/company/dascient/)
 - **Email:** [github@dascient.com](mailto:github@dascient.com)
 - **Website:** [dascient.com](https://dascient.com)
