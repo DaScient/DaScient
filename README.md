@@ -48,8 +48,8 @@
 
 <br/>
 
-## About Me
-Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** As the founder of DaScient, LLC, I bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
+## About Us
+Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** At DaScient, we bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
 
 ## Impact
 * **[DaScient Press, Ltd.](https://dascient.com/press):** — Our mission in the literacy space.
