@@ -1,15 +1,15 @@
 #### Don Tadaya | Founder & Principal at [DaScient, LLC](https://dascient.com) - [DogFight AI](https://dog-fight.dascient.xyz/) - [RoboVet™](https://apps.apple.com/us/app/robovet-24-7-ai-veterinarian/id6753560467) - [@Univerzine!](https://univerzine.dascient.org)
 
 <div align="center">
-  <h3>📡 DaScient Transmissions</h3>
+  <h3>DaScient Transmissions</h3>
   
   <table border="0">
     <tr>
       <td width="50%" valign="top">
-        <h4>🎙️ Quantum Intelligence Podcast</h4>
+        <h4>Quantum Intelligence Podcast</h4>
         </td>
       <td width="50%" valign="top">
-        <h4>⚡ GoZaddy Updates</h4>
+        <h4>GoZaddy Updates</h4>
         </td>
     </tr>
   </table>
@@ -25,7 +25,7 @@
 </div>
 
 <div align="center">
-  <h3>🛰️ Kaggle Intelligence</h3>
+  <h3>Kaggle Intelligence</h3>
   
   <a href="https://www.kaggle.com/dascient">
     <img src="https://kaggle-card.chienhsiang-hung.eu.org/api/svg?dascient" alt="DaScient Kaggle Stats" height="180" />
@@ -49,7 +49,7 @@
 <br/>
 
 ## About Us
-Mathematician, Engineer, and Data Scientist with over a decade of contributions across institutional, intelligence, and aerospace sectors. Machine Learning and Artificial Intelligence expert focused on opensource systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for the Quantum Era.** At DaScient, we bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
+Machine Learning and Artificial Intelligence Engineering focused on systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for Quantum-scaled Deployments.** At DaScient, we bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
 
 ## Impact
 * **[DaScient Press, Ltd.](https://dascient.com/press):** — Our mission in the literacy space.
