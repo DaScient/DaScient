@@ -49,7 +49,7 @@
 <br/>
 
 ## About Us
-Machine Learning and Artificial Intelligence Engineering focused on systems design, multidimensional analytics, and hyperspectral technologies. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for Quantum-scaled Deployments.** At DaScient, we bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
+Machine Learning and Artificial Intelligence Engineering delivering complex systems design, multidimensional analytics, and opensource intelligence. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for Quantum-scaled Deployments.** At DaScient, we bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
 
 ## Impact
 * **[DaScient Press, Ltd.](https://dascient.com/press):** — Our mission in the literacy space.
