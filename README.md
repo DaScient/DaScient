@@ -1,7 +1,7 @@
 #### Don Tadaya | Founder & Principal at [DaScient, LLC](https://dascient.com) - [DogFight AI](https://dog-fight.dascient.xyz/) - [RoboVet™](https://apps.apple.com/us/app/robovet-24-7-ai-veterinarian/id6753560467) - [Univerzine!](https://dascient.github.io/Univerzine2.0/)
 
 <div align="center">
-  <h3>DaScient Transmissions</h3>
+  <h3>DaScient Metrics</h3>
   
   <table border="0">
     <tr>
@@ -53,6 +53,7 @@ Machine Learning and Artificial Intelligence group delivering complex systems de
 
 ## Impact
 * **[DaScient Press, Ltd.](https://dascient.com/press):** — Our mission in the literacy space.
+* **[Organoid Intelligence](http://dascient.net/):** — The first exploratory textbook to treat organoid intelligence as a unified field.
 * **Open Source:** Committed to building reproducible and transparent data science workflows.
 * **[Stocks](https://donutz.ai/stocks) & [Crypto](https://donutz.ai/crypto)** 
 * **Shop:** [Accessible Intelligence™](https://dascient.com/shop/ols/products) — View latest products in our literature, workbooks, and textbooks line.
