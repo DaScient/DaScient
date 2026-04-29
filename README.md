@@ -1,71 +1,16 @@
-#### Don Tadaya | Founder & Principal at [DaScient, LLC](https://dascient.com) - [DogFight AI](https://dog-fight.dascient.xyz/) - [RoboVet™](https://apps.apple.com/us/app/robovet-24-7-ai-veterinarian/id6753560467) - [Univerzine!](https://dascient.github.io/Univerzine2.0/)
+# React + Vite
 
-<div align="center">
-  <h3>DaScient Metrics</h3>
-  
-  <table border="0">
-    <tr>
-      <td width="50%" valign="top">
-        <h4>Quantum Intelligence Podcast</h4>
-        </td>
-      <td width="50%" valign="top">
-        <h4>GoZaddy Updates</h4>
-        </td>
-    </tr>
-  </table>
-</div>
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-<div align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=dascient&show_icons=true&count_private=true&theme=dark&hide_border=true&bg_color=0D1117&rank_icon=github" alt="DaScient Stats" height="180" />
-  <img src="https://streak-stats.demolab.com?user=dascient&theme=dark&background=0D1117&date_format=M%20j%5B%2C%20Y%5D&hide_border=true" alt="GitHub Streak" height="180" />
-</div>
+Currently, two official plugins are available:
 
-<div align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=dascient&layout=compact&theme=dark&hide_border=true&bg_color=0D1117&hide=html,css,jupyter%20notebook" alt="Top Languages" height="180" />
-</div>
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-<div align="center">
-  <h3>Kaggle Intelligence</h3>
-  
-  <a href="https://www.kaggle.com/dascient">
-    <img src="https://kaggle-card.chienhsiang-hung.eu.org/api/svg?dascient" alt="DaScient Kaggle Stats" height="180" />
-  </a>
+## React Compiler
 
-  <br/>
-  <a href="https://www.kaggle.com/dascient">
-    <img src="https://img.shields.io/badge/Kaggle-Expert-blue?style=for-the-badge&logo=kaggle" alt="Kaggle Expert" />
-    <img src="https://img.shields.io/badge/Notebooks-Expert-gold?style=for-the-badge&logo=jupyter" alt="Notebooks Expert" />
-    <img src="https://img.shields.io/badge/Followers-16+-lightgrey?style=for-the-badge&logo=kaggler" alt="Followers" />
-  </a>
-</div>
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-<div align="center">
-  <br />
-  <code>Strategic Intelligence • MLOps • Quantum Engineering</code>
-  <br />
-  <a href="https://dascient.com">dascient.com</a>
-</div>
+## Expanding the ESLint configuration
 
-<br/>
-
-## About Us
-Machine Learning and Artificial Intelligence group delivering complex systems design, multidimensional analytics, and opensource intelligence. Focused on **Strategic Intelligence, Advanced Engineering, and AI/ML/IoT for Quantum-scaled Deployments.** At DaScient, we bridge the gap between complex data ecosystems and actionable intelligence, developing proprietary solutions like **[RoboVet™](https://dascient.com/robovet)** and **[GoZaddy.ai™](https://dascient.com/gozaddy-ai)**.
-
-## Impact
-* **[DaScient Press, Ltd.](https://dascient.com/press):** — Our mission in the literacy space.
-* **[Organoid Intelligence](http://dascient.net/):** — The first exploratory textbook to treat organoid intelligence as a unified field.
-* **Open Source:** Committed to building reproducible and transparent data science workflows.
-* **[Stocks](https://donutz.ai/stocks) & [Crypto](https://donutz.ai/crypto)** 
-* **Shop:** [Accessible Intelligence™](https://dascient.com/shop/ols/products) — View latest products in our literature, workbooks, and textbooks line.
-
-## Get in Touch
-- **LinkedIn:** [@DaScient](https://www.linkedin.com/company/dascient/)
-- **Email:** [github@dascient.com](mailto:github@dascient.com)
-- **Website:** [dascient.com](https://dascient.com)
-- **Medium:** [@DaScient](https://medium.com/@dascient)
-- **Kaggle:** [@dascient](https://www.kaggle.com/dascient/code)
-
----
-*“Strategic Intelligence for the Quantum Era.”*
-<br/>
-Copyright © 2026 | DaScient, LLC - All Rights Reserved.
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
