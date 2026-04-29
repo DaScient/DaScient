@@ -132,8 +132,8 @@ export default function Hero() {
           <a href="#contact" className="btn-glow">
             Initiate Consultation
           </a>
-          <a href="#expertise" className="btn-ghost">
-            Explore Expertise
+          <a href="#services" className="btn-ghost">
+            Explore Services
           </a>
         </div>
 
