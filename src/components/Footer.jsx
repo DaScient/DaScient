@@ -6,6 +6,12 @@ const FOOTER_LINKS = {
     { label: 'Press & Media', href: 'mailto:press@dascient.com' },
   ],
   Services: [
+    { label: 'Federal Readiness', href: '#services' },
+    { label: 'Technical Build-out', href: '#services' },
+    { label: 'Funding & Capture', href: '#services' },
+    { label: 'Entrepreneur Concierge', href: '#entrepreneur-support' },
+  ],
+  Expertise: [
     { label: 'AI / ML Consulting', href: '#expertise' },
     { label: 'Human-Machine Teaming', href: '#expertise' },
     { label: 'Quantum Applications', href: '#expertise' },
@@ -42,7 +48,7 @@ export default function Footer() {
 
       <div className="section-container py-16 md:py-20">
         {/* Top row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-[rgba(255,255,255,0.05)]">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b border-[rgba(255,255,255,0.05)]">
           {/* Brand */}
           <div className="md:col-span-1 flex flex-col gap-5">
             <a href="/" className="flex items-center gap-2.5 group w-fit">
