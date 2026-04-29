@@ -132,7 +132,7 @@ export default function ServiceTiers() {
   const [activeIdx, setActiveIdx] = useState(null)
 
   return (
-    <section id="services" className="py-28 relative overflow-hidden">
+    <section id="services" aria-labelledby="services-heading" className="py-28 relative overflow-hidden">
       {/* Background */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -150,6 +150,7 @@ export default function ServiceTiers() {
             Service Architecture
           </div>
           <h2
+            id="services-heading"
             className="font-display font-800 text-white mb-4 tracking-tight"
             style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}
           >

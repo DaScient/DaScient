@@ -80,7 +80,7 @@ function CheckIcon({ color }) {
 
 export default function Pricing() {
   return (
-    <section id="pricing" className="py-28 relative overflow-hidden">
+    <section id="pricing" aria-labelledby="pricing-heading" className="py-28 relative overflow-hidden">
       {/* Background gradient */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -98,6 +98,7 @@ export default function Pricing() {
             Engagement Model
           </div>
           <h2
+            id="pricing-heading"
             className="font-display font-800 text-white mb-4 tracking-tight"
             style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}
           >
