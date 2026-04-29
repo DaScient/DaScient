@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react'
 
-// Formspree endpoint — owner should replace with their own Formspree form ID
+// ⚠️  ACTION REQUIRED: Replace YOUR_FORM_ID with your real Formspree form ID.
+//    Sign up at https://formspree.io, create a form, and paste its ID below.
+//    Example: 'https://formspree.io/f/xpzgkwvd'
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'
 
 const INQUIRY_SUBJECTS = [
