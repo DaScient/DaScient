@@ -1,0 +1,105 @@
+{
+  "system": {
+    "name": "DaScient",
+    "designation": "Single-Pane Glass",
+    "version": "1.0.0",
+    "tagline": "We don't build software; we engineer resilience.",
+    "doctrine": "Deterministic Elegance",
+    "concierge_prompt": "How can DaScient assist your evolution today?",
+    "boot_sequence": [
+      "Initializing Single-Pane Glass...",
+      "Mounting manifest layer...",
+      "Calibrating agentic concierge...",
+      "Synchronizing bio-digital link...",
+      "Operational."
+    ]
+  },
+  "intents": [
+    {
+      "id": "proposal",
+      "label": "Proposal Crafting",
+      "command": "EXEC :: GRANT_LOGIC",
+      "synopsis": "Synthesize operational stress parameters and structured narrative for DoE / DARPA / NIH submission."
+    },
+    {
+      "id": "booking",
+      "label": "Initiate Session",
+      "command": "EXEC :: SESSION_OPEN",
+      "synopsis": "Open a deterministic scheduling channel for strategic consultation or agentic engineering."
+    },
+    {
+      "id": "modules",
+      "label": "Artifact Carousel",
+      "command": "EXEC :: ARTIFACT_LOAD",
+      "synopsis": "Inspect operational manifests of Plan-Examiner, Organoid-Intelligence, ARES-E."
+    },
+    {
+      "id": "library",
+      "label": "Literacy Space",
+      "command": "EXEC :: LIBRARY_OPEN",
+      "synopsis": "Traverse the published doctrine — the language of the architecture."
+    },
+    {
+      "id": "about",
+      "label": "Architect Briefing",
+      "command": "EXEC :: BRIEF_ARCHITECT",
+      "synopsis": "Surface the operating thesis behind DaScient."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "plan-examiner",
+      "name": "Plan-Examiner",
+      "class": "Client-side Logic Engine",
+      "summary": "A manifest-driven inspector that parses structured plans and renders deterministic UI from them — the substrate for the Single-Pane.",
+      "signal": "// parse → reflect → execute"
+    },
+    {
+      "id": "organoid-intelligence",
+      "name": "Organoid-Intelligence",
+      "class": "Biological Computing",
+      "summary": "Research surface bridging cortical organoids and silicon — the wetware referent for our agentic substrate.",
+      "signal": "// neurons ⇌ tensors"
+    },
+    {
+      "id": "ares-e",
+      "name": "ARES-E",
+      "class": "Agentic Resilience",
+      "summary": "Adversarially-Robust Evaluation Suite for Evolving agents. The dashboard aesthetic of this Single-Pane derives from ARES-E.",
+      "signal": "// stress → adapt → harden"
+    }
+  ],
+  "library": [
+    {
+      "id": "prompt-atlas",
+      "title": "The Prompt Atlas",
+      "subtitle": "A Cartography of Intent",
+      "spine": "PROMPT ATLAS"
+    },
+    {
+      "id": "modern-psychology-of-ai",
+      "title": "The Modern Psychology of AI",
+      "subtitle": "Cognition, Constraint, Composure",
+      "spine": "ψ AI"
+    },
+    {
+      "id": "agentic-resilience",
+      "title": "Agentic Resilience",
+      "subtitle": "Engineering Systems That Endure",
+      "spine": "RESILIENCE"
+    }
+  ],
+  "session_options": [
+    { "id": "consult", "label": "Strategic Consultation", "duration": "45m" },
+    { "id": "engineer", "label": "Agentic Engineering", "duration": "90m" },
+    { "id": "review", "label": "Manifest Review", "duration": "30m" }
+  ],
+  "concierge_responses": {
+    "proposal": "Synthesizing operational stress parameters for your DoE proposal... Grant Logic module engaged. Provide the program solicitation and target outcome.",
+    "booking": "Opening deterministic scheduling channel. Select session class to continue.",
+    "modules": "Loading artifact manifests. Each module is a live referent of an operational repository.",
+    "library": "Surfacing the published doctrine. These are not books — they are the language of the architecture.",
+    "about": "DaScient engineers resilience at the seam where biological computing meets agentic systems. Every artifact you see here is a manifestation of that thesis.",
+    "default": "Intent unresolved. Re-state your evolution vector or select an executable module."
+  }
+}
