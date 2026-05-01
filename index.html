@@ -512,7 +512,7 @@
           class="glass rounded relative overflow-hidden"
           style="grid-row: 2"
         >
-          <div id="stage" class="stage absolute inset-0 p-8 md:p-10 flex flex-col"></div>
+          <div id="stage" class="stage absolute inset-0 p-8 md:p-10 flex flex-col overflow-y-auto panel-scroll"></div>
         </main>
 
         <!-- Right rail: System Log + Session Memory -->
@@ -1065,7 +1065,7 @@
           '</h2>' +
           '<div class="gold-rule mt-3" style="max-width: 200px"></div>' +
           '<p id="art-resp" class="mt-6 text-concrete-mute text-[13px] leading-relaxed max-w-2xl"></p>' +
-          '<div id="art-grid" class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 flex-1"></div>';
+          '<div id="art-grid" class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 overflow-y-auto panel-scroll"></div>';
         typewriter(qs('#art-resp', s), State.manifest.concierge_responses.modules, 10);
 
         const grid = qs('#art-grid', s);
@@ -1103,7 +1103,7 @@
           '</h2>' +
           '<div class="gold-rule mt-3" style="max-width: 200px"></div>' +
           '<p id="lib-resp" class="mt-6 text-concrete-mute text-[13px] leading-relaxed max-w-2xl"></p>' +
-          '<div id="lib-shelf" class="mt-10 flex flex-wrap items-end gap-10 flex-1" style="perspective: 1200px"></div>';
+          '<div id="lib-shelf" class="mt-10 flex flex-wrap items-end gap-10 flex-1 overflow-y-auto panel-scroll" style="perspective: 1200px"></div>';
         typewriter(qs('#lib-resp', s), State.manifest.concierge_responses.library, 10);
 
         const shelf = qs('#lib-shelf', s);
@@ -1469,6 +1469,10 @@
         Orchestrator.setProgress(100, vector.code);
 
         const stageEl = stage();
+        // Append the overlay to the workspace container (<main>) rather than
+        // the scrollable stage so it stays centred over the visible pane even
+        // when the user has scrolled the stage content down.
+        const workspaceEl = stageEl.parentElement || stageEl;
         const overlay = ce('div', 'conv-overlay');
         const ho = vector.handoff;
         const subjectParam = encodeURIComponent(ho.subject || 'DaScient · ' + vector.label);
@@ -1499,7 +1503,7 @@
                 'text-concrete-mute hover:text-concrete transition">[ ACKNOWLEDGE ]</button>' +
             '</div>' +
           '</div>';
-        stageEl.appendChild(overlay);
+        workspaceEl.appendChild(overlay);
         Log.push('EXEC', 'HANDOFF · ' + vector.code + ' -> ' + ho.email + ' · REF ' + ref);
         const dismiss = qs('#conv-dismiss', overlay);
         if (dismiss) dismiss.addEventListener('click', () => overlay.remove());
