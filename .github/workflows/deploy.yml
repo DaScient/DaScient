@@ -40,6 +40,13 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build Vite project
+        env:
+          # Build-time injection of OPENAI_API_KEY into the static bundle.
+          # See vite.config.js for the transformIndexHtml plugin that
+          # substitutes this value into index.html. The key ends up readable
+          # in the published site, so the secret should be origin-restricted
+          # and rate-limited at the OpenAI dashboard.
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
 
       - name: Upload Pages artifact
