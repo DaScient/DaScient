@@ -313,8 +313,8 @@
         /* Order: top bar → workspace → intents → log → footer */
         .hud-grid > header { order: 0; min-height: 48px; padding-left: 14px; padding-right: 14px; }
         .hud-grid > main   { order: 1; min-height: 60vh; }
-        .hud-grid > aside:nth-of-type(1) { order: 2; }
-        .hud-grid > aside:nth-of-type(2) { order: 3; }
+        .hud-grid > #intent-rail { order: 2; }
+        .hud-grid > #log-rail    { order: 3; }
         .hud-grid > footer { order: 4; min-height: 40px; padding-left: 14px; padding-right: 14px; flex-wrap: wrap; gap: 6px; }
 
         /* Tighten typography & paddings on small screens */
@@ -361,8 +361,8 @@
 
         /* Hide some non-essential chrome to reduce visual noise */
         #hud-clock, #hud-session, #hud-intent { display: none; }
-        header .pulse-dot + .mono + .mono { display: none; } /* "· SINGLE-PANE GLASS · v1.0" */
-        footer .mono { display: none; } /* "BIO-DIGITAL · AGENTIC · DETERMINISTIC" */
+        #hud-version { display: none; }
+        #hud-substrate { display: none; }
 
         /* Library shelf was a wide 3D row — wrap and flatten for narrow screens */
         #lib-shelf { gap: 28px; perspective: none; }
@@ -480,7 +480,7 @@
             <div class="mono text-[11px] tracking-[0.28em] text-concrete">
               DASCIENT
             </div>
-            <div class="hidden md:block mono text-[10px] tracking-[0.24em] text-concrete-mute">
+            <div id="hud-version" class="hidden md:block mono text-[10px] tracking-[0.24em] text-concrete-mute">
               · SINGLE-PANE GLASS · v1.0
             </div>
           </div>
@@ -493,6 +493,7 @@
 
         <!-- Left rail: Intent selector -->
         <aside
+          id="intent-rail"
           class="glass rounded p-4 flex flex-col"
           style="grid-row: 2"
         >
@@ -516,6 +517,7 @@
 
         <!-- Right rail: System Log + Session Memory -->
         <aside
+          id="log-rail"
           class="glass rounded p-4 flex flex-col gap-3"
           style="grid-row: 2"
         >
@@ -546,7 +548,7 @@
           <div class="prose-display italic text-[15px] text-concrete">
             We engineer resilient systems.
           </div>
-          <div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">
+          <div id="hud-substrate" class="mono text-[10px] tracking-[0.22em] text-concrete-mute">
             BIO-DIGITAL · AGENTIC · DETERMINISTIC
           </div>
         </footer>
