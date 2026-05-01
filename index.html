@@ -291,6 +291,73 @@
       @media (max-height: 640px), (max-width: 720px) {
         html, body { overflow: auto; }
       }
+
+      /* ---------- Orchestration Layer surfaces ---------- */
+
+      /* Memory rail pulse — fires on specialist swap */
+      .rail-pulse {
+        animation: rail-pulse 1.6s ease-out 1;
+      }
+      @keyframes rail-pulse {
+        0%   { box-shadow: 0 0 0 0 rgba(250, 208, 44, 0.45); }
+        50%  { box-shadow: 0 0 0 6px rgba(250, 208, 44, 0.18); }
+        100% { box-shadow: 0 0 0 0 rgba(250, 208, 44, 0); }
+      }
+
+      /* System Log — orchestration levels get their own treatment */
+      .log-switch { color: var(--gold); font-weight: 500; }
+      .log-mem    { color: #e0e0e0; }
+      .log-alert  { color: var(--gold); text-shadow: 0 0 6px rgba(250, 208, 44, 0.35); }
+
+      /* Chat thread bubbles */
+      .arch-msg-user {
+        background: rgba(250, 208, 44, 0.06);
+        border: 1px solid rgba(250, 208, 44, 0.16);
+      }
+      .arch-msg-spec {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--hairline);
+      }
+
+      /* Threshold meter */
+      .meter-track {
+        background: rgba(224, 224, 224, 0.08);
+        height: 2px;
+        border-radius: 1px;
+        overflow: hidden;
+      }
+      .meter-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #b89a1f, #fad02c);
+        transition: width 480ms ease;
+      }
+
+      /* Conversion overlay */
+      .conv-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(5, 5, 5, 0.72);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: conv-fade-in 420ms ease;
+      }
+      @keyframes conv-fade-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+      }
+      .conv-card {
+        max-width: 540px;
+        width: calc(100% - 48px);
+        background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+        border: 1px solid var(--hairline-strong);
+        border-radius: 6px;
+        padding: 28px 30px;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
+      }
     </style>
   </head>
 
@@ -429,13 +496,43 @@
         manifest: null,
         intent: null,
         sessionId: null,
-        memory: { events: [], lastIntent: null, bookings: [] },
+        // Orchestration runtime — not persisted (engines are reconstructed per session).
+        orchestration: {
+          currentModel: null,
+          currentVector: null,
+          progress: 0, // 0..100 — feeds threshold meter / [ALERT] hooks
+          handoffShown: false,
+          webllm: { engaged: false, engine: null, modelId: null, loading: false },
+        },
+        memory: {
+          events: [],
+          lastIntent: null,
+          bookings: [],
+          // Persisted dialogue state (so VECTOR_C interview survives refresh).
+          dialogue: { vector: null, history: [], recruitment: { answers: [], step: 0, completed: false } },
+        },
       };
 
       function loadMemory() {
         try {
           const raw = localStorage.getItem(STORE_KEY);
-          if (raw) State.memory = { ...State.memory, ...JSON.parse(raw) };
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            // Shallow merge top-level, then re-hydrate nested dialogue block defensively
+            // so older persisted shapes (without dialogue) don't break orchestration.
+            State.memory = { ...State.memory, ...parsed };
+            const d = State.memory.dialogue || {};
+            const r = d.recruitment || {};
+            State.memory.dialogue = {
+              vector: d.vector || null,
+              history: Array.isArray(d.history) ? d.history : [],
+              recruitment: {
+                answers: Array.isArray(r.answers) ? r.answers : [],
+                step: typeof r.step === 'number' ? r.step : 0,
+                completed: !!r.completed,
+              },
+            };
+          }
         } catch (_) {
           /* deterministic ignore */
         }
@@ -467,6 +564,16 @@
       // ---------- System Log (Agentic Events) ----------
       const Log = {
         el: null,
+        levelClass(level) {
+          switch (level) {
+            case 'EXEC':   return 'text-gold';
+            case 'WARN':   return 'text-gold-mute';
+            case 'SWITCH': return 'log-switch';
+            case 'MEM':    return 'log-mem';
+            case 'ALERT':  return 'log-alert';
+            default:       return 'text-concrete';
+          }
+        },
         push(level, msg) {
           if (!this.el) this.el = qs('#syslog');
           const t = new Date();
@@ -477,18 +584,12 @@
             ':' +
             String(t.getUTCSeconds()).padStart(2, '0');
           const line = ce('div');
-          const lvlColor =
-            level === 'EXEC'
-              ? 'text-gold'
-              : level === 'WARN'
-              ? 'text-gold-mute'
-              : 'text-concrete';
           line.innerHTML =
             '<span class="text-concrete-mute">' +
             ts +
             '</span> ' +
             '<span class="' +
-            lvlColor +
+            this.levelClass(level) +
             '">' +
             escapeHtml(level) +
             '</span> ' +
@@ -599,6 +700,8 @@
             return morph(renderLibrary);
           case 'about':
             return morph(renderArchitectBriefing);
+          case 'dialogue':
+            return morph(renderOrchestratorModule);
           default:
             return morph(renderConcierge);
         }
@@ -651,8 +754,11 @@
           { id: 'proposal', words: ['proposal', 'grant', 'doe', 'darpa', 'nih', 'craft'] },
           { id: 'booking', words: ['booking', 'book', 'session', 'consult', 'schedule', 'meet'] },
           { id: 'modules', words: ['module', 'artifact', 'repo', 'plan', 'organoid', 'ares'] },
-          { id: 'library', words: ['library', 'book', 'read', 'doctrine', 'literacy'] },
-          { id: 'about', words: ['about', 'who', 'thesis', 'brief', 'architect'] },
+          { id: 'library', words: ['library', 'read', 'doctrine', 'literacy'] },
+          { id: 'about', words: ['about', 'who', 'thesis', 'brief'] },
+          { id: 'dialogue', words: ['dialogue', 'chat', 'talk', 'agent', 'agentic', 'develop',
+                                    'hire', 'join', 'career', 'recruit', 'team', 'orchestrat',
+                                    'specialist', 'webllm'] },
         ];
         let match = null;
         for (const a of aliases) {
@@ -946,11 +1052,523 @@
         typewriter(qs('#brief-resp', s), State.manifest.concierge_responses.about, 12);
       }
 
+      // ============================================================
+      // Module: Architect Dialogue (Model Orchestration Layer)
+      // ============================================================
+      // Architectural Hand-off: a Dispatcher (Qwen 2.5-Coder 1.5B in spec)
+      // routes user intent into one of three Specialist vectors. Each vector
+      // streams a deterministic synthesis (or, if engaged, a real WebLLM
+      // engine), tracks a conversion-threshold meter, and pivots to a human
+      // hand-off email when its "End of Logic" state is reached.
+
+      const Orchestrator = {
+        // Lookup helpers
+        vectorById(id) {
+          const o = State.manifest && State.manifest.orchestration;
+          if (!o) return null;
+          return o.vectors.find((v) => v.id === id) || null;
+        },
+
+        // Dispatcher: keyword-scored classification. Stand-in for the live
+        // Qwen 2.5-Coder router — emits the same telemetry surface so the
+        // engine can be swapped underneath without changing the UI contract.
+        route(text) {
+          const o = State.manifest.orchestration;
+          const t = text.toLowerCase();
+          let best = { id: null, score: 0 };
+          for (const v of o.vectors) {
+            let score = 0;
+            for (const k of v.keywords) {
+              if (t.includes(k)) score += k.length >= 5 ? 2 : 1;
+            }
+            if (score > best.score) best = { id: v.id, score };
+          }
+          // Default vector — if router is uncertain, prefer Agentic Development
+          // (the broadest specialist surface for unresolved technical intents).
+          return best.id || 'B';
+        },
+
+        // Setting the active specialist also fires the [SWITCH]/[MEM]
+        // telemetry pair and pulses the right-rail.
+        setVector(vectorId, opts) {
+          opts = opts || {};
+          const v = this.vectorById(vectorId);
+          if (!v) return;
+          if (State.orchestration.currentVector === v.code && !opts.force) return;
+          const router = State.manifest.orchestration.router;
+          State.orchestration.currentVector = v.code;
+          State.orchestration.currentModel = v.model;
+          State.orchestration.progress = 0;
+          State.orchestration.handoffShown = false;
+          State.memory.dialogue.vector = v.id;
+          persistMemory();
+
+          Log.push('SWITCH', '-> Intent Detected: ' + v.code +
+            '. Loading ' + v.model + ' (' + v.mode + ')...');
+          Log.push('MEM', '-> Context transferred to Specialist Engine via ' + router.name + '.');
+          pulseMemoryRail();
+          renderMemory();
+        },
+
+        // Threshold meter — surfaces the [ALERT] hooks from the spec.
+        setProgress(pct, ctx) {
+          const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+          const prev = State.orchestration.progress;
+          State.orchestration.progress = clamped;
+          const meter = qs('#arch-meter-fill');
+          if (meter) meter.style.width = clamped + '%';
+          const label = qs('#arch-meter-label');
+          if (label) label.textContent = clamped + '%';
+          // Cross the 85% line exactly once per vector for the [ALERT] event.
+          if (prev < 85 && clamped >= 85) {
+            Log.push('ALERT', '-> Conversion Threshold: ' + clamped +
+              '% reached. Displaying Human Hand-off...' +
+              (ctx ? ' [' + ctx + ']' : ''));
+          }
+        },
+      };
+
+      // ----- Deterministic specialist runners -----
+      // Each runner streams in-voice text into the chat thread and returns
+      // when its synthesis is complete. If WebLLM is engaged AND a vector's
+      // engine is ready, we route to the live model instead.
+
+      function specialistRunA(vector, userText, threadEl) {
+        // VECTOR_A — The Strategist. Structural deconstruction + signed hash.
+        Orchestrator.setProgress(25, 'parse');
+        const id = signedHash('grant', userText);
+        const lines = [
+          '↳ DECONSTRUCTING SOLICITATION (' + userText.length + ' chars)',
+          '↳ MAPPING OUTCOME ONTO PROGRAM AXES',
+          '↳ STRESS-TESTING NARRATIVE FOR ADVERSARIAL REVIEW',
+          '↳ STRUCTURAL SYNTHESIS COMPLETE · REF ' + id,
+        ];
+        return streamSpecialistLines(threadEl, vector, lines, [25, 50, 75, 100]);
+      }
+
+      function specialistRunB(vector, userText, threadEl) {
+        // VECTOR_B — The Senior Architect. Plan-Examiner-aware homebrew guide.
+        const t = userText.toLowerCase();
+        let block;
+        if (t.includes('parse') || t.includes('document') || t.includes('manifest')) {
+          block = [
+            '↳ HOMEBREW GUIDE · CLIENT-SIDE DOCUMENT PARSING',
+            '· Treat the manifest as the ground truth — render UI from it; never the inverse.',
+            '· For unstructured inputs: tokenize → segment → project onto a deterministic schema.',
+            '· Persist intermediate state in IndexedDB or LocalStorage; keep the network out of the loop.',
+          ];
+        } else if (t.includes('wasm') || t.includes('webgpu') || t.includes('webllm') || t.includes('inference')) {
+          block = [
+            '↳ HOMEBREW GUIDE · WASM-BASED INFERENCE',
+            '· WebGPU + WebLLM gives you 1.5B–8B-class reasoning entirely on-device.',
+            '· Engage Qwen-class routers ahead of heavyweight specialists — keep the dispatcher cheap.',
+            '· Cache weights via the browser HTTP cache; first-load is the cost, every subsequent load is free.',
+          ];
+        } else {
+          block = [
+            '↳ HOMEBREW GUIDE · AGENTIC WORKFLOW PATTERN',
+            '· Decompose: Router → Specialist → Verifier — three roles, three separate model passes.',
+            '· Bound the agent by a manifest of allowed actions; emergent agency lives inside that frame.',
+            '· Surface every model swap in a System Log — observability is not optional in agentic work.',
+          ];
+        }
+        const cur = State.orchestration.progress || 20;
+        const next = Math.min(80, cur + 20);
+        return streamSpecialistLines(threadEl, vector, block, [cur + 5, next - 5, next, next + 5]);
+      }
+
+      function specialistRunC(vector, userText, threadEl) {
+        // VECTOR_C — The Talent Liaison. Records the user's latest answer,
+        // then either asks the next interview question or signals completion.
+        const r = State.memory.dialogue.recruitment;
+        if (!r.completed && r.step < vector.questions.length) {
+          // Record the answer to the current question.
+          const q = vector.questions[r.step];
+          r.answers.push({ id: q.id, label: q.label, answer: userText });
+          r.step += 1;
+          if (r.step >= vector.questions.length) r.completed = true;
+          persistMemory();
+        }
+        const total = vector.questions.length;
+        const pct = Math.round((r.step / total) * 100);
+        Orchestrator.setProgress(pct, 'interview ' + r.step + '/' + total);
+
+        if (r.completed) {
+          const lines = [
+            '↳ INTAKE CAPTURED · ' + total + '/' + total + ' RESPONSES RECORDED',
+            '↳ PROVENANCE LOCKED · SIGNED-HASH ' + signedHash('intake', JSON.stringify(r.answers)),
+            '↳ INITIATING TEAM HANDOFF',
+          ];
+          return streamSpecialistLines(threadEl, vector, lines, [pct, pct, 100]);
+        }
+        const next = vector.questions[r.step];
+        const lines = [
+          'QUESTION ' + (r.step + 1) + ' / ' + total + ' · ' + next.label,
+          next.prompt,
+        ];
+        return streamSpecialistLines(threadEl, vector, lines, [pct, pct]);
+      }
+
+      // Streams text lines into a specialist bubble — the deterministic
+      // analogue of a token-by-token LLM stream. Returns a Promise that
+      // resolves when the bubble has finished rendering.
+      function streamSpecialistLines(threadEl, vector, lines, progressSteps) {
+        const bubble = ce('div', 'arch-msg-spec rounded p-4 mt-3');
+        bubble.innerHTML =
+          '<div class="mono text-[9px] tracking-[0.22em] text-gold-mute">' +
+          escapeHtml(vector.model) + ' · ' + escapeHtml(vector.role.toUpperCase()) +
+          '</div>' +
+          '<div class="mt-2 text-[12.5px] leading-relaxed text-concrete font-mono"></div>';
+        threadEl.appendChild(bubble);
+        threadEl.scrollTop = threadEl.scrollHeight;
+        const target = bubble.querySelector('div:nth-child(2)');
+        return new Promise((resolve) => {
+          let i = 0;
+          const next = () => {
+            if (i >= lines.length) return resolve();
+            if (progressSteps && typeof progressSteps[i] === 'number') {
+              Orchestrator.setProgress(progressSteps[i], vector.code);
+            }
+            const ln = ce('div');
+            ln.textContent = lines[i++];
+            target.appendChild(ln);
+            threadEl.scrollTop = threadEl.scrollHeight;
+            setTimeout(next, 360);
+          };
+          next();
+        });
+      }
+
+      // Real WebLLM streaming — used only when the user has explicitly
+      // engaged the engine. Falls back gracefully on any error.
+      async function specialistRunWebLLM(vector, userText, threadEl) {
+        const eng = State.orchestration.webllm.engine;
+        if (!eng) return null;
+        const bubble = ce('div', 'arch-msg-spec rounded p-4 mt-3');
+        bubble.innerHTML =
+          '<div class="mono text-[9px] tracking-[0.22em] text-gold-mute">' +
+          escapeHtml(vector.model) + ' · ' + escapeHtml(vector.role.toUpperCase()) +
+          ' · LIVE' +
+          '</div>' +
+          '<div class="mt-2 text-[12.5px] leading-relaxed text-concrete"></div>';
+        threadEl.appendChild(bubble);
+        const target = bubble.querySelector('div:nth-child(2)');
+        try {
+          Orchestrator.setProgress(40, 'webllm');
+          const sys = 'You are ' + vector.role + ' for DaScient (' + vector.label +
+            '). Respond with deterministic, high-signal, in-voice prose. ' +
+            'Be concise. No preamble. Use mono-style step markers (↳) where appropriate.';
+          const messages = [{ role: 'system', content: sys }, { role: 'user', content: userText }];
+          const stream = await eng.chat.completions.create({ messages, stream: true });
+          let acc = '';
+          for await (const chunk of stream) {
+            const delta = (chunk.choices && chunk.choices[0] && chunk.choices[0].delta &&
+                           chunk.choices[0].delta.content) || '';
+            if (!delta) continue;
+            acc += delta;
+            target.textContent = acc;
+            threadEl.scrollTop = threadEl.scrollHeight;
+          }
+          Orchestrator.setProgress(95, 'webllm');
+          return acc;
+        } catch (e) {
+          Log.push('WARN', 'WebLLM stream failed — falling back to deterministic');
+          bubble.remove();
+          return null;
+        }
+      }
+
+      // Threshold evaluator — vector-specific "End of Logic" check.
+      function evaluateThreshold(vector, userText) {
+        const th = vector.threshold || {};
+        if (th.type === 'synthesis_complete') {
+          // VECTOR_A — one full structural synthesis is the conversion line.
+          return State.orchestration.progress >= 100;
+        }
+        if (th.type === 'keyword_trigger') {
+          const t = (userText || '').toLowerCase();
+          return (th.words || []).some((w) => t.includes(w));
+        }
+        if (th.type === 'interview_complete') {
+          return !!(State.memory.dialogue.recruitment.completed);
+        }
+        return false;
+      }
+
+      // The Conversion Component — overlays the chat with a vector-specific
+      // human hand-off card.
+      function triggerHandoff(vector) {
+        if (State.orchestration.handoffShown) return;
+        State.orchestration.handoffShown = true;
+        Orchestrator.setProgress(100, vector.code);
+
+        const stageEl = stage();
+        const overlay = ce('div', 'conv-overlay');
+        const ho = vector.handoff;
+        const subjectParam = encodeURIComponent(ho.subject || 'DaScient · ' + vector.label);
+        const mailto = 'mailto:' + ho.email + '?subject=' + subjectParam;
+        const ref = signedHash('handoff', vector.code + '|' + State.sessionId);
+        overlay.innerHTML =
+          '<div class="conv-card">' +
+            '<div class="mono text-[10px] tracking-[0.28em] text-gold">' +
+              'CONVERSION · ' + escapeHtml(vector.code) +
+            '</div>' +
+            '<h3 class="prose-display text-[26px] mt-3 leading-tight">' +
+              escapeHtml(ho.headline) +
+            '</h3>' +
+            '<div class="gold-rule mt-3" style="max-width: 160px"></div>' +
+            '<p class="mt-5 text-[13px] text-concrete-mute leading-relaxed">' +
+              escapeHtml(ho.message) +
+            '</p>' +
+            '<a class="mt-4 inline-flex items-center gap-3 px-4 py-3 hairline-strong border rounded ' +
+              'hover:bg-white/[0.04] transition mono text-[13px] text-gold tracking-[0.12em]" ' +
+              'href="' + mailto + '">' +
+              '<span>›</span><span>' + escapeHtml(ho.email) + '</span>' +
+            '</a>' +
+            '<div class="flex items-center justify-between mt-6">' +
+              '<div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">' +
+                'REF&nbsp;<span class="text-gold">' + escapeHtml(ref) + '</span>' +
+              '</div>' +
+              '<button id="conv-dismiss" class="mono text-[10px] tracking-[0.22em] ' +
+                'text-concrete-mute hover:text-concrete transition">[ ACKNOWLEDGE ]</button>' +
+            '</div>' +
+          '</div>';
+        stageEl.appendChild(overlay);
+        Log.push('EXEC', 'HANDOFF · ' + vector.code + ' -> ' + ho.email + ' · REF ' + ref);
+        const dismiss = qs('#conv-dismiss', overlay);
+        if (dismiss) dismiss.addEventListener('click', () => overlay.remove());
+      }
+
+      // ----- WebLLM opt-in engagement -----
+      // Loads @mlc-ai/web-llm via esm.run on demand. Honors WebGPU absence
+      // with a [WARN] event and stays in deterministic mode.
+      async function engageWebLLM(vector, btn) {
+        const w = State.orchestration.webllm;
+        if (w.loading) return;
+        if (!('gpu' in navigator)) {
+          Log.push('WARN', 'WebGPU unavailable — staying in deterministic mode');
+          if (btn) btn.textContent = '[ WEBGPU UNAVAILABLE ]';
+          return;
+        }
+        w.loading = true;
+        if (btn) btn.textContent = '[ LOADING ' + vector.model + ' ]';
+        Log.push('MEM', 'engaging WebLLM · ' + vector.engine);
+        try {
+          const mod = await import('https://esm.run/@mlc-ai/web-llm');
+          const engine = await mod.CreateMLCEngine(vector.engine, {
+            initProgressCallback: (p) => {
+              const pct = Math.round((p && typeof p.progress === 'number' ? p.progress : 0) * 100);
+              if (btn) btn.textContent = '[ LOADING · ' + pct + '% ]';
+              if (pct % 10 === 0) Log.push('MEM', vector.engine + ' · ' + pct + '%');
+            },
+          });
+          w.engine = engine;
+          w.engaged = true;
+          w.modelId = vector.engine;
+          if (btn) btn.textContent = '[ WEBLLM ENGAGED ]';
+          Log.push('SWITCH', '-> Live engine ready: ' + vector.model);
+        } catch (e) {
+          Log.push('WARN', 'WebLLM engagement failed — deterministic only');
+          if (btn) btn.textContent = '[ WEBLLM UNAVAILABLE ]';
+        } finally {
+          w.loading = false;
+        }
+      }
+
+      // ----- Dialogue renderer -----
+      function renderOrchestratorModule(s) {
+        const orch = State.manifest.orchestration;
+        s.innerHTML =
+          '<div class="flex items-start justify-between gap-4">' +
+          '  <div>' +
+          '    <div class="mono text-[10px] tracking-[0.28em] text-gold">EXEC :: ARCHITECT_DIALOGUE</div>' +
+          '    <h2 class="prose-display text-[30px] md:text-[36px] mt-3 leading-tight">Architect Dialogue</h2>' +
+          '    <div class="gold-rule mt-3" style="max-width: 200px"></div>' +
+          '  </div>' +
+          '  <button id="arch-engage" class="mono text-[10px] tracking-[0.22em] text-concrete-mute ' +
+          '    hover:text-gold transition hairline border rounded px-3 py-2">' +
+          '    [ ENGAGE WEBLLM ]' +
+          '  </button>' +
+          '</div>' +
+          '<p id="arch-resp" class="mt-5 text-concrete-mute text-[13px] leading-relaxed max-w-2xl"></p>' +
+          '<div class="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">' +
+          '  <div class="hairline border rounded p-3">' +
+          '    <div class="mono text-[9px] tracking-[0.22em] text-concrete-mute">DISPATCHER</div>' +
+          '    <div class="text-[12.5px] mt-1 text-concrete">' + escapeHtml(orch.router.name) + '</div>' +
+          '  </div>' +
+          '  <div class="hairline border rounded p-3">' +
+          '    <div class="mono text-[9px] tracking-[0.22em] text-concrete-mute">SPECIALIST</div>' +
+          '    <div id="arch-current" class="text-[12.5px] mt-1 text-concrete-mute">— awaiting intent —</div>' +
+          '  </div>' +
+          '  <div class="hairline border rounded p-3">' +
+          '    <div class="flex items-center justify-between">' +
+          '      <div class="mono text-[9px] tracking-[0.22em] text-concrete-mute">CONVERSION THRESHOLD</div>' +
+          '      <div id="arch-meter-label" class="mono text-[10px] text-gold">0%</div>' +
+          '    </div>' +
+          '    <div class="meter-track mt-2"><div id="arch-meter-fill" class="meter-fill" style="width: 0%"></div></div>' +
+          '  </div>' +
+          '</div>' +
+          '<div id="arch-thread" class="mt-5 flex-1 overflow-y-auto panel-scroll pr-1" ' +
+          '     style="min-height: 200px"></div>' +
+          '<form id="arch-form" class="mt-4">' +
+          '  <div class="flex items-center gap-3 px-4 py-3 hairline border rounded bg-white/[0.02]">' +
+          '    <span class="mono text-gold text-[12px]">›</span>' +
+          '    <input id="arch-input" class="cmd-input text-[13px]" autocomplete="off" ' +
+          '      placeholder="state intent — e.g. craft a DOE proposal, build an agent, join the team" />' +
+          '    <button type="submit" class="mono text-[10px] tracking-[0.22em] text-gold hover:text-concrete transition">[ DISPATCH ]</button>' +
+          '  </div>' +
+          '</form>';
+
+        typewriter(qs('#arch-resp', s), State.manifest.concierge_responses.dialogue, 10);
+
+        const thread = qs('#arch-thread', s);
+        const input = qs('#arch-input', s);
+        const form = qs('#arch-form', s);
+        const engageBtn = qs('#arch-engage', s);
+
+        // Re-hydrate persisted dialogue history (e.g. mid-interview refresh).
+        const persisted = State.memory.dialogue;
+        if (persisted && Array.isArray(persisted.history) && persisted.history.length) {
+          for (const m of persisted.history) appendMessage(thread, m.role, m.text, m.modelLabel);
+        }
+        // If a recruitment interview is in flight, restore the running vector
+        // and surface the next pending question so the user resumes mid-flow.
+        if (persisted.vector === 'C' && !persisted.recruitment.completed && persisted.recruitment.step > 0) {
+          const v = Orchestrator.vectorById('C');
+          if (v) {
+            Orchestrator.setVector('C', { force: true });
+            const total = v.questions.length;
+            const r = persisted.recruitment;
+            Orchestrator.setProgress(Math.round((r.step / total) * 100), 'interview-resume');
+            const next = v.questions[r.step];
+            const bubble = ce('div', 'arch-msg-spec rounded p-4 mt-3');
+            bubble.innerHTML =
+              '<div class="mono text-[9px] tracking-[0.22em] text-gold-mute">' +
+                escapeHtml(v.model) + ' · RESUMING · ' + escapeHtml(v.role.toUpperCase()) +
+              '</div>' +
+              '<div class="mt-2 text-[12.5px] text-concrete font-mono">' +
+                'QUESTION ' + (r.step + 1) + ' / ' + total + ' · ' + escapeHtml(next.label) +
+              '</div>' +
+              '<div class="mt-1 text-[12.5px] text-concrete font-mono">' +
+                escapeHtml(next.prompt) +
+              '</div>';
+            thread.appendChild(bubble);
+          }
+        }
+        renderCurrentSpecialist();
+
+        engageBtn.addEventListener('click', () => {
+          // Prefer the active vector; otherwise, default to the router.
+          const v = State.orchestration.currentVector
+            ? Orchestrator.vectorById(State.orchestration.currentVector.replace('VECTOR_', ''))
+            : Orchestrator.vectorById('B');
+          engageWebLLM(v, engageBtn);
+        });
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const text = input.value.trim();
+          if (!text) return;
+          input.value = '';
+          await dispatchUserTurn(text, thread);
+        });
+      }
+
+      function renderCurrentSpecialist() {
+        const el = qs('#arch-current');
+        if (!el) return;
+        const o = State.orchestration;
+        if (!o.currentModel) {
+          el.textContent = '— awaiting intent —';
+          el.className = 'text-[12.5px] mt-1 text-concrete-mute';
+        } else {
+          el.innerHTML = escapeHtml(o.currentModel) +
+            '<span class="text-concrete-mute"> · ' + escapeHtml(o.currentVector) + '</span>';
+          el.className = 'text-[12.5px] mt-1 text-gold';
+        }
+      }
+
+      function appendMessage(threadEl, role, text, modelLabel) {
+        const bubble = ce('div',
+          (role === 'user' ? 'arch-msg-user' : 'arch-msg-spec') + ' rounded p-4 mt-3');
+        const headerLabel = role === 'user'
+          ? 'OPERATOR'
+          : (modelLabel || 'SPECIALIST');
+        bubble.innerHTML =
+          '<div class="mono text-[9px] tracking-[0.22em] ' +
+            (role === 'user' ? 'text-gold' : 'text-gold-mute') + '">' +
+            escapeHtml(headerLabel) +
+          '</div>' +
+          '<div class="mt-2 text-[12.5px] leading-relaxed text-concrete ' +
+            (role === 'user' ? '' : 'font-mono') + '"></div>';
+        bubble.querySelector('div:nth-child(2)').textContent = text;
+        threadEl.appendChild(bubble);
+        threadEl.scrollTop = threadEl.scrollHeight;
+      }
+
+      async function dispatchUserTurn(text, threadEl) {
+        // Persist user turn first.
+        State.memory.dialogue.history.push({ role: 'user', text });
+        if (State.memory.dialogue.history.length > 40) {
+          State.memory.dialogue.history = State.memory.dialogue.history.slice(-40);
+        }
+        persistMemory();
+        appendMessage(threadEl, 'user', text);
+
+        // Dispatcher routing — re-route on every turn so a thread can pivot
+        // from VECTOR_B to VECTOR_C mid-conversation.
+        const vectorId = Orchestrator.route(text);
+        const vector = Orchestrator.vectorById(vectorId);
+        Orchestrator.setVector(vectorId);
+        renderCurrentSpecialist();
+
+        // Threshold pre-check for VECTOR_B keyword triggers — must run BEFORE
+        // streaming so the [ALERT] precedes the hand-off in the log.
+        const earlyTrigger =
+          vector.threshold &&
+          vector.threshold.type === 'keyword_trigger' &&
+          evaluateThreshold(vector, text);
+
+        // Run the specialist — live engine if engaged, deterministic otherwise.
+        let liveOutput = null;
+        if (State.orchestration.webllm.engaged && State.orchestration.webllm.engine) {
+          liveOutput = await specialistRunWebLLM(vector, text, threadEl);
+        }
+        if (liveOutput == null) {
+          if (vector.id === 'A') await specialistRunA(vector, text, threadEl);
+          else if (vector.id === 'B') await specialistRunB(vector, text, threadEl);
+          else await specialistRunC(vector, text, threadEl);
+        }
+
+        // Persist specialist turn (record-only; bubble was already streamed).
+        State.memory.dialogue.history.push({
+          role: 'specialist',
+          text: '[' + vector.code + ' synthesis]',
+          modelLabel: vector.model + ' · ' + vector.role.toUpperCase(),
+        });
+        persistMemory();
+
+        // Threshold post-evaluation + Conversion Component trigger.
+        if (earlyTrigger || evaluateThreshold(vector, text)) {
+          Orchestrator.setProgress(100, vector.code);
+          setTimeout(() => triggerHandoff(vector), 320);
+        }
+      }
+
       // ---------- Memory pane ----------
       function renderMemory() {
         const m = qs('#memory');
         const last = State.memory.lastIntent || '—';
         const bookings = State.memory.bookings.length;
+        const o = State.orchestration;
+        const modelLine = o.currentModel
+          ? '<div class="mt-1">SPECIALIST&nbsp;&nbsp;<span class="text-gold">' +
+            escapeHtml(o.currentModel) +
+            '</span></div>' +
+            '<div class="mt-1">VECTOR&nbsp;&nbsp;<span class="text-concrete-mute">' +
+            escapeHtml(o.currentVector || '—') +
+            '</span></div>'
+          : '';
         m.innerHTML =
           '<div>SESSION&nbsp;&nbsp;<span class="text-gold">' +
           escapeHtml(State.sessionId) +
@@ -960,8 +1578,20 @@
           '</span></div>' +
           '<div class="mt-1">SESSIONS LOCKED&nbsp;&nbsp;<span class="text-concrete-mute">' +
           bookings +
-          '</span></div>';
+          '</span></div>' +
+          modelLine;
         qs('#hud-session').textContent = State.sessionId;
+      }
+
+      // Pulse the right-rail container — fired on specialist swap to surface
+      // the model transition under the "Break-the-Fourth-Wall" aesthetic.
+      function pulseMemoryRail() {
+        const rail = qs('#memory') && qs('#memory').closest('aside');
+        if (!rail) return;
+        rail.classList.remove('rail-pulse');
+        // force reflow so the animation can replay on subsequent switches
+        void rail.offsetWidth;
+        rail.classList.add('rail-pulse');
       }
 
       // ---------- Bio-Digital Link: silent neural pathways ----------
@@ -1107,6 +1737,7 @@
           { id: 'modules',  label: 'Artifact Carousel', command: 'EXEC :: ARTIFACT_LOAD', synopsis: '' },
           { id: 'library',  label: 'Literacy Space',    command: 'EXEC :: LIBRARY_OPEN',  synopsis: '' },
           { id: 'about',    label: 'Architect Briefing', command: 'EXEC :: BRIEF_ARCHITECT', synopsis: '' },
+          { id: 'dialogue', label: 'Architect Dialogue', command: 'EXEC :: ARCHITECT_DIALOGUE', synopsis: '' },
         ],
         artifacts: [
           { id: 'plan-examiner', name: 'Plan-Examiner', class: 'Client-side Logic Engine',
@@ -1135,7 +1766,81 @@
           modules:  'Loading artifact manifests. Each module is a live referent of an operational repository.',
           library:  'Surfacing the published doctrine. These are not books — they are the language of the architecture.',
           about:    'DaScient engineers resilience at the seam where biological computing meets agentic systems.',
+          dialogue: 'Architect Dialogue online. State your intent — the dispatcher will route to a specialist and surface the human hand-off when autonomous synthesis reaches its limit.',
           default:  'Intent unresolved. Re-state your evolution vector or select an executable module.',
+        },
+        orchestration: {
+          router: {
+            name: 'Qwen 2.5-Coder 1.5B',
+            engine: 'Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC',
+            role: 'Dispatcher',
+            synopsis: 'Lightweight classifier — projects user intent onto VECTOR_A / VECTOR_B / VECTOR_C.',
+          },
+          vectors: [
+            {
+              id: 'A', code: 'VECTOR_A', label: 'Grant Intelligence',
+              model: 'DeepSeek-R1-Distill-Llama-8B',
+              engine: 'DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC',
+              role: 'The Strategist', mode: 'Reasoning Mode',
+              synopsis: 'Deconstructs solicitation texts and projects outcomes onto program axes.',
+              keywords: ['grant','proposal','doe','darpa','nih','nsf','arpa-h',
+                         'foa','baa','rfp','solicitation','funding','award','submission'],
+              threshold: { type: 'synthesis_complete', max_progress: 100 },
+              handoff: {
+                email: 'grants@dascient.com',
+                subject: 'Proposal Finalization · DaScient Grant Intelligence',
+                headline: 'Autonomous Synthesis Limit Reached',
+                message: 'You have reached the limits of autonomous synthesis. To finalize, verify, and submit this proposal to private, local, or federal pools, please contact:',
+              },
+            },
+            {
+              id: 'B', code: 'VECTOR_B', label: 'Agentic AI Development',
+              model: 'DeepSeek-R1-Distill-Llama-8B',
+              engine: 'DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC',
+              role: 'The Senior Architect', mode: 'Reasoning Mode',
+              synopsis: 'Plan-Examiner-aware homebrew guidance: client-side parsing, WASM inference, agentic workflows.',
+              keywords: ['agent','agentic','build','develop','developer',
+                         'plan-examiner','wasm','webgpu','webllm','homebrew',
+                         'code','engineer','architecture','client-side','rag','llm'],
+              threshold: {
+                type: 'keyword_trigger',
+                words: ['implement','implementation','specifics','specific',
+                        'scale','scaling','production','deploy','deployment',
+                        'enterprise','operational'],
+              },
+              handoff: {
+                email: 'agentic@dascient.com',
+                subject: 'Plan-Examiner API · Operational Engagement',
+                headline: 'Homebrew Ceiling Detected',
+                message: 'To access the full Plan-Examiner API suite and transition from homebrew to military-grade operational capability, contact our development team:',
+              },
+            },
+            {
+              id: 'C', code: 'VECTOR_C', label: 'Recruitment & Evolution',
+              model: 'SmolLM3-3B',
+              engine: 'SmolLM2-1.7B-Instruct-q4f16_1-MLC',
+              role: 'The Talent Liaison', mode: 'Interview Mode',
+              synopsis: 'Conducts a 3-question intake instead of answering. Captures specialization, philosophy, provenance.',
+              keywords: ['join','hire','career','careers','recruit','recruiting',
+                         'work','apply','team','employ','employment','portfolio',
+                         'position','role','opening','opportunity'],
+              questions: [
+                { id: 'specialization', label: 'TECHNICAL SPECIALIZATION',
+                  prompt: 'State your primary technical specialization — and indicate where on the bio↔silicon axis your craft sits.' },
+                { id: 'philosophy', label: 'PHILOSOPHY · AGENTIC AUTONOMY',
+                  prompt: 'State your operating philosophy on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?' },
+                { id: 'provenance', label: 'PROVENANCE',
+                  prompt: 'Provide provenance — a portfolio, GitHub, or canonical artifact. One link is sufficient. The work speaks.' },
+              ],
+              threshold: { type: 'interview_complete', count: 3 },
+              handoff: {
+                email: 'join@dascient.com',
+                subject: 'DaScient · Talent Intake Follow-up',
+                headline: 'Intake Captured',
+                message: 'Data captured. Initiating follow-up with DaScient team members. For immediate manual submission:',
+              },
+            },
+          ],
         },
       };
 
