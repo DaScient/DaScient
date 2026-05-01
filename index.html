@@ -492,6 +492,17 @@
 
       // ---------- State ----------
       const STORE_KEY = 'dascient.session.v1';
+      // Build-time injected OpenAI API key. The literal token below is
+      // replaced by Vite's `transformIndexHtml` hook (see vite.config.js)
+      // with the value of the OPENAI_API_KEY environment variable at build
+      // time. When the env var is unset the placeholder becomes an empty
+      // string and the OpenAI fallback stays disabled.
+      //
+      // SECURITY CAVEAT: this value ships in the public static bundle and is
+      // readable by anyone who loads the deployed site. Only use a key that
+      // is origin-restricted and rate-limited at the OpenAI dashboard.
+      const OPENAI_API_KEY = '__OPENAI_API_KEY__';
+      const OPENAI_MODEL = 'gpt-4o-mini';
       const State = {
         manifest: null,
         intent: null,
@@ -1277,6 +1288,76 @@
         }
       }
 
+      // OpenAI streaming fallback — used when WebLLM is not engaged and a
+      // build-time OpenAI key has been injected. Streams via the chat
+      // completions SSE endpoint and renders into a specialist bubble in the
+      // same shape as specialistRunWebLLM. Returns the accumulated text on
+      // success or null on any failure (so the caller can fall through to
+      // the deterministic synthesis).
+      async function specialistRunOpenAI(vector, userText, threadEl) {
+        if (!OPENAI_API_KEY) return null;
+        const bubble = ce('div', 'arch-msg-spec rounded p-4 mt-3');
+        bubble.innerHTML =
+          '<div class="mono text-[9px] tracking-[0.22em] text-gold-mute">' +
+          escapeHtml(vector.model) + ' · ' + escapeHtml(vector.role.toUpperCase()) +
+          ' · LIVE · OPENAI' +
+          '</div>' +
+          '<div class="mt-2 text-[12.5px] leading-relaxed text-concrete"></div>';
+        threadEl.appendChild(bubble);
+        const target = bubble.querySelector('div:nth-child(2)');
+        try {
+          Orchestrator.setProgress(40, 'openai');
+          const sys = 'You are ' + vector.role + ' for DaScient (' + vector.label +
+            '). Respond with deterministic, high-signal, in-voice prose. ' +
+            'Be concise. No preamble. Use mono-style step markers (↳) where appropriate.';
+          const messages = [{ role: 'system', content: sys }, { role: 'user', content: userText }];
+          const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + OPENAI_API_KEY,
+            },
+            body: JSON.stringify({ model: OPENAI_MODEL, messages, stream: true }),
+          });
+          if (!resp.ok || !resp.body) {
+            throw new Error('openai http ' + resp.status);
+          }
+          const reader = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let buf = '';
+          let acc = '';
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            // SSE: events delimited by blank lines, each line "data: ...".
+            let idx;
+            while ((idx = buf.indexOf('\n')) >= 0) {
+              const line = buf.slice(0, idx).trim();
+              buf = buf.slice(idx + 1);
+              if (!line.startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') { buf = ''; break; }
+              try {
+                const json = JSON.parse(payload);
+                const delta = json?.choices?.[0]?.delta?.content || '';
+                if (delta) {
+                  acc += delta;
+                  target.textContent = acc;
+                  threadEl.scrollTop = threadEl.scrollHeight;
+                }
+              } catch (_) { /* tolerate partials */ }
+            }
+          }
+          Orchestrator.setProgress(95, 'openai');
+          return acc || null;
+        } catch (e) {
+          Log.push('WARN', 'OpenAI stream failed — falling back to deterministic');
+          bubble.remove();
+          return null;
+        }
+      }
+
       // Threshold evaluator — vector-specific "End of Logic" check.
       function evaluateThreshold(vector, userText) {
         const th = vector.threshold || {};
@@ -1529,9 +1610,15 @@
           evaluateThreshold(vector, text);
 
         // Run the specialist — live engine if engaged, deterministic otherwise.
+        // Order: explicitly-engaged WebLLM > build-time OpenAI fallback >
+        // deterministic synthesis. Each tier returns null on failure so the
+        // next tier picks up cleanly.
         let liveOutput = null;
         if (State.orchestration.webllm.engaged && State.orchestration.webllm.engine) {
           liveOutput = await specialistRunWebLLM(vector, text, threadEl);
+        }
+        if (liveOutput == null && OPENAI_API_KEY) {
+          liveOutput = await specialistRunOpenAI(vector, text, threadEl);
         }
         if (liveOutput == null) {
           if (vector.id === 'A') await specialistRunA(vector, text, threadEl);
