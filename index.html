@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="DaScient — Single-Pane Glass. Deterministic intelligence at the seam of biological computing and agentic resilience."
+      content="DaScient — Single-Pane Glass. A focused interface for biological computing and agentic systems work."
     />
     <title>DaScient // Single-Pane Glass</title>
 
@@ -287,9 +287,97 @@
         pointer-events: none;
       }
 
+      /* Default (desktop) HUD grid template */
+      .hud-grid {
+        grid-template-columns: 240px 1fr 280px;
+        grid-template-rows: 56px 1fr 44px;
+      }
+
       /* Viewport guard for tiny screens — let it scroll instead of crushing */
       @media (max-height: 640px), (max-width: 720px) {
         html, body { overflow: auto; }
+      }
+
+      /* ---------- Low-end mobile / narrow viewport optimizations ---------- */
+      @media (max-width: 768px) {
+        /* Stack the HUD vertically. Center workspace appears first; rails follow. */
+        .hud-grid {
+          grid-template-columns: 1fr !important;
+          grid-template-rows: auto !important;
+          height: auto !important;
+        }
+        .hud-grid > * {
+          grid-row: auto !important;
+          grid-column: auto !important;
+        }
+        /* Order: top bar → workspace → intents → log → footer */
+        .hud-grid > header { order: 0; min-height: 48px; padding-left: 14px; padding-right: 14px; }
+        .hud-grid > main   { order: 1; min-height: 60vh; }
+        .hud-grid > aside:nth-of-type(1) { order: 2; }
+        .hud-grid > aside:nth-of-type(2) { order: 3; }
+        .hud-grid > footer { order: 4; min-height: 40px; padding-left: 14px; padding-right: 14px; flex-wrap: wrap; gap: 6px; }
+
+        /* Tighten typography & paddings on small screens */
+        .hud-grid > main #stage { padding: 18px !important; }
+        .hud-grid > aside { padding: 12px; }
+        .prose-display { letter-spacing: 0; }
+        .mono { letter-spacing: 0.04em; }
+
+        /* The inline neural background is decorative; keep it but make it cheaper */
+        #neural { opacity: 0.55; }
+
+        /* Backdrop-filter blur is GPU-expensive on low-end phones — soften it
+           and back it with a more opaque surface so contrast still reads. */
+        .glass {
+          backdrop-filter: blur(6px) saturate(110%);
+          -webkit-backdrop-filter: blur(6px) saturate(110%);
+          background: linear-gradient(
+            135deg,
+            rgba(20, 20, 24, 0.55) 0%,
+            rgba(10, 10, 12, 0.55) 100%
+          );
+        }
+
+        /* The radial vignette adds another full-viewport composited layer for
+           little visual benefit at this size — drop it on small screens. */
+        .vignette::before { display: none; }
+
+        /* Shorten the stage morph so module swaps don't feel laggy on slow GPUs */
+        .stage { transition-duration: 220ms; }
+        .stage.hiding { filter: blur(6px); }
+
+        /* Hide the ambient pulse animation outline (cheap but redundant on mobile) */
+        .pulse-dot { animation: none; box-shadow: none; }
+
+        /* Make tap targets at least ~36px tall */
+        button, .cmd-input { min-height: 36px; }
+
+        /* Ensure inputs render at >=16px so iOS doesn't auto-zoom on focus */
+        .cmd-input { font-size: 16px; }
+        textarea.cmd-input { font-size: 14px; min-height: 96px; }
+
+        /* Right-rail panels can grow naturally rather than fighting for height */
+        #syslog, #arch-thread { max-height: 240px; }
+
+        /* Hide some non-essential chrome to reduce visual noise */
+        #hud-clock, #hud-session, #hud-intent { display: none; }
+        header .pulse-dot + .mono + .mono { display: none; } /* "· SINGLE-PANE GLASS · v1.0" */
+        footer .mono { display: none; } /* "BIO-DIGITAL · AGENTIC · DETERMINISTIC" */
+
+        /* Library shelf was a wide 3D row — wrap and flatten for narrow screens */
+        #lib-shelf { gap: 28px; perspective: none; }
+        .book { transform: none; width: 96px; height: 140px; }
+        .book:hover { transform: none; }
+      }
+
+      /* Honor user preference for reduced motion: no animations, no canvas drift */
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+        }
+        #neural { display: none; }
       }
 
       /* ---------- Orchestration Layer surfaces ---------- */
@@ -381,10 +469,7 @@
 
     <!-- HUD -->
     <div class="relative z-10 h-screen w-screen p-4 md:p-5">
-      <div
-        class="grid h-full w-full gap-3 md:gap-4"
-        style="grid-template-columns: 240px 1fr 280px; grid-template-rows: 56px 1fr 44px"
-      >
+      <div class="hud-grid grid h-full w-full gap-3 md:gap-4">
         <!-- Top bar (spans all columns) -->
         <header
           class="glass col-span-3 flex items-center justify-between px-5 rounded"
@@ -459,7 +544,7 @@
           style="grid-row: 3"
         >
           <div class="prose-display italic text-[15px] text-concrete">
-            We don't build software; we engineer resilience.
+            We engineer resilient systems.
           </div>
           <div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">
             BIO-DIGITAL · AGENTIC · DETERMINISTIC
@@ -732,9 +817,8 @@
         const sub = qs('#concierge-sub', wrap);
         typewriter(heading, State.manifest.system.concierge_prompt, 22).then(() => {
           sub.textContent =
-            'I am the Architect — not a chatbot. Responses are brief, ' +
-            'high-level, deterministic. Select a module from the left rail or ' +
-            'type an intent below.';
+            'Responses are brief and high-level. Select a module from the ' +
+            'left rail or type an intent below.';
         });
 
         const form = qs('#concierge-form', wrap);
@@ -1045,9 +1129,9 @@
           '<div class="gold-rule mt-3" style="max-width: 200px"></div>' +
           '<p id="brief-resp" class="mt-6 text-concrete text-[15px] leading-relaxed max-w-2xl prose-display"></p>' +
           '<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl">' +
-          '  <div class="hairline border rounded p-4"><div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">DOCTRINE</div><div class="text-[14px] mt-2">Deterministic Elegance</div></div>' +
+          '  <div class="hairline border rounded p-4"><div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">DOCTRINE</div><div class="text-[14px] mt-2">Deterministic Design</div></div>' +
           '  <div class="hairline border rounded p-4"><div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">SUBSTRATE</div><div class="text-[14px] mt-2">Bio-Digital · Agentic</div></div>' +
-          '  <div class="hairline border rounded p-4"><div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">PROMISE</div><div class="text-[14px] mt-2">Engineered Resilience</div></div>' +
+          '  <div class="hairline border rounded p-4"><div class="mono text-[10px] tracking-[0.22em] text-concrete-mute">FOCUS</div><div class="text-[14px] mt-2">Resilient Systems</div></div>' +
           '</div>';
         typewriter(qs('#brief-resp', s), State.manifest.concierge_responses.about, 12);
       }
@@ -1596,12 +1680,27 @@
       // ---------- Bio-Digital Link: silent neural pathways ----------
       (function neural() {
         const svg = qs('#neural');
+        const reduced =
+          window.matchMedia &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) return; // honor user preference, leave the pane blank
+
         const NS = 'http://www.w3.org/2000/svg';
-        const N = 26;
-        const nodes = [];
         const w = window.innerWidth;
         const h = window.innerHeight;
 
+        // Scale fidelity to viewport size: low-end / narrow viewports get a
+        // sparser graph, longer connection threshold floor, and no cursor
+        // attraction — keeps the fan quiet on phones.
+        const small = w < 768;
+        const coarse =
+          window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        const N = small ? 12 : 26;
+        const linkRadius = small ? 160 : 220;
+        const targetFps = small ? 30 : 60;
+        const frameInterval = 1000 / targetFps;
+
+        const nodes = [];
         for (let i = 0; i < N; i++) {
           const c = document.createElementNS(NS, 'circle');
           const x = Math.random() * w;
@@ -1629,7 +1728,7 @@
             const dx = nodes[i].x - nodes[j].x;
             const dy = nodes[i].y - nodes[j].y;
             const d = Math.hypot(dx, dy);
-            if (d < 220) {
+            if (d < linkRadius) {
               const ln = document.createElementNS(NS, 'line');
               ln.setAttribute('stroke', 'rgba(224,224,224,0.06)');
               ln.setAttribute('stroke-width', '0.5');
@@ -1641,16 +1740,45 @@
 
         let mx = w / 2;
         let my = h / 2;
-        window.addEventListener('mousemove', (e) => {
-          mx = e.clientX;
-          my = e.clientY;
-        });
+        // Cursor attraction is only useful with a fine pointer; touch devices
+        // never fire mousemove anyway, so don't bother registering it.
+        if (!coarse) {
+          window.addEventListener(
+            'mousemove',
+            (e) => {
+              mx = e.clientX;
+              my = e.clientY;
+            },
+            { passive: true }
+          );
+        }
         window.addEventListener('resize', () => {
-          svg.setAttribute('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight);
+          svg.setAttribute(
+            'viewBox',
+            '0 0 ' + window.innerWidth + ' ' + window.innerHeight
+          );
         });
         svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
 
-        function frame() {
+        let last = 0;
+        let running = true;
+        // Pause animation while the tab is hidden — saves battery on mobile.
+        document.addEventListener('visibilitychange', () => {
+          running = !document.hidden;
+          if (running) {
+            last = 0;
+            requestAnimationFrame(frame);
+          }
+        });
+
+        function frame(now) {
+          if (!running) return;
+          // Throttle to targetFps on small screens
+          if (now - last < frameInterval) {
+            requestAnimationFrame(frame);
+            return;
+          }
+          last = now;
           for (const n of nodes) {
             // gentle drift
             n.x += n.vx;
@@ -1658,13 +1786,15 @@
             // bounded around origin
             if (Math.abs(n.x - n.ox) > 40) n.vx *= -1;
             if (Math.abs(n.y - n.oy) > 40) n.vy *= -1;
-            // subtle attraction toward cursor
-            const dx = mx - n.x;
-            const dy = my - n.y;
-            const d2 = dx * dx + dy * dy;
-            if (d2 < 60000) {
-              n.x += (dx / 60000) * 14;
-              n.y += (dy / 60000) * 14;
+            // subtle attraction toward cursor (skipped on coarse pointers)
+            if (!coarse) {
+              const dx = mx - n.x;
+              const dy = my - n.y;
+              const d2 = dx * dx + dy * dy;
+              if (d2 < 60000) {
+                n.x += (dx / 60000) * 14;
+                n.y += (dy / 60000) * 14;
+              }
             }
             n.el.setAttribute('cx', n.x.toFixed(2));
             n.el.setAttribute('cy', n.y.toFixed(2));
@@ -1719,15 +1849,15 @@
           name: 'DaScient',
           designation: 'Single-Pane Glass',
           version: '1.0.0',
-          tagline: "We don't build software; we engineer resilience.",
-          doctrine: 'Deterministic Elegance',
-          concierge_prompt: 'How can DaScient assist your evolution today?',
+          tagline: 'We engineer resilient systems.',
+          doctrine: 'Deterministic Design',
+          concierge_prompt: 'How can DaScient help today?',
           boot_sequence: [
-            'Initializing Single-Pane Glass...',
-            'Mounting manifest layer...',
-            'Calibrating agentic concierge...',
-            'Synchronizing bio-digital link...',
-            'Operational.',
+            'Initializing single-pane glass...',
+            'Loading manifest...',
+            'Starting concierge...',
+            'Linking bio-digital channel...',
+            'Ready.',
           ],
         },
         intents: [
@@ -1740,13 +1870,13 @@
         ],
         artifacts: [
           { id: 'plan-examiner', name: 'Plan-Examiner', class: 'Client-side Logic Engine',
-            summary: 'A manifest-driven inspector that parses structured plans and renders deterministic UI.',
+            summary: 'A manifest-driven inspector that parses structured plans and renders UI from them.',
             signal: '// parse → reflect → execute' },
           { id: 'organoid-intelligence', name: 'Organoid-Intelligence', class: 'Biological Computing',
-            summary: 'Research surface bridging cortical organoids and silicon.',
+            summary: 'Research bridging cortical organoids and silicon.',
             signal: '// neurons ⇌ tensors' },
           { id: 'ares-e', name: 'ARES-E', class: 'Agentic Resilience',
-            summary: 'Adversarially-Robust Evaluation Suite for Evolving agents.',
+            summary: 'Adversarially-Robust Evaluation Suite for evolving agents.',
             signal: '// stress → adapt → harden' },
         ],
         library: [
@@ -1760,20 +1890,20 @@
           { id: 'review',   label: 'Manifest Review',        duration: '30m' },
         ],
         concierge_responses: {
-          proposal: 'Synthesizing operational stress parameters for your DoE proposal... Grant Logic module engaged.',
-          booking:  'Opening deterministic scheduling channel. Select session class to continue.',
-          modules:  'Loading artifact manifests. Each module is a live referent of an operational repository.',
-          library:  'Surfacing the published doctrine. These are not books — they are the language of the architecture.',
-          about:    'DaScient engineers resilience at the seam where biological computing meets agentic systems.',
-          dialogue: 'Architect Dialogue online. State your intent — the dispatcher will route to a specialist and surface the human hand-off when autonomous synthesis reaches its limit.',
-          default:  'Intent unresolved. Re-state your evolution vector or select an executable module.',
+          proposal: 'Loading the Grant Logic module. Provide the program solicitation and target outcome.',
+          booking:  'Opening scheduling channel. Select a session class to continue.',
+          modules:  'Loading module manifests. Each entry references an active repository.',
+          library:  'Showing the published reference works behind the architecture.',
+          about:    'DaScient works at the intersection of biological computing and agentic systems.',
+          dialogue: 'Architect Dialogue ready. State your intent — the dispatcher routes to a specialist and surfaces a human hand-off when automated synthesis reaches its limit.',
+          default:  'Intent unresolved. Re-state your request or pick a module.',
         },
         orchestration: {
           router: {
             name: 'Qwen 2.5-Coder 1.5B',
             engine: 'Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC',
             role: 'Dispatcher',
-            synopsis: 'Lightweight classifier — projects user intent onto VECTOR_A / VECTOR_B / VECTOR_C.',
+            synopsis: 'Lightweight classifier — routes user intent to VECTOR_A / VECTOR_B / VECTOR_C.',
           },
           vectors: [
             {
@@ -1781,15 +1911,15 @@
               model: 'DeepSeek-R1-Distill-Llama-8B',
               engine: 'DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC',
               role: 'The Strategist', mode: 'Reasoning Mode',
-              synopsis: 'Deconstructs solicitation texts and projects outcomes onto program axes.',
+              synopsis: 'Deconstructs solicitation texts and maps outcomes to program axes.',
               keywords: ['grant','proposal','doe','darpa','nih','nsf','arpa-h',
                          'foa','baa','rfp','solicitation','funding','award','submission'],
               threshold: { type: 'synthesis_complete', max_progress: 100 },
               handoff: {
                 email: 'grants@dascient.com',
                 subject: 'Proposal Finalization · DaScient Grant Intelligence',
-                headline: 'Autonomous Synthesis Limit Reached',
-                message: 'You have reached the limits of autonomous synthesis. To finalize, verify, and submit this proposal to private, local, or federal pools, please contact:',
+                headline: 'Synthesis Complete',
+                message: 'Automated synthesis is complete. To finalize, verify, and submit this proposal to private, local, or federal pools, contact:',
               },
             },
             {
@@ -1797,7 +1927,7 @@
               model: 'DeepSeek-R1-Distill-Llama-8B',
               engine: 'DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC',
               role: 'The Senior Architect', mode: 'Reasoning Mode',
-              synopsis: 'Plan-Examiner-aware homebrew guidance: client-side parsing, WASM inference, agentic workflows.',
+              synopsis: 'Plan-Examiner-aware homebrew guidance for client-side parsing, WASM inference, and agentic workflows.',
               keywords: ['agent','agentic','build','develop','developer',
                          'plan-examiner','wasm','webgpu','webllm','homebrew',
                          'code','engineer','architecture','client-side','rag','llm'],
@@ -1810,8 +1940,8 @@
               handoff: {
                 email: 'agentic@dascient.com',
                 subject: 'Plan-Examiner API · Operational Engagement',
-                headline: 'Homebrew Ceiling Detected',
-                message: 'To access the full Plan-Examiner API suite and transition from homebrew to military-grade operational capability, contact our development team:',
+                headline: 'Beyond Homebrew Scope',
+                message: 'To access the full Plan-Examiner API and move from a homebrew prototype to production, contact our development team:',
               },
             },
             {
@@ -1819,24 +1949,24 @@
               model: 'SmolLM3-3B',
               engine: 'SmolLM3-3B-Instruct-q4f16_1-MLC',
               role: 'The Talent Liaison', mode: 'Interview Mode',
-              synopsis: 'Conducts a 3-question intake instead of answering. Captures specialization, philosophy, provenance.',
+              synopsis: 'Conducts a 3-question intake instead of answering. Captures specialization, philosophy, and provenance.',
               keywords: ['join','hire','career','careers','recruit','recruiting',
                          'work','apply','team','employ','employment','portfolio',
                          'position','role','opening','opportunity'],
               questions: [
                 { id: 'specialization', label: 'TECHNICAL SPECIALIZATION',
-                  prompt: 'State your primary technical specialization — and indicate where on the bio↔silicon axis your craft sits.' },
+                  prompt: 'State your primary technical specialization, and where on the bio↔silicon axis your work sits.' },
                 { id: 'philosophy', label: 'PHILOSOPHY · AGENTIC AUTONOMY',
-                  prompt: 'State your operating philosophy on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?' },
+                  prompt: 'State your view on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?' },
                 { id: 'provenance', label: 'PROVENANCE',
-                  prompt: 'Provide provenance — a portfolio, GitHub, or canonical artifact. One link is sufficient. The work speaks.' },
+                  prompt: 'Provide a portfolio, GitHub, or representative artifact. One link is enough.' },
               ],
               threshold: { type: 'interview_complete', count: 3 },
               handoff: {
                 email: 'join@dascient.com',
                 subject: 'DaScient · Talent Intake Follow-up',
                 headline: 'Intake Captured',
-                message: 'Data captured. Initiating follow-up with DaScient team members. For immediate manual submission:',
+                message: 'Intake captured. We will follow up. For immediate manual submission:',
               },
             },
           ],

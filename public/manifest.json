@@ -3,15 +3,15 @@
     "name": "DaScient",
     "designation": "Single-Pane Glass",
     "version": "1.0.0",
-    "tagline": "We don't build software; we engineer resilience.",
-    "doctrine": "Deterministic Elegance",
-    "concierge_prompt": "How can DaScient assist your evolution today?",
+    "tagline": "We engineer resilient systems.",
+    "doctrine": "Deterministic Design",
+    "concierge_prompt": "How can DaScient help today?",
     "boot_sequence": [
-      "Initializing Single-Pane Glass...",
-      "Mounting manifest layer...",
-      "Calibrating agentic concierge...",
-      "Synchronizing bio-digital link...",
-      "Operational."
+      "Initializing single-pane glass...",
+      "Loading manifest...",
+      "Starting concierge...",
+      "Linking bio-digital channel...",
+      "Ready."
     ]
   },
   "intents": [
@@ -19,31 +19,31 @@
       "id": "proposal",
       "label": "Proposal Crafting",
       "command": "EXEC :: GRANT_LOGIC",
-      "synopsis": "Synthesize operational stress parameters and structured narrative for DoE / DARPA / NIH submission."
+      "synopsis": "Synthesize stress parameters and a structured narrative for DoE / DARPA / NIH submissions."
     },
     {
       "id": "booking",
       "label": "Initiate Session",
       "command": "EXEC :: SESSION_OPEN",
-      "synopsis": "Open a deterministic scheduling channel for strategic consultation or agentic engineering."
+      "synopsis": "Open a scheduling channel for a strategic consultation or engineering session."
     },
     {
       "id": "modules",
       "label": "Artifact Carousel",
       "command": "EXEC :: ARTIFACT_LOAD",
-      "synopsis": "Inspect operational manifests of Plan-Examiner, Organoid-Intelligence, ARES-E."
+      "synopsis": "Inspect manifests for Plan-Examiner, Organoid-Intelligence, and ARES-E."
     },
     {
       "id": "library",
       "label": "Literacy Space",
       "command": "EXEC :: LIBRARY_OPEN",
-      "synopsis": "Traverse the published doctrine — the language of the architecture."
+      "synopsis": "Browse the published reference works behind the architecture."
     },
     {
       "id": "about",
       "label": "Architect Briefing",
       "command": "EXEC :: BRIEF_ARCHITECT",
-      "synopsis": "Surface the operating thesis behind DaScient."
+      "synopsis": "An overview of the thinking behind DaScient."
     },
     {
       "id": "dialogue",
@@ -57,21 +57,21 @@
       "id": "plan-examiner",
       "name": "Plan-Examiner",
       "class": "Client-side Logic Engine",
-      "summary": "A manifest-driven inspector that parses structured plans and renders deterministic UI from them — the substrate for the Single-Pane.",
+      "summary": "A manifest-driven inspector that parses structured plans and renders UI from them — the substrate for the single-pane.",
       "signal": "// parse → reflect → execute"
     },
     {
       "id": "organoid-intelligence",
       "name": "Organoid-Intelligence",
       "class": "Biological Computing",
-      "summary": "Research surface bridging cortical organoids and silicon — the wetware referent for our agentic substrate.",
+      "summary": "Research bridging cortical organoids and silicon — the wetware reference for our agentic substrate.",
       "signal": "// neurons ⇌ tensors"
     },
     {
       "id": "ares-e",
       "name": "ARES-E",
       "class": "Agentic Resilience",
-      "summary": "Adversarially-Robust Evaluation Suite for Evolving agents. The dashboard aesthetic of this Single-Pane derives from ARES-E.",
+      "summary": "Adversarially-Robust Evaluation Suite for evolving agents. The dashboard layout used here derives from ARES-E.",
       "signal": "// stress → adapt → harden"
     }
   ],
@@ -101,20 +101,20 @@
     { "id": "review", "label": "Manifest Review", "duration": "30m" }
   ],
   "concierge_responses": {
-    "proposal": "Synthesizing operational stress parameters for your DoE proposal... Grant Logic module engaged. Provide the program solicitation and target outcome.",
-    "booking": "Opening deterministic scheduling channel. Select session class to continue.",
-    "modules": "Loading artifact manifests. Each module is a live referent of an operational repository.",
-    "library": "Surfacing the published doctrine. These are not books — they are the language of the architecture.",
-    "about": "DaScient engineers resilience at the seam where biological computing meets agentic systems. Every artifact you see here is a manifestation of that thesis.",
-    "dialogue": "Architect Dialogue online. State your intent — the dispatcher will route to a specialist and surface the human hand-off when autonomous synthesis reaches its limit.",
-    "default": "Intent unresolved. Re-state your evolution vector or select an executable module."
+    "proposal": "Loading the Grant Logic module. Provide the program solicitation and target outcome.",
+    "booking": "Opening scheduling channel. Select a session class to continue.",
+    "modules": "Loading module manifests. Each entry references an active repository.",
+    "library": "Showing the published reference works behind the architecture.",
+    "about": "DaScient works at the intersection of biological computing and agentic systems.",
+    "dialogue": "Architect Dialogue ready. State your intent — the dispatcher routes to a specialist and surfaces a human hand-off when automated synthesis reaches its limit.",
+    "default": "Intent unresolved. Re-state your request or pick a module."
   },
   "orchestration": {
     "router": {
       "name": "Qwen 2.5-Coder 1.5B",
       "engine": "Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC",
       "role": "Dispatcher",
-      "synopsis": "Lightweight classifier — projects user intent onto VECTOR_A / VECTOR_B / VECTOR_C."
+      "synopsis": "Lightweight classifier — routes user intent to VECTOR_A / VECTOR_B / VECTOR_C."
     },
     "vectors": [
       {
@@ -125,7 +125,7 @@
         "engine": "DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC",
         "role": "The Strategist",
         "mode": "Reasoning Mode",
-        "synopsis": "Deconstructs solicitation texts and projects outcomes onto program axes.",
+        "synopsis": "Deconstructs solicitation texts and maps outcomes to program axes.",
         "keywords": [
           "grant", "proposal", "doe", "darpa", "nih", "nsf", "arpa-h",
           "foa", "baa", "rfp", "solicitation", "funding", "award", "submission"
@@ -134,8 +134,8 @@
         "handoff": {
           "email": "grants@dascient.com",
           "subject": "Proposal Finalization · DaScient Grant Intelligence",
-          "headline": "Autonomous Synthesis Limit Reached",
-          "message": "You have reached the limits of autonomous synthesis. To finalize, verify, and submit this proposal to private, local, or federal pools, please contact:"
+          "headline": "Synthesis Complete",
+          "message": "Automated synthesis is complete. To finalize, verify, and submit this proposal to private, local, or federal pools, contact:"
         }
       },
       {
@@ -146,7 +146,7 @@
         "engine": "DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC",
         "role": "The Senior Architect",
         "mode": "Reasoning Mode",
-        "synopsis": "Plan-Examiner-aware homebrew guidance: client-side parsing, WASM inference, agentic workflows.",
+        "synopsis": "Plan-Examiner-aware homebrew guidance for client-side parsing, WASM inference, and agentic workflows.",
         "keywords": [
           "agent", "agentic", "build", "develop", "developer",
           "plan-examiner", "wasm", "webgpu", "webllm", "homebrew",
@@ -163,8 +163,8 @@
         "handoff": {
           "email": "agentic@dascient.com",
           "subject": "Plan-Examiner API · Operational Engagement",
-          "headline": "Homebrew Ceiling Detected",
-          "message": "To access the full Plan-Examiner API suite and transition from homebrew to military-grade operational capability, contact our development team:"
+          "headline": "Beyond Homebrew Scope",
+          "message": "To access the full Plan-Examiner API and move from a homebrew prototype to production, contact our development team:"
         }
       },
       {
@@ -175,7 +175,7 @@
         "engine": "SmolLM3-3B-Instruct-q4f16_1-MLC",
         "role": "The Talent Liaison",
         "mode": "Interview Mode",
-        "synopsis": "Conducts a 3-question intake instead of answering. Captures specialization, philosophy, provenance.",
+        "synopsis": "Conducts a 3-question intake instead of answering. Captures specialization, philosophy, and provenance.",
         "keywords": [
           "join", "hire", "career", "careers", "recruit", "recruiting",
           "work", "apply", "team", "employ", "employment", "portfolio",
@@ -185,17 +185,17 @@
           {
             "id": "specialization",
             "label": "TECHNICAL SPECIALIZATION",
-            "prompt": "State your primary technical specialization — and indicate where on the bio↔silicon axis your craft sits."
+            "prompt": "State your primary technical specialization, and where on the bio↔silicon axis your work sits."
           },
           {
             "id": "philosophy",
             "label": "PHILOSOPHY · AGENTIC AUTONOMY",
-            "prompt": "State your operating philosophy on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?"
+            "prompt": "State your view on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?"
           },
           {
             "id": "provenance",
             "label": "PROVENANCE",
-            "prompt": "Provide provenance — a portfolio, GitHub, or canonical artifact. One link is sufficient. The work speaks."
+            "prompt": "Provide a portfolio, GitHub, or representative artifact. One link is enough."
           }
         ],
         "threshold": { "type": "interview_complete", "count": 3 },
@@ -203,7 +203,7 @@
           "email": "join@dascient.com",
           "subject": "DaScient · Talent Intake Follow-up",
           "headline": "Intake Captured",
-          "message": "Data captured. Initiating follow-up with DaScient team members. For immediate manual submission:"
+          "message": "Intake captured. We will follow up. For immediate manual submission:"
         }
       }
     ]
