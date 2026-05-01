@@ -172,7 +172,7 @@
         "code": "VECTOR_C",
         "label": "Recruitment & Evolution",
         "model": "SmolLM3-3B",
-        "engine": "SmolLM2-1.7B-Instruct-q4f16_1-MLC",
+        "engine": "SmolLM3-3B-Instruct-q4f16_1-MLC",
         "role": "The Talent Liaison",
         "mode": "Interview Mode",
         "synopsis": "Conducts a 3-question intake instead of answering. Captures specialization, philosophy, provenance.",
