@@ -1,0 +1,211 @@
+{
+  "system": {
+    "name": "DaScient",
+    "designation": "Single-Pane Glass",
+    "version": "1.0.0",
+    "tagline": "We don't build software; we engineer resilience.",
+    "doctrine": "Deterministic Elegance",
+    "concierge_prompt": "How can DaScient assist your evolution today?",
+    "boot_sequence": [
+      "Initializing Single-Pane Glass...",
+      "Mounting manifest layer...",
+      "Calibrating agentic concierge...",
+      "Synchronizing bio-digital link...",
+      "Operational."
+    ]
+  },
+  "intents": [
+    {
+      "id": "proposal",
+      "label": "Proposal Crafting",
+      "command": "EXEC :: GRANT_LOGIC",
+      "synopsis": "Synthesize operational stress parameters and structured narrative for DoE / DARPA / NIH submission."
+    },
+    {
+      "id": "booking",
+      "label": "Initiate Session",
+      "command": "EXEC :: SESSION_OPEN",
+      "synopsis": "Open a deterministic scheduling channel for strategic consultation or agentic engineering."
+    },
+    {
+      "id": "modules",
+      "label": "Artifact Carousel",
+      "command": "EXEC :: ARTIFACT_LOAD",
+      "synopsis": "Inspect operational manifests of Plan-Examiner, Organoid-Intelligence, ARES-E."
+    },
+    {
+      "id": "library",
+      "label": "Literacy Space",
+      "command": "EXEC :: LIBRARY_OPEN",
+      "synopsis": "Traverse the published doctrine — the language of the architecture."
+    },
+    {
+      "id": "about",
+      "label": "Architect Briefing",
+      "command": "EXEC :: BRIEF_ARCHITECT",
+      "synopsis": "Surface the operating thesis behind DaScient."
+    },
+    {
+      "id": "dialogue",
+      "label": "Architect Dialogue",
+      "command": "EXEC :: ARCHITECT_DIALOGUE",
+      "synopsis": "Open a conversational channel routed through the model orchestration layer."
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "plan-examiner",
+      "name": "Plan-Examiner",
+      "class": "Client-side Logic Engine",
+      "summary": "A manifest-driven inspector that parses structured plans and renders deterministic UI from them — the substrate for the Single-Pane.",
+      "signal": "// parse → reflect → execute"
+    },
+    {
+      "id": "organoid-intelligence",
+      "name": "Organoid-Intelligence",
+      "class": "Biological Computing",
+      "summary": "Research surface bridging cortical organoids and silicon — the wetware referent for our agentic substrate.",
+      "signal": "// neurons ⇌ tensors"
+    },
+    {
+      "id": "ares-e",
+      "name": "ARES-E",
+      "class": "Agentic Resilience",
+      "summary": "Adversarially-Robust Evaluation Suite for Evolving agents. The dashboard aesthetic of this Single-Pane derives from ARES-E.",
+      "signal": "// stress → adapt → harden"
+    }
+  ],
+  "library": [
+    {
+      "id": "prompt-atlas",
+      "title": "The Prompt Atlas",
+      "subtitle": "A Cartography of Intent",
+      "spine": "PROMPT ATLAS"
+    },
+    {
+      "id": "modern-psychology-of-ai",
+      "title": "The Modern Psychology of AI",
+      "subtitle": "Cognition, Constraint, Composure",
+      "spine": "ψ AI"
+    },
+    {
+      "id": "agentic-resilience",
+      "title": "Agentic Resilience",
+      "subtitle": "Engineering Systems That Endure",
+      "spine": "RESILIENCE"
+    }
+  ],
+  "session_options": [
+    { "id": "consult", "label": "Strategic Consultation", "duration": "45m" },
+    { "id": "engineer", "label": "Agentic Engineering", "duration": "90m" },
+    { "id": "review", "label": "Manifest Review", "duration": "30m" }
+  ],
+  "concierge_responses": {
+    "proposal": "Synthesizing operational stress parameters for your DoE proposal... Grant Logic module engaged. Provide the program solicitation and target outcome.",
+    "booking": "Opening deterministic scheduling channel. Select session class to continue.",
+    "modules": "Loading artifact manifests. Each module is a live referent of an operational repository.",
+    "library": "Surfacing the published doctrine. These are not books — they are the language of the architecture.",
+    "about": "DaScient engineers resilience at the seam where biological computing meets agentic systems. Every artifact you see here is a manifestation of that thesis.",
+    "dialogue": "Architect Dialogue online. State your intent — the dispatcher will route to a specialist and surface the human hand-off when autonomous synthesis reaches its limit.",
+    "default": "Intent unresolved. Re-state your evolution vector or select an executable module."
+  },
+  "orchestration": {
+    "router": {
+      "name": "Qwen 2.5-Coder 1.5B",
+      "engine": "Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC",
+      "role": "Dispatcher",
+      "synopsis": "Lightweight classifier — projects user intent onto VECTOR_A / VECTOR_B / VECTOR_C."
+    },
+    "vectors": [
+      {
+        "id": "A",
+        "code": "VECTOR_A",
+        "label": "Grant Intelligence",
+        "model": "DeepSeek-R1-Distill-Llama-8B",
+        "engine": "DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC",
+        "role": "The Strategist",
+        "mode": "Reasoning Mode",
+        "synopsis": "Deconstructs solicitation texts and projects outcomes onto program axes.",
+        "keywords": [
+          "grant", "proposal", "doe", "darpa", "nih", "nsf", "arpa-h",
+          "foa", "baa", "rfp", "solicitation", "funding", "award", "submission"
+        ],
+        "threshold": { "type": "synthesis_complete", "max_progress": 100 },
+        "handoff": {
+          "email": "grants@dascient.com",
+          "subject": "Proposal Finalization · DaScient Grant Intelligence",
+          "headline": "Autonomous Synthesis Limit Reached",
+          "message": "You have reached the limits of autonomous synthesis. To finalize, verify, and submit this proposal to private, local, or federal pools, please contact:"
+        }
+      },
+      {
+        "id": "B",
+        "code": "VECTOR_B",
+        "label": "Agentic AI Development",
+        "model": "DeepSeek-R1-Distill-Llama-8B",
+        "engine": "DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC",
+        "role": "The Senior Architect",
+        "mode": "Reasoning Mode",
+        "synopsis": "Plan-Examiner-aware homebrew guidance: client-side parsing, WASM inference, agentic workflows.",
+        "keywords": [
+          "agent", "agentic", "build", "develop", "developer",
+          "plan-examiner", "wasm", "webgpu", "webllm", "homebrew",
+          "code", "engineer", "architecture", "client-side", "rag", "llm"
+        ],
+        "threshold": {
+          "type": "keyword_trigger",
+          "words": [
+            "implement", "implementation", "specifics", "specific",
+            "scale", "scaling", "production", "deploy", "deployment",
+            "enterprise", "operational"
+          ]
+        },
+        "handoff": {
+          "email": "agentic@dascient.com",
+          "subject": "Plan-Examiner API · Operational Engagement",
+          "headline": "Homebrew Ceiling Detected",
+          "message": "To access the full Plan-Examiner API suite and transition from homebrew to military-grade operational capability, contact our development team:"
+        }
+      },
+      {
+        "id": "C",
+        "code": "VECTOR_C",
+        "label": "Recruitment & Evolution",
+        "model": "SmolLM3-3B",
+        "engine": "SmolLM3-3B-Instruct-q4f16_1-MLC",
+        "role": "The Talent Liaison",
+        "mode": "Interview Mode",
+        "synopsis": "Conducts a 3-question intake instead of answering. Captures specialization, philosophy, provenance.",
+        "keywords": [
+          "join", "hire", "career", "careers", "recruit", "recruiting",
+          "work", "apply", "team", "employ", "employment", "portfolio",
+          "position", "role", "opening", "opportunity"
+        ],
+        "questions": [
+          {
+            "id": "specialization",
+            "label": "TECHNICAL SPECIALIZATION",
+            "prompt": "State your primary technical specialization — and indicate where on the bio↔silicon axis your craft sits."
+          },
+          {
+            "id": "philosophy",
+            "label": "PHILOSOPHY · AGENTIC AUTONOMY",
+            "prompt": "State your operating philosophy on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?"
+          },
+          {
+            "id": "provenance",
+            "label": "PROVENANCE",
+            "prompt": "Provide provenance — a portfolio, GitHub, or canonical artifact. One link is sufficient. The work speaks."
+          }
+        ],
+        "threshold": { "type": "interview_complete", "count": 3 },
+        "handoff": {
+          "email": "join@dascient.com",
+          "subject": "DaScient · Talent Intake Follow-up",
+          "headline": "Intake Captured",
+          "message": "Data captured. Initiating follow-up with DaScient team members. For immediate manual submission:"
+        }
+      }
+    ]
+  }
+}
