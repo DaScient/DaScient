@@ -548,9 +548,10 @@
         setTimeout(() => {
           s.innerHTML = '';
           renderFn(s);
-          // force reflow then reveal
-          // eslint-disable-next-line no-unused-expressions
-          s.offsetHeight;
+          // Force a synchronous reflow so the browser commits the new DOM /
+          // initial 'hiding' styles before we remove the class — this is what
+          // produces the blur-and-reveal transition rather than an instant swap.
+          void s.offsetHeight;
           s.classList.remove('hiding');
         }, 380);
       }
@@ -1060,7 +1061,7 @@
         const line = qs('#boot-line');
         // Try fetching the manifest; fall back to inlined deterministic copy.
         try {
-          const r = await fetch('manifest.json', { cache: 'no-store' });
+          const r = await fetch('manifest.json', { cache: 'no-cache' });
           if (!r.ok) throw new Error('manifest http ' + r.status);
           State.manifest = await r.json();
         } catch (e) {
@@ -1105,7 +1106,7 @@
           { id: 'booking',  label: 'Initiate Session',  command: 'EXEC :: SESSION_OPEN', synopsis: '' },
           { id: 'modules',  label: 'Artifact Carousel', command: 'EXEC :: ARTIFACT_LOAD', synopsis: '' },
           { id: 'library',  label: 'Literacy Space',    command: 'EXEC :: LIBRARY_OPEN',  synopsis: '' },
-          { id: 'about',    label: 'Architect Briefing',command: 'EXEC :: BRIEF_ARCHITECT',synopsis: '' },
+          { id: 'about',    label: 'Architect Briefing', command: 'EXEC :: BRIEF_ARCHITECT', synopsis: '' },
         ],
         artifacts: [
           { id: 'plan-examiner', name: 'Plan-Examiner', class: 'Client-side Logic Engine',
