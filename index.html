@@ -938,6 +938,37 @@
           const next = () => {
             if (i >= lines.length) {
               Log.push('EXEC', 'GRANT_LOGIC synthesized · ' + id);
+              // Generate deterministic stress parameters from solicitation + outcome.
+              const keywords = sol.split(/\W+/).filter(w => w.length > 5).slice(0, 3)
+                .map(w => w.toUpperCase()).filter(Boolean);
+              const alignPct  = 50 + (id.charCodeAt(0) % 40);
+              const coherence = 85 + (id.charCodeAt(2) % 13);
+              const riskLabels = ['LOW', 'MODERATE', 'ELEVATED'];
+              const params = [
+                '── SOLICITATION AXIS ALIGNMENT · ' + alignPct + '%',
+                '── NARRATIVE COHERENCE · ' + coherence + '%',
+                '── ADVERSARIAL RISK FLAG · ' + riskLabels[id.charCodeAt(1) % 3],
+              ];
+              if (keywords.length) params.push('── KEY AXES · ' + keywords.join(' · '));
+              params.push('── SYNTHESIS COMPLETE · REF ' + id);
+              const sep = ce('div');
+              sep.className = 'mt-3 pt-3 border-t border-white/[0.08]';
+              target.appendChild(sep);
+              params.forEach((p, idx) => {
+                setTimeout(() => {
+                  const pl = ce('div');
+                  pl.textContent = p;
+                  pl.className = 'text-gold-mute';
+                  target.appendChild(pl);
+                  if (idx === params.length - 1) {
+                    const vectorA = (State.manifest.orchestration.vectors || []).find(v => v.id === 'A');
+                    if (vectorA) {
+                      State.orchestration.handoffShown = false;
+                      setTimeout(() => triggerHandoff(vectorA), 600);
+                    }
+                  }
+                }, idx * 320);
+              });
               return;
             }
             const ln = ce('div');
