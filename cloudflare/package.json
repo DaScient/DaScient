@@ -1,0 +1,14 @@
+{
+  "name": "dascient-cloudflare",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Cloudflare Pages Functions / Worker scaffolding for DaScient. Opt-in.",
+  "scripts": {
+    "dev": "wrangler pages dev ../dist --compatibility-date=2025-04-01",
+    "deploy": "wrangler pages deploy ../dist",
+    "deploy:worker": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

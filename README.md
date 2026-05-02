@@ -2,6 +2,19 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+> **Note on the live site.** The deployed site is the single-file
+> vanilla-JS HUD in `index.html` ("Atelier" — sleek minimalist layout,
+> manifest-driven). The `src/` React scaffold ships with the template
+> but is not the live site. The proposal module uses a
+> review → cooling → email flow (configurable under
+> `vectors[A].handoff` in `public/manifest.json`).
+>
+> An opt-in Cloudflare integration is scaffolded under `cloudflare/`
+> for server-side proposal submission via MailChannels and an optional
+> OpenAI proxy. See [CLOUDFLARE.md](./CLOUDFLARE.md) for the runbook;
+> nothing is enabled by default and the GitHub Pages deploy is
+> unchanged.
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)

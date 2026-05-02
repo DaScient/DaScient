@@ -1,0 +1,53 @@
+# Cloudflare configuration for DaScient.
+#
+# This file is OPT-IN. The repository's primary deploy target is GitHub
+# Pages (see .github/workflows/deploy.yml). Cloudflare is a parallel
+# option you can enable for two reasons:
+#
+#   (a) Host the entire site on Cloudflare Pages and get edge Functions
+#       co-located with the static assets — `pages_build_output_dir`
+#       below points at the same `dist/` directory the Vite build emits.
+#
+#   (b) Keep GitHub Pages as the static host and deploy *only* the
+#       Functions in `cloudflare/functions/api/` as a Worker bound to
+#       a separate hostname (e.g. `api.dascient.com`).
+#
+# See CLOUDFLARE.md for the full runbook.
+#
+# Compatibility date is set to a recent stable date; bump as needed.
+
+name = "dascient"
+compatibility_date = "2025-04-01"
+
+# When deploying as Cloudflare Pages, this points at the static build output.
+# Path is relative to this wrangler.toml. Ignored when deploying as a Worker.
+pages_build_output_dir = "../dist"
+
+# ---------------------------------------------------------------------------
+# Routes — uncomment and tailor when wiring a custom domain.
+# ---------------------------------------------------------------------------
+# [[routes]]
+# pattern = "dascient.com/*"
+# custom_domain = true
+#
+# [[routes]]
+# pattern = "api.dascient.com/*"
+# custom_domain = true
+
+# ---------------------------------------------------------------------------
+# Bindings (commented stubs — uncomment as you provision them).
+# ---------------------------------------------------------------------------
+# Rate-limit KV namespace used by /api/grant-submit (1 submission / IP / 5 min).
+# Create with:  wrangler kv:namespace create GRANT_RL
+# [[kv_namespaces]]
+# binding = "GRANT_RL"
+# id      = "REPLACE_WITH_KV_ID"
+
+# Optional D1 database for archival of submissions.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "dascient"
+# database_id   = "REPLACE_WITH_D1_ID"
+
+# Turnstile secret is provisioned via `wrangler secret put TURNSTILE_SECRET`,
+# not here. Same for OPENAI_API_KEY and MAIL_FROM. See CLOUDFLARE.md.

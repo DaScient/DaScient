@@ -1,0 +1,18 @@
+# Cloudflare Pages-native header config. No-op on GitHub Pages, which
+# ignores this file. When deployed to Cloudflare Pages the same headers
+# are also applied by cloudflare/functions/_middleware.ts; this file is
+# the static fallback for assets served outside the Functions surface.
+
+/*
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.run; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://api.openai.com https://esm.run; frame-ancestors 'none'; base-uri 'self'
+
+# Cache the immutable build output. index.html should always be revalidated.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/index.html
+  Cache-Control: no-cache

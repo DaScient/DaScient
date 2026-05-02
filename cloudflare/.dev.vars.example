@@ -1,0 +1,23 @@
+# Local development variables for `wrangler pages dev`. Copy this file to
+# `.dev.vars` (which is gitignored) and fill in real values. Production
+# values are set with `wrangler secret put NAME`.
+
+# Build-time / runtime OpenAI key for the optional /api/concierge proxy.
+# When this is set on the Worker, the front-end can drop the key from the
+# static bundle entirely (set manifest.orchestration.proxy_endpoint to
+# the deployed Worker URL and remove __OPENAI_API_KEY__ from vite.config.js).
+OPENAI_API_KEY=
+
+# Cloudflare Turnstile server-side secret. When set, /api/grant-submit
+# requires a `turnstileToken` field in the POST body and verifies it
+# against Cloudflare's siteverify endpoint.
+TURNSTILE_SECRET=
+
+# From-address used by /api/grant-submit when forwarding through
+# MailChannels. Must be on a domain you've authorized for MailChannels
+# (SPF / DKIM / _mailchannels lockdown — see CLOUDFLARE.md).
+MAIL_FROM=concierge@dascient.com
+
+# Comma-separated list of origins permitted to call /api/* (CORS allow-list).
+# Defaults are baked in to _middleware.ts; this just augments them.
+ALLOWED_ORIGINS=https://dascient.com,https://www.dascient.com
