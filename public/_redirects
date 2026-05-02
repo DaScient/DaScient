@@ -1,0 +1,7 @@
+# Cloudflare Pages-native redirect / rewrite config. No-op on GitHub Pages.
+#
+# Reserve /api/* for the Pages Functions surface so the static handler
+# never tries to serve a 404 for an in-flight API request. The 200 status
+# means "rewrite, do not redirect" — the URL stays the same, the request
+# is just routed to the Function.
+/api/*  /api/:splat  200

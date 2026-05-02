@@ -110,6 +110,7 @@
     "default": "Intent unresolved. Re-state your request or pick a module."
   },
   "orchestration": {
+    "proxy_endpoint": null,
     "router": {
       "name": "Qwen 2.5-Coder 1.5B",
       "engine": "Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC",
@@ -136,7 +137,13 @@
           "send_endpoint": "https://api.dascient.com/api/grant-submit",
           "subject": "Proposal Finalization · DaScient Grant Intelligence",
           "headline": "Synthesis Complete",
-          "message": "Automated synthesis is complete. To finalize, verify, and submit this proposal to private, local, or federal pools, contact:"
+          "message": "Automated synthesis is complete. To finalize, verify, and submit this proposal to private, local, or federal pools, contact:",
+          "cooling_seconds": 120,
+          "review_copy": {
+            "headline": "Review window",
+            "body": "Take a moment to review the synthesized feedback. The submission channel will unlock when the review window completes. Any edit to the draft, subject, or cover note resets the timer."
+          },
+          "send_endpoint": null
         }
       },
       {
