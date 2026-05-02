@@ -133,6 +133,7 @@
         "threshold": { "type": "synthesis_complete", "max_progress": 100 },
         "handoff": {
           "email": "grants@dascient.com",
+          "send_endpoint": "https://api.dascient.com/api/grant-submit",
           "subject": "Proposal Finalization · DaScient Grant Intelligence",
           "headline": "Synthesis Complete",
           "message": "Automated synthesis is complete. To finalize, verify, and submit this proposal to private, local, or federal pools, contact:"
