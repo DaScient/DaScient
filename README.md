@@ -5,12 +5,12 @@
 [<img align="center" alt="f | Instagram" width="45px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />][instagram]
 [<img align="center" alt="f | Facebook" width="45px" src="https://cdn.jsdelivr.net/npm/simple-icons@3.13.0/icons/facebook.svg" />][kaggle]
 </div>
-<div align="center">
+
   [<img align="left" alt="w  | Website" width="45px" src="https://raw.githubusercontent.com/iconic/open-iconic/master/svg/globe.svg" />][website]
   [<img align="left" alt="f | LinkedIn" width="45px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/linkedin.svg" />][linkedin]
   [<img align="left" alt="f | Instagram" width="45px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />][instagram]
   [<img align="left" alt="f | Facebook" width="45px" src="https://cdn.jsdelivr.net/npm/simple-icons@3.13.0/icons/facebook.svg" />][kaggle]
-</div>
+
 [website]: https://www.dascient.com/
 [instagram]: https://www.instagram.com/dascient/
 [linkedin]: https://www.linkedin.com/company/dascient/
