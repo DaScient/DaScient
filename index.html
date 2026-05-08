@@ -6,1919 +6,749 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="DaScient — a focused interface for biological computing and agentic systems work."
+      content="DaScient builds practical AI products and partners with clients on biological computing and agentic systems. Schedule a call or explore our work."
     />
-    <title>DaScient</title>
+    <meta name="theme-color" content="#fbfaf7" />
+    <title>DaScient — Practical AI, thoughtfully built</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Tailwind via CDN Play. Utility classes still consumed by the renderers;
-         the heavy lifting is done by the inline CSS-vars system below. -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              ink:    '#0a0a0c',
-              paper:  '#0e0e11',
-              text:   '#e6e6e6',
-              accent: '#fad02c',
-            },
-            fontFamily: {
-              prose: ['Cormorant Garamond', 'serif'],
-              sans:  ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-              mono:  ['JetBrains Mono', 'ui-monospace', 'monospace'],
-            },
-          },
-        },
-      };
-    </script>
-
     <style>
-      /* Atelier — 5-token palette. */
+      /* ---------- Palette & tokens ---------- */
       :root {
-        --ink:    #0a0a0c;
-        --paper:  #0e0e11;
-        --rule:   rgba(224, 224, 224, 0.10);
-        --text:   #e6e6e6;
-        --accent: #fad02c;
+        --bg:        #fbfaf7;   /* warm cream */
+        --bg-soft:   #f3eeff;   /* faint lavender wash */
+        --bg-warm:   #fff4ec;   /* faint peach wash */
+        --surface:   #ffffff;
+        --ink:       #15131f;
+        --ink-soft:  #4b465a;
+        --ink-muted: #6f6a7d;
+        --line:      #e7e2f0;
+        --accent:    #7e14ff;   /* brand purple from favicon */
+        --accent-2:  #47bfff;   /* sky from favicon */
+        --accent-warm:#ff7a59;  /* coral for CTA highlights */
+        --shadow-sm: 0 1px 2px rgba(20, 16, 40, 0.04), 0 2px 8px rgba(20, 16, 40, 0.04);
+        --shadow-md: 0 6px 16px rgba(20, 16, 40, 0.06), 0 18px 40px rgba(126, 20, 255, 0.08);
+        --radius:    16px;
       }
 
       *, *::before, *::after { box-sizing: border-box; }
 
+      html { scroll-behavior: smooth; }
+
       html, body {
-        background: var(--ink);
-        color: var(--text);
-        font-family: 'Inter', sans-serif;
-        font-weight: 300;
-        font-size: 16px;
-        line-height: 1.7;
-        -webkit-font-smoothing: antialiased;
         margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        font-weight: 400;
+        font-size: 17px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
       }
 
-      a { color: inherit; }
-      button { font-family: inherit; }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      img { max-width: 100%; display: block; }
 
       .display {
-        font-family: 'Cormorant Garamond', serif;
-        font-weight: 500;
-        letter-spacing: -0.005em;
-      }
-      .mono {
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 400;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
       }
 
-      /* Layout shell. */
       .container {
-        max-width: 880px;
+        max-width: 1100px;
         margin: 0 auto;
         padding: 0 24px;
       }
 
-      /* Top bar. */
-      .topbar {
-        border-bottom: 1px solid var(--rule);
+      /* ---------- Top nav ---------- */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(251, 250, 247, 0.85);
+        backdrop-filter: saturate(140%) blur(10px);
+        -webkit-backdrop-filter: saturate(140%) blur(10px);
+        border-bottom: 1px solid var(--line);
       }
-      .topbar-inner {
+      .nav-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 22px 0;
+        padding: 16px 0;
+        gap: 16px;
       }
-      .wordmark {
-        font-family: 'Cormorant Garamond', serif;
-        font-weight: 500;
-        font-size: 22px;
-        letter-spacing: 0.01em;
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--ink);
         text-decoration: none;
-        color: var(--text);
-      }
-
-      /* Hero. */
-      .hero {
-        padding: 72px 0 56px;
-      }
-      .hero h1 {
-        font-family: 'Cormorant Garamond', serif;
-        font-weight: 500;
-        font-size: 44px;
-        line-height: 1.15;
-        margin: 0 0 18px;
+        font-weight: 600;
+        font-size: 20px;
         letter-spacing: -0.005em;
       }
-      .hero p {
-        max-width: 60ch;
-        color: rgba(230, 230, 230, 0.78);
-        margin: 0 0 28px;
+      .brand:hover { text-decoration: none; }
+      .brand img { width: 26px; height: auto; }
+      .brand .word {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 24px;
       }
 
-      /* Concierge bar. */
-      .concierge {
-        padding: 8px 0 24px;
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
       }
-      .concierge-input-wrap {
+      .nav-links a {
+        color: var(--ink-soft);
+        font-size: 15px;
+        font-weight: 500;
+      }
+      .nav-links a:hover { color: var(--ink); text-decoration: none; }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 15px;
+        line-height: 1;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: transform 150ms ease, box-shadow 200ms ease, background 200ms ease, color 200ms ease, border-color 200ms ease;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(126, 20, 255, 0.25);
+      }
+      .btn-primary:hover {
+        background: #6a0fe0;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(126, 20, 255, 0.30);
+      }
+      .btn-ghost {
+        background: var(--surface);
+        color: var(--ink);
+        border-color: var(--line);
+      }
+      .btn-ghost:hover {
+        background: #fff;
+        border-color: #d6cdea;
+        text-decoration: none;
+        transform: translateY(-1px);
+      }
+      .btn-warm {
+        background: var(--accent-warm);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(255, 122, 89, 0.28);
+      }
+      .btn-warm:hover {
+        background: #ff6440;
+        text-decoration: none;
+        transform: translateY(-1px);
+      }
+
+      .nav-cta { padding: 10px 16px; font-size: 14px; }
+
+      @media (max-width: 720px) {
+        .nav-links a:not(.nav-cta) { display: none; }
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        position: relative;
+        padding: 88px 0 72px;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -20% -10% auto auto;
+        width: 620px;
+        height: 620px;
+        background: radial-gradient(closest-side, rgba(126, 20, 255, 0.18), transparent 70%);
+        filter: blur(10px);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto auto -30% -10%;
+        width: 560px;
+        height: 560px;
+        background: radial-gradient(closest-side, rgba(71, 191, 255, 0.18), transparent 70%);
+        filter: blur(10px);
+        z-index: 0;
+        pointer-events: none;
+      }
+      .hero-inner { position: relative; z-index: 1; max-width: 760px; }
+      .eyebrow {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: var(--bg-soft);
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        margin-bottom: 20px;
+      }
+      .hero h1 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: clamp(40px, 6vw, 64px);
+        line-height: 1.05;
+        letter-spacing: -0.015em;
+        margin: 0 0 20px;
+      }
+      .hero h1 .accent {
+        background: linear-gradient(120deg, var(--accent) 20%, var(--accent-2) 90%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .hero p.lead {
+        font-size: 19px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+        max-width: 60ch;
+        margin: 0 0 32px;
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      .hero-meta {
+        margin-top: 28px;
+        color: var(--ink-muted);
+        font-size: 14px;
+      }
+      .hero-meta a { color: var(--ink); font-weight: 500; }
+
+      /* ---------- Section primitives ---------- */
+      section.block { padding: 72px 0; position: relative; }
+      .section-head { max-width: 720px; margin: 0 0 36px; }
+      .section-kicker {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin: 0 0 10px;
+      }
+      .section-head h2 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: clamp(30px, 3.8vw, 42px);
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        margin: 0 0 12px;
+      }
+      .section-head p {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 17px;
+      }
+
+      /* ---------- Cards ---------- */
+      .grid { display: grid; gap: 22px; }
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      @media (max-width: 880px) {
+        .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        .grid-4-sm-2 { grid-template-columns: repeat(2, 1fr) !important; }
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: #d6cdea;
+      }
+      .card .tag {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: var(--bg-soft);
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-bottom: 14px;
+        align-self: flex-start;
+      }
+      .card h3 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 26px;
+        line-height: 1.2;
+        margin: 0 0 8px;
+        color: var(--ink);
+      }
+      .card .author {
+        font-size: 13px;
+        color: var(--ink-muted);
+        margin: 0 0 12px;
+      }
+      .card p { color: var(--ink-soft); margin: 0 0 18px; }
+      .card .card-link {
+        margin-top: auto;
+        font-weight: 500;
+        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .card .card-link::after {
+        content: "→";
+        transition: transform 150ms ease;
+      }
+      .card:hover .card-link::after { transform: translateX(3px); }
+
+      /* Product card icon block */
+      .product-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 18px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #fff;
+        font-size: 26px;
+      }
+      .product-icon.warm {
+        background: linear-gradient(135deg, var(--accent-warm), #ffb380);
+      }
+
+      /* Book cover (text-only stylized cover) */
+      .book-cover {
+        aspect-ratio: 3 / 4;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 18px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 10px 24px rgba(20, 16, 40, 0.18);
+        position: relative;
+        overflow: hidden;
+      }
+      .book-cover .spine {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 22px;
+        line-height: 1.15;
+        letter-spacing: -0.005em;
+      }
+      .book-cover .imprint {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.85;
+      }
+      .book-cover.violet { background: linear-gradient(160deg, #5b14b8, #7e14ff 60%, #a259ff); }
+      .book-cover.indigo { background: linear-gradient(160deg, #1e1a4d, #3730a3 55%, #6366f1); }
+      .book-cover.sunset { background: linear-gradient(160deg, #b1224b, #ff7a59 60%, #ffb380); }
+
+      /* ---------- Connect strip ---------- */
+      .connect {
+        background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+      }
+      .social-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      @media (max-width: 720px) { .social-grid { grid-template-columns: repeat(2, 1fr); } }
+      .social {
         display: flex;
         align-items: center;
         gap: 12px;
-        border: 1px solid var(--rule);
-        border-radius: 4px;
-        padding: 12px 16px;
-        background: var(--paper);
-        transition: border-color 200ms ease;
-      }
-      .concierge-input-wrap:focus-within {
-        border-color: var(--accent);
-      }
-      .concierge-input {
-        flex: 1;
-        background: transparent;
-        border: 0;
-        outline: 0;
-        color: var(--text);
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        font-weight: 400;
-      }
-      .concierge-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 14px;
-      }
-      .chip {
-        background: transparent;
-        color: rgba(230, 230, 230, 0.78);
-        border: 1px solid var(--rule);
-        border-radius: 999px;
-        padding: 6px 14px;
-        font-size: 13px;
-        cursor: pointer;
-        transition: color 200ms ease, border-color 200ms ease;
-      }
-      .chip:hover, .chip:focus-visible {
-        color: var(--text);
-        border-color: rgba(230, 230, 230, 0.35);
-        outline: none;
-      }
-      .chip-active {
+        padding: 18px 20px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
         color: var(--ink);
-        background: var(--accent);
-        border-color: var(--accent);
+        text-decoration: none;
+        transition: transform 150ms ease, border-color 200ms ease, box-shadow 200ms ease;
       }
+      .social:hover {
+        text-decoration: none;
+        transform: translateY(-2px);
+        border-color: #d6cdea;
+        box-shadow: var(--shadow-sm);
+      }
+      .social .dot {
+        width: 36px; height: 36px; border-radius: 10px;
+        display: grid; place-items: center;
+        background: var(--bg-soft); color: var(--accent);
+        font-weight: 700; font-size: 14px; letter-spacing: 0.04em;
+      }
+      .social .label { font-weight: 500; }
+      .social .sub { font-size: 13px; color: var(--ink-muted); }
 
-      /* Module card. */
-      .module-card {
-        border: 1px solid var(--rule);
-        border-radius: 4px;
-        padding: 32px;
-        margin: 12px 0 56px;
-        background: var(--paper);
+      /* ---------- Contact CTA ---------- */
+      .cta {
+        background: linear-gradient(135deg, #1a0f3a 0%, #3a1080 55%, #7e14ff 100%);
+        color: #fff;
+        border-radius: 24px;
+        padding: 56px 48px;
+        position: relative;
+        overflow: hidden;
+        margin: 24px 0 56px;
       }
-      .module-card .kicker {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 0.18em;
-        color: rgba(230, 230, 230, 0.55);
-        text-transform: uppercase;
-        margin-bottom: 8px;
+      .cta::before {
+        content: "";
+        position: absolute;
+        inset: -30% auto auto -10%;
+        width: 480px; height: 480px;
+        background: radial-gradient(closest-side, rgba(71, 191, 255, 0.35), transparent 70%);
+        filter: blur(10px);
       }
-      .module-card h2 {
-        font-family: 'Cormorant Garamond', serif;
-        font-weight: 500;
-        font-size: 30px;
-        line-height: 1.2;
-        margin: 0 0 16px;
+      .cta::after {
+        content: "";
+        position: absolute;
+        inset: auto -10% -40% auto;
+        width: 480px; height: 480px;
+        background: radial-gradient(closest-side, rgba(255, 122, 89, 0.30), transparent 70%);
+        filter: blur(10px);
       }
-      .module-card .lede {
-        color: rgba(230, 230, 230, 0.78);
+      .cta-inner { position: relative; z-index: 1; max-width: 760px; }
+      .cta h2 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: clamp(30px, 4.2vw, 44px);
+        line-height: 1.1;
+        margin: 0 0 14px;
+      }
+      .cta p {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.82);
+        margin: 0 0 28px;
         max-width: 60ch;
-        margin: 0 0 24px;
       }
-      .module-card .field {
-        margin-top: 18px;
+      .cta .btn-ghost {
+        background: rgba(255, 255, 255, 0.10);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.30);
       }
-      .module-card label {
-        display: block;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 0.14em;
-        color: rgba(230, 230, 230, 0.55);
-        text-transform: uppercase;
-        margin-bottom: 6px;
+      .cta .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.55);
       }
-      .module-card textarea,
-      .module-card input[type="text"],
-      .module-card input[type="email"] {
-        width: 100%;
-        background: var(--ink);
-        color: var(--text);
-        border: 1px solid var(--rule);
-        border-radius: 3px;
-        padding: 10px 12px;
-        font: inherit;
+      .cta .email-line {
+        margin-top: 20px;
         font-size: 14px;
-        outline: none;
+        color: rgba(255, 255, 255, 0.75);
       }
-      .module-card textarea {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px;
-        resize: vertical;
-        min-height: 100px;
-      }
-      .module-card textarea:focus,
-      .module-card input:focus {
-        border-color: var(--accent);
-      }
+      .cta .email-line a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 
-      /* Buttons. One CTA per view — gold. */
-      .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--accent);
-        color: var(--ink);
-        border: 1px solid var(--accent);
-        border-radius: 3px;
-        padding: 10px 20px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: opacity 200ms ease;
-      }
-      .btn-primary:hover { opacity: 0.85; }
-      .btn-primary:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
-        background: transparent;
-        color: rgba(230, 230, 230, 0.55);
-        border-color: var(--rule);
-      }
-      .btn-ghost {
-        background: transparent;
-        color: var(--text);
-        border: 1px solid var(--rule);
-        border-radius: 3px;
-        padding: 10px 20px;
-        font-size: 14px;
-        font-weight: 400;
-        cursor: pointer;
-        transition: border-color 200ms ease, color 200ms ease;
-      }
-      .btn-ghost:hover {
-        border-color: rgba(230, 230, 230, 0.35);
-      }
-
-      /* Hairline rule used sparingly. */
-      .rule { border-top: 1px solid var(--rule); margin: 24px 0; }
-      .rule-accent {
-        height: 1px;
-        background: var(--accent);
-        opacity: 0.55;
-        width: 64px;
-        margin: 14px 0 22px;
-      }
-
-      /* Mono ref/hash chips. */
-      .ref-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
-        letter-spacing: 0.08em;
-        color: var(--accent);
-        border: 1px solid var(--rule);
-        border-radius: 3px;
-        padding: 4px 10px;
-      }
-      .ref-chip .ref-label {
-        color: rgba(230, 230, 230, 0.55);
-        font-size: 10px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-      }
-
-      /* Dialogue thread bubbles — flat, no glass. */
-      .arch-msg-user, .arch-msg-spec {
-        border: 1px solid var(--rule);
-        border-radius: 3px;
-        padding: 14px 16px;
-        margin-top: 10px;
-      }
-      .arch-msg-user {
-        background: rgba(250, 208, 44, 0.04);
-        border-color: rgba(250, 208, 44, 0.20);
-      }
-      .arch-msg-spec {
-        background: var(--ink);
-      }
-      .arch-msg-spec pre, .arch-msg-spec .body {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12.5px;
-        white-space: pre-wrap;
-        margin: 0;
-      }
-
-      /* Threshold meter. */
-      .meter-track {
-        background: var(--rule);
-        height: 2px;
-        border-radius: 1px;
-        overflow: hidden;
-      }
-      .meter-fill {
-        height: 100%;
-        background: var(--accent);
-        transition: width 480ms ease;
-      }
-
-      /* Stage subtle fade transition (replaces blur-and-reveal). */
-      .stage { transition: opacity 200ms ease; }
-      .stage.hiding { opacity: 0; pointer-events: none; }
-
-      /* Footer + log drawer. */
-      .footer {
-        border-top: 1px solid var(--rule);
-        padding: 22px 0 28px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 13px;
-        color: rgba(230, 230, 230, 0.55);
-      }
-      .footer .link {
-        background: none;
-        border: 0;
-        cursor: pointer;
-        color: rgba(230, 230, 230, 0.55);
-        text-decoration: underline;
-        text-decoration-color: rgba(230, 230, 230, 0.18);
-        text-underline-offset: 3px;
-        font: inherit;
-      }
-      .footer .link:hover { color: var(--text); }
-      .log-drawer {
-        border-top: 1px solid var(--rule);
-        background: var(--paper);
-        padding: 18px 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 240ms ease;
-      }
-      .log-drawer.open { max-height: 280px; }
-      .log-drawer .container { display: flex; flex-direction: column; gap: 8px; }
-      .log-drawer .log-head {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
-        letter-spacing: 0.14em;
-        color: rgba(230, 230, 230, 0.55);
-        text-transform: uppercase;
-      }
-      #syslog {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 11.5px;
-        line-height: 1.7;
-        color: rgba(230, 230, 230, 0.78);
-        max-height: 200px;
-        overflow-y: auto;
-      }
-      #syslog .ts { color: rgba(230, 230, 230, 0.45); }
-      #syslog .lvl-EXEC,
-      #syslog .lvl-ALERT { color: var(--accent); }
-      #syslog .lvl-WARN  { color: #b89a1f; }
-
-      /* Cooling timer ring/label. */
-      .cooling-bar {
-        margin-top: 18px;
-        padding: 14px 16px;
-        border: 1px solid var(--rule);
-        border-radius: 3px;
-        background: var(--ink);
-      }
-      .cooling-line {
-        font-size: 13px;
-        color: rgba(230, 230, 230, 0.78);
-        margin: 0 0 8px;
-      }
-      .cooling-meter { height: 2px; background: var(--rule); border-radius: 1px; overflow: hidden; }
-      .cooling-fill  { height: 100%; background: var(--accent); transition: width 200ms linear; }
-
-      /* Reduced motion. */
-      @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-          transition-duration: 0.001ms !important;
-          animation-duration: 0.001ms !important;
-        }
-      }
-
-      /* Narrow viewports. */
       @media (max-width: 720px) {
-        .container { padding: 0 18px; }
-        .hero { padding: 48px 0 40px; }
-        .hero h1 { font-size: 34px; }
-        .module-card { padding: 22px; }
-        .module-card h2 { font-size: 26px; }
+        .cta { padding: 40px 28px; border-radius: 18px; }
       }
+
+      /* ---------- Footer ---------- */
+      footer.foot {
+        border-top: 1px solid var(--line);
+        padding: 28px 0 40px;
+        color: var(--ink-muted);
+        font-size: 14px;
+      }
+      .foot-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .foot a { color: var(--ink-soft); }
     </style>
   </head>
-
   <body>
-    <header class="topbar">
-      <div class="container topbar-inner">
-        <a href="#" class="wordmark">DaScient</a>
-        <nav class="mono" style="font-size: 11px; letter-spacing: 0.18em; color: rgba(230,230,230,0.55);">
-          <a href="#concierge-input" id="nav-begin" style="text-decoration: none; color: inherit;">BEGIN</a>
+    <!-- ---------- Top nav ---------- -->
+    <header class="nav">
+      <div class="container nav-inner">
+        <a class="brand" href="#top" aria-label="DaScient — home">
+          <img src="/favicon.svg" alt="" aria-hidden="true" />
+          <span class="word">DaScient</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#products">Products</a>
+          <a href="#books">Books</a>
+          <a href="#connect">Connect</a>
+          <a href="#contact" class="btn btn-primary nav-cta">Get in touch</a>
         </nav>
       </div>
     </header>
 
-    <main class="container">
-      <section class="hero" id="hero">
-        <h1 id="hero-title">We engineer resilient systems.</h1>
-        <p id="hero-synopsis">A focused interface for biological computing and agentic systems work.</p>
-        <button id="hero-cta" class="btn-primary" type="button">Begin</button>
-      </section>
-
-      <section class="concierge">
-        <form id="concierge-form" autocomplete="off">
-          <div class="concierge-input-wrap">
-            <input
-              id="concierge-input"
-              class="concierge-input"
-              type="text"
-              placeholder="State an intent — e.g. craft a DOE proposal, book a session, browse the library"
-              aria-label="Concierge input"
-            />
-            <button type="submit" class="btn-ghost" style="padding: 6px 14px; font-size: 13px;">
-              Dispatch
-            </button>
+    <main id="top">
+      <!-- ---------- Hero ---------- -->
+      <section class="hero">
+        <div class="container hero-inner">
+          <span class="eyebrow">Practical AI · Biological computing · Agentic systems</span>
+          <h1>
+            Thoughtful AI, <span class="accent">made approachable.</span>
+          </h1>
+          <p class="lead">
+            DaScient is a small, hands-on studio building dependable AI products and
+            partnering with teams who want clear thinking — not buzzwords. We help
+            organizations turn complex problems into simple, working software.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#contact">Schedule a call</a>
+            <a
+              class="btn btn-ghost"
+              href="mailto:contact@dascient.com?subject=Business%20inquiry"
+            >Send a business inquiry</a>
           </div>
-        </form>
-        <div id="intent-list" class="concierge-chips" role="list"></div>
-        <div id="concierge-flash" class="mono" style="margin-top: 10px; font-size: 11px; color: var(--accent); min-height: 14px;"></div>
+          <p class="hero-meta">
+            Prefer email? Reach us at
+            <a href="mailto:contact@dascient.com">contact@dascient.com</a>.
+          </p>
+        </div>
       </section>
 
-      <section id="stage" class="stage" aria-live="polite"></section>
+      <!-- ---------- Products ---------- -->
+      <section id="products" class="block">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-kicker">Products</p>
+            <h2>Tools we&rsquo;ve shipped</h2>
+            <p>
+              Real software, in the hands of real users — from federal proposal teams
+              to pet owners looking for late-night answers.
+            </p>
+          </div>
+
+          <div class="grid grid-2">
+            <article class="card">
+              <div class="product-icon" aria-hidden="true">⌬</div>
+              <h3>Plan-Examiner</h3>
+              <p>
+                A manifest-driven workspace that reads structured plans and proposals,
+                then helps teams refine, stress-test, and submit them. Built for grant
+                writers, program managers, and anyone who lives in long-form documents.
+              </p>
+              <a
+                class="card-link"
+                href="https://plan-examiner.com/"
+                target="_blank"
+                rel="noopener"
+              >Visit plan-examiner.com</a>
+            </article>
+
+            <article class="card">
+              <div class="product-icon warm" aria-hidden="true">🐾</div>
+              <h3>RoboVet 24/7</h3>
+              <p>
+                An AI veterinary companion in your pocket. Calm, clear guidance for
+                pet questions any hour of the day, with a clear hand-off whenever a
+                real vet is the right answer.
+              </p>
+              <a
+                class="card-link"
+                href="https://apps.apple.com/us/app/robovet-24-7-ai-veterinarian/id6753560467"
+                target="_blank"
+                rel="noopener"
+              >Open in the App Store</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Books ---------- -->
+      <section id="books" class="block" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-kicker">Library</p>
+            <h2>Books from our shelf</h2>
+            <p>
+              The thinking behind the work — written for builders, founders, and
+              curious readers. Available wherever you buy books.
+            </p>
+          </div>
+
+          <div class="grid grid-3">
+            <article class="card">
+              <div class="book-cover violet">
+                <span class="imprint">DaScient Press</span>
+                <span class="spine">Organoid<br />Intelligence</span>
+              </div>
+              <h3>Organoid Intelligence</h3>
+              <p class="author">by Don M. Tadaya</p>
+              <p>
+                A field guide to the emerging frontier where cortical organoids meet
+                silicon — the wetware substrate behind a new generation of agents.
+              </p>
+              <a
+                class="card-link"
+                href="https://www.barnesandnoble.com/w/organoid-intelligence-don-m-tadaya/1149944275"
+                target="_blank"
+                rel="noopener"
+              >Buy at Barnes &amp; Noble</a>
+            </article>
+
+            <article class="card">
+              <div class="book-cover indigo">
+                <span class="imprint">DaScient Press</span>
+                <span class="spine">The Modern<br />Psychology of AI</span>
+              </div>
+              <h3>The Modern Psychology of AI</h3>
+              <p class="author">by Don M. Tadaya</p>
+              <p>
+                How today&rsquo;s models actually behave — cognition, constraint, and
+                composure — and what that means for the people designing with them.
+              </p>
+              <a
+                class="card-link"
+                href="https://www.amazon.com/Modern-Psychology-Artificial-Intelligence-Psychological-ebook/dp/B0G59B7NK9"
+                target="_blank"
+                rel="noopener"
+              >Buy on Amazon</a>
+            </article>
+
+            <article class="card">
+              <div class="book-cover sunset">
+                <span class="imprint">DaScient Press</span>
+                <span class="spine">The Prompt<br />Atlas</span>
+              </div>
+              <h3>The Prompt Atlas</h3>
+              <p class="author">by Don D. M. Tadaya</p>
+              <p>
+                A cartography of intent — practical patterns and prompts for getting
+                useful, repeatable work out of modern language models.
+              </p>
+              <a
+                class="card-link"
+                href="https://www.amazon.com/Prompt-Atlas-Don-D-M-Tadaya/dp/B0G14CN6FF"
+                target="_blank"
+                rel="noopener"
+              >Buy on Amazon</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Connect ---------- -->
+      <section id="connect" class="block connect">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-kicker">Connect</p>
+            <h2>Find us across the web</h2>
+            <p>Follow along, read our notes, or peek at the code.</p>
+          </div>
+
+          <div class="social-grid">
+            <a class="social" href="https://www.linkedin.com/company/dascient/" target="_blank" rel="noopener">
+              <span class="dot">in</span>
+              <span>
+                <span class="label">LinkedIn</span><br />
+                <span class="sub">Company updates</span>
+              </span>
+            </a>
+            <a class="social" href="https://www.github.com/dascient/" target="_blank" rel="noopener">
+              <span class="dot">GH</span>
+              <span>
+                <span class="label">GitHub</span><br />
+                <span class="sub">Open-source work</span>
+              </span>
+            </a>
+            <a class="social" href="https://www.kaggle.com/dascient/" target="_blank" rel="noopener">
+              <span class="dot">K</span>
+              <span>
+                <span class="label">Kaggle</span><br />
+                <span class="sub">Datasets &amp; notebooks</span>
+              </span>
+            </a>
+            <a class="social" href="https://dascient.medium.com/" target="_blank" rel="noopener">
+              <span class="dot">M</span>
+              <span>
+                <span class="label">Medium</span><br />
+                <span class="sub">Essays &amp; field notes</span>
+              </span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Contact CTA ---------- -->
+      <section id="contact" class="block" style="padding-top: 24px;">
+        <div class="container">
+          <div class="cta">
+            <div class="cta-inner">
+              <h2>Let&rsquo;s talk about what you&rsquo;re building.</h2>
+              <p>
+                Whether you have a clear scope or just a hunch, we&rsquo;d love to hear
+                about it. Book a short call, or send a few sentences by email — we
+                read every message.
+              </p>
+              <div class="hero-actions">
+                <a
+                  class="btn btn-warm"
+                  href="mailto:contact@dascient.com?subject=Schedule%20a%20call&amp;body=Hi%20DaScient%2C%0A%0AI%27d%20like%20to%20schedule%20a%20call.%20A%20few%20times%20that%20work%20for%20me%3A%0A%0A-%20%0A-%20%0A%0AA%20bit%20about%20what%20I%27m%20working%20on%3A%0A"
+                >Schedule a call</a>
+                <a
+                  class="btn btn-ghost"
+                  href="mailto:contact@dascient.com?subject=Business%20inquiry"
+                >Send a business inquiry</a>
+              </div>
+              <p class="email-line">
+                Or email us directly at
+                <a href="mailto:contact@dascient.com">contact@dascient.com</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer class="footer">
-      <div class="container" style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 24px;">
-        <span>© <span id="footer-year"></span> DaScient</span>
-        <button id="log-toggle" class="link" type="button" aria-expanded="false">system log</button>
-        <span class="mono" id="footer-version" style="font-size: 11px; letter-spacing: 0.14em; color: rgba(230,230,230,0.45);">v—</span>
+    <!-- ---------- Footer ---------- -->
+    <footer class="foot">
+      <div class="container foot-inner">
+        <span>&copy; <span id="year">2026</span> DaScient. Built with care.</span>
+        <span>
+          <a href="mailto:contact@dascient.com">contact@dascient.com</a>
+        </span>
       </div>
     </footer>
 
-    <div id="log-drawer" class="log-drawer" aria-hidden="true">
-      <div class="container">
-        <div class="log-head">SYSTEM LOG</div>
-        <div id="syslog"></div>
-      </div>
-    </div>
-
-    <!-- ================================================================== -->
-    <!-- Engine (vanilla JS, manifest-driven). Logic preserved from the      -->
-    <!-- prior single-pane build; render layer rewritten for the new tokens. -->
-    <!-- ================================================================== -->
     <script>
-      'use strict';
-      // ---------- Utilities ----------
-      const qs = (s, r = document) => r.querySelector(s);
-      const ce = (t, c) => {
-        const e = document.createElement(t);
-        if (c) e.className = c;
-        return e;
-      };
-      const escapeHtml = (s) =>
-        String(s).replace(/[&<>"']/g, (m) => ({
-          '&': '&amp;', '<': '&lt;', '>': '&gt;',
-          '"': '&quot;', "'": '&#39;',
-        }[m]));
-
-      // ---------- State ----------
-      const STORE_KEY = 'dascient.session.v1';
-      // Build-time injected key. Replaced by Vite's transformIndexHtml (see
-      // vite.config.js). Empty string disables the OpenAI fallback. SECURITY
-      // CAVEAT: visible to any visitor of the deployed site — only acceptable
-      // for an origin-restricted, rate-limited key. Prefer the Cloudflare
-      // Worker proxy (Part 3 / CLOUDFLARE.md) when possible; the front-end
-      // will use the proxy whenever manifest.orchestration.proxy_endpoint
-      // is set.
-      const OPENAI_API_KEY = '__OPENAI_API_KEY__';
-      const OPENAI_MODEL = 'gpt-4o-mini';
-      const State = {
-        manifest: null,
-        intent: null,
-        sessionId: null,
-        orchestration: {
-          currentModel: null,
-          currentVector: null,
-          progress: 0,
-          handoffShown: false,
-          webllm: { engaged: false, engine: null, modelId: null, loading: false },
-        },
-        memory: {
-          events: [],
-          lastIntent: null,
-          bookings: [],
-          dialogue: { vector: null, history: [], recruitment: { answers: [], step: 0, completed: false } },
-        },
-      };
-
-      function loadMemory() {
-        try {
-          const raw = localStorage.getItem(STORE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            State.memory = { ...State.memory, ...parsed };
-            const d = State.memory.dialogue || {};
-            const r = d.recruitment || {};
-            State.memory.dialogue = {
-              vector: d.vector || null,
-              history: Array.isArray(d.history) ? d.history : [],
-              recruitment: {
-                answers: Array.isArray(r.answers) ? r.answers : [],
-                step: typeof r.step === 'number' ? r.step : 0,
-                completed: !!r.completed,
-              },
-            };
-          }
-        } catch (_) { /* ignore */ }
-        if (!State.memory.sessionId) {
-          State.memory.sessionId = signedHash('session', Date.now());
-        }
-        State.sessionId = State.memory.sessionId;
-      }
-      function persistMemory() {
-        try { localStorage.setItem(STORE_KEY, JSON.stringify(State.memory)); }
-        catch (_) { /* */ }
-      }
-
-      // Deterministic visual hash — UI flair, not a security primitive.
-      function signedHash(prefix, seed) {
-        const s = String(prefix) + ':' + String(seed);
-        let h = 2166136261 >>> 0;
-        for (let i = 0; i < s.length; i++) {
-          h ^= s.charCodeAt(i);
-          h = Math.imul(h, 16777619) >>> 0;
-        }
-        return ('00000000' + h.toString(16)).slice(-8).toUpperCase();
-      }
-
-      // ---------- System Log ----------
-      const Log = {
-        el: null,
-        push(level, msg) {
-          if (!this.el) this.el = qs('#syslog');
-          const t = new Date();
-          const ts =
-            String(t.getUTCHours()).padStart(2, '0') + ':' +
-            String(t.getUTCMinutes()).padStart(2, '0') + ':' +
-            String(t.getUTCSeconds()).padStart(2, '0');
-          if (this.el) {
-            const line = ce('div');
-            line.innerHTML =
-              '<span class="ts">' + ts + '</span> ' +
-              '<span class="lvl-' + escapeHtml(level) + '">' + escapeHtml(level) + '</span> ' +
-              '<span>' + escapeHtml(msg) + '</span>';
-            this.el.appendChild(line);
-            this.el.scrollTop = this.el.scrollHeight;
-          }
-          State.memory.events.push({ ts: t.toISOString(), level, msg });
-          if (State.memory.events.length > 60)
-            State.memory.events = State.memory.events.slice(-60);
-          persistMemory();
-        },
-      };
-
-      // ---------- Subtle typewriter (used once per view on the lede). ----------
-      function typewriter(node, text, speed = 14) {
-        return new Promise((resolve) => {
-          node.textContent = '';
-          let i = 0;
-          const step = () => {
-            if (i >= text.length) return resolve();
-            node.textContent += text.charAt(i++);
-            setTimeout(step, speed);
-          };
-          step();
-        });
-      }
-
-      // ---------- Stage swap (replaces blur-and-reveal). ----------
-      const stage = () => qs('#stage');
-      function morph(renderFn) {
-        const s = stage();
-        s.classList.add('hiding');
-        setTimeout(() => {
-          s.innerHTML = '';
-          renderFn(s);
-          void s.offsetHeight;
-          s.classList.remove('hiding');
-          // Bring the rendered module into view for the user.
-          const card = s.querySelector('.module-card');
-          if (card && typeof card.scrollIntoView === 'function') {
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 200);
-      }
-
-      // ---------- Intent chips ----------
-      function renderIntentList() {
-        const list = qs('#intent-list');
-        list.innerHTML = '';
-        State.manifest.intents.forEach((it) => {
-          const btn = ce('button', 'chip');
-          btn.type = 'button';
-          btn.dataset.intent = it.id;
-          btn.setAttribute('role', 'listitem');
-          btn.textContent = it.label;
-          btn.title = it.synopsis || it.label;
-          btn.addEventListener('click', () => selectIntent(it.id));
-          list.appendChild(btn);
-        });
-      }
-
-      function highlightChip(id) {
-        document.querySelectorAll('#intent-list .chip').forEach((c) => {
-          c.classList.toggle('chip-active', c.dataset.intent === id);
-        });
-      }
-
-      function selectIntent(id) {
-        const intent = State.manifest.intents.find((i) => i.id === id);
-        if (!intent) return;
-        State.intent = intent;
-        State.memory.lastIntent = id;
-        persistMemory();
-        highlightChip(id);
-        Log.push('EXEC', intent.command);
-        switch (id) {
-          case 'proposal': return morph(renderProposalModule);
-          case 'booking':  return morph(renderBookingModule);
-          case 'modules':  return morph(renderArtifactCarousel);
-          case 'library':  return morph(renderLibrary);
-          case 'about':    return morph(renderArchitectBriefing);
-          case 'dialogue': return morph(renderOrchestratorModule);
-          default:         return;
-        }
-      }
-
-      function parseIntent(text) {
-        if (!text) return;
-        Log.push('PARSE', '"' + text + '"');
-        const t = text.toLowerCase();
-        const aliases = [
-          { id: 'proposal', words: ['proposal','grant','doe','darpa','nih','craft'] },
-          { id: 'booking',  words: ['booking','book','session','consult','schedule','meet'] },
-          { id: 'modules',  words: ['module','artifact','repo','plan','organoid','ares'] },
-          { id: 'library',  words: ['library','read','doctrine','literacy'] },
-          { id: 'about',    words: ['about','who','thesis','brief'] },
-          { id: 'dialogue', words: ['dialogue','chat','talk','agent','agentic','develop',
-                                    'hire','join','career','recruit','team','orchestrat',
-                                    'specialist','webllm'] },
-        ];
-        let match = null;
-        for (const a of aliases) {
-          if (a.words.some((w) => t.includes(w))) { match = a.id; break; }
-        }
-        if (!match) {
-          Log.push('WARN', 'intent unresolved');
-          flashUnresolved();
-          return;
-        }
-        selectIntent(match);
-      }
-
-      function flashUnresolved() {
-        const f = qs('#concierge-flash');
-        if (!f) return;
-        f.textContent = (State.manifest.concierge_responses.default || 'Intent unresolved.');
-        clearTimeout(flashUnresolved._t);
-        flashUnresolved._t = setTimeout(() => { f.textContent = ''; }, 2400);
-      }
-
-      // ============================================================
-      // Module: Proposal Crafting (Grant Logic) — review → cooling → email
-      // ============================================================
-      function renderProposalModule(s) {
-        const r = State.manifest.concierge_responses.proposal;
-        const card = ce('div', 'module-card');
-        card.innerHTML =
-          '<div class="kicker">Proposal · Grant Logic</div>' +
-          '<h2>Proposal Crafting</h2>' +
-          '<div class="rule-accent"></div>' +
-          '<p class="lede" id="grant-resp"></p>' +
-          '<div class="field">' +
-          '  <label for="g-sol">Program solicitation</label>' +
-          '  <textarea id="g-sol" rows="5" placeholder="Paste FOA / BAA / RFP language…"></textarea>' +
-          '</div>' +
-          '<div class="field">' +
-          '  <label for="g-out">Target outcome</label>' +
-          '  <textarea id="g-out" rows="4" placeholder="State the operational outcome you intend to engineer…"></textarea>' +
-          '</div>' +
-          '<div class="field" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px;">' +
-          '  <div class="kicker" style="margin: 0;">Synthesized review</div>' +
-          '  <button id="g-synth" class="btn-primary" type="button">Synthesize</button>' +
-          '</div>' +
-          '<div id="g-output" class="field"></div>' +
-          '<div id="g-review" class="field"></div>';
-        s.appendChild(card);
-
-        typewriter(qs('#grant-resp', s), r, 10);
-        qs('#g-synth', s).addEventListener('click', () => runSynthesis(s));
-      }
-
-      function runSynthesis(s) {
-        const sol = qs('#g-sol', s).value.trim();
-        const out = qs('#g-out', s).value.trim();
-        const target = qs('#g-output', s);
-        const reviewEl = qs('#g-review', s);
-        if (!sol || !out) {
-          target.innerHTML =
-            '<div class="mono" style="font-size: 12px; color: #b89a1f;">' +
-            'Parameters incomplete — provide solicitation and outcome.' +
-            '</div>';
-          return;
-        }
-        const id = signedHash('grant', sol + '|' + out);
-        const lines = [
-          '↳ Deconstructing solicitation (' + sol.length + ' chars)',
-          '↳ Projecting outcome vector onto program axes',
-          '↳ Stress-testing narrative for adversarial review',
-          '↳ Manifest ready · REF ' + id,
-        ];
-        target.innerHTML = '<div class="mono" style="font-size: 12.5px; color: rgba(230,230,230,0.78);"></div>';
-        const tickerEl = target.firstChild;
-        let i = 0;
-        const next = () => {
-          if (i >= lines.length) {
-            Log.push('EXEC', 'GRANT_LOGIC synthesized · ' + id);
-            const params = computeStressParams(sol, out, id);
-            const review = composeReview(sol, out, id, params);
-            renderReviewPanel(reviewEl, sol, out, id, params, review);
-            return;
-          }
-          const ln = ce('div');
-          ln.textContent = lines[i++];
-          tickerEl.appendChild(ln);
-          setTimeout(next, 320);
-        };
-        next();
-      }
-
-      // Deterministic stress parameters — same approach as before.
-      function computeStressParams(sol, out, id) {
-        const keywords = sol.split(/\W+/)
-          .filter((w) => w.length > 5).slice(0, 4)
-          .map((w) => w.toUpperCase()).filter(Boolean);
-        const alignPct  = 50 + (id.charCodeAt(0) % 40);
-        const coherence = 85 + (id.charCodeAt(2) % 13);
-        const riskLabels = ['LOW', 'MODERATE', 'ELEVATED'];
-        const risk = riskLabels[id.charCodeAt(1) % 3];
-        return {
-          alignment: alignPct,
-          coherence,
-          risk,
-          axes: keywords,
-          ref: id,
-        };
-      }
-
-      // Deterministic agentic review — bullets + outline + draft body.
-      function composeReview(sol, out, id, p) {
-        const sentences = (sol.match(/[^.!?]+[.!?]+/g) || [sol])
-          .map((x) => x.trim()).filter(Boolean);
-        const lead = (sentences[0] || sol).slice(0, 220);
-        const axesStr = p.axes.length ? p.axes.slice(0, 3).join(' · ') : 'PROGRAM AXES';
-        const reviewerNotes = [
-          'Solicitation lead: "' + lead + (lead.length >= 220 ? '…' : '') + '"',
-          'Alignment to program axes is ' + p.alignment + '%; widen evidence around ' + axesStr + ' to lift this above 80%.',
-          'Narrative coherence ' + p.coherence + '% — strong; preserve the through-line from problem → approach → evaluation.',
-          'Adversarial-review risk flag: ' + p.risk + '. ' +
-            (p.risk === 'LOW' ? 'No structural exposure detected.'
-              : p.risk === 'MODERATE' ? 'Address one likely-reviewer objection in the approach section.'
-              : 'Add an explicit risk & mitigation paragraph; reviewers will probe this.'),
-          'Provenance ref ' + id + ' will travel on the email; quote it in any follow-up correspondence.',
-        ];
-        const outline = [
-          'Objectives — restate the operational outcome in one paragraph; map each clause to a solicitation axis.',
-          'Approach — three concrete work-streams; cite prior art and substrate (' + axesStr + ').',
-          'Evaluation — define one quantitative success metric per work-stream and the data needed to compute it.',
-          'Risk & mitigation — name the top adversarial-review concern and how the plan absorbs it.',
-        ];
-        const draft =
-          'Subject: response to the program solicitation; target outcome described below.\n\n' +
-          '1. Target outcome\n' + out + '\n\n' +
-          '2. Alignment to solicitation\n' +
-          'The proposed effort maps onto the solicitation along ' + axesStr + '. ' +
-          'Synthesized alignment is ' + p.alignment + '%; coherence ' + p.coherence + '%; ' +
-          'adversarial-review risk: ' + p.risk + '.\n\n' +
-          '3. Approach\n' +
-          '- Objectives: ' + outline[0] + '\n' +
-          '- Method:     ' + outline[1] + '\n' +
-          '- Evaluation: ' + outline[2] + '\n' +
-          '- Risk:       ' + outline[3] + '\n\n' +
-          '4. Reviewer notes (synthesized)\n' +
-          reviewerNotes.map((n, i) => '  ' + (i + 1) + '. ' + n).join('\n') + '\n\n' +
-          'Provenance · REF ' + id + '\n' +
-          '— Generated by DaScient Concierge.';
-        return { reviewerNotes, outline, draft };
-      }
-
-      // Render the review panel + cooling timer + send controls.
-      function renderReviewPanel(host, sol, out, id, p, review) {
-        const vectorA = (State.manifest.orchestration.vectors || []).find((v) => v.id === 'A');
-        const ho = (vectorA && vectorA.handoff) || {};
-        const cooling = Math.max(0, Number(ho.cooling_seconds) || 120);
-        const reviewCopy = ho.review_copy || {
-          headline: 'Review window',
-          body: 'Take a moment to review the synthesized feedback. The submission channel will unlock when the review window completes. Any edit resets the timer.',
-        };
-        const subjectBase = ho.subject || ('DaScient · ' + (vectorA ? vectorA.label : 'Grant Intelligence'));
-        const draftSubject = subjectBase + ' · REF ' + id;
-
-        const params = [
-          'Solicitation axis alignment · ' + p.alignment + '%',
-          'Narrative coherence · ' + p.coherence + '%',
-          'Adversarial risk flag · ' + p.risk,
-          (p.axes.length ? 'Key axes · ' + p.axes.join(' · ') : ''),
-          'Synthesis complete · REF ' + id,
-        ].filter(Boolean);
-
-        host.innerHTML =
-          '<div class="rule"></div>' +
-          '<div class="kicker">Stress parameters</div>' +
-          '<div class="mono" style="font-size: 12.5px; color: rgba(230,230,230,0.85);">' +
-            params.map((x) => '<div>── ' + escapeHtml(x) + '</div>').join('') +
-          '</div>' +
-          '<div class="rule"></div>' +
-          '<div class="kicker">Reviewer notes</div>' +
-          '<ul style="padding-left: 18px; margin: 0 0 16px; color: rgba(230,230,230,0.85);">' +
-            review.reviewerNotes.map((n) => '<li style="margin-bottom: 4px;">' + escapeHtml(n) + '</li>').join('') +
-          '</ul>' +
-          '<div class="kicker">Suggested narrative outline</div>' +
-          '<ul style="padding-left: 18px; margin: 0 0 16px; color: rgba(230,230,230,0.85);">' +
-            review.outline.map((n) => '<li style="margin-bottom: 4px;">' + escapeHtml(n) + '</li>').join('') +
-          '</ul>' +
-          '<div class="field">' +
-          '  <label for="g-subject">Email subject</label>' +
-          '  <input id="g-subject" type="text" />' +
-          '</div>' +
-          '<div class="field">' +
-          '  <label for="g-cover">Short cover note</label>' +
-          '  <textarea id="g-cover" rows="3" placeholder="Optional one-liner that goes above the synthesized draft…"></textarea>' +
-          '</div>' +
-          '<div class="field">' +
-          '  <label for="g-draft">Proposal draft (editable)</label>' +
-          '  <textarea id="g-draft" rows="14"></textarea>' +
-          '</div>' +
-          '<div class="ref-chip" style="margin-top: 12px;">' +
-          '  <span class="ref-label">REF</span>' +
-          '  <span>' + escapeHtml(id) + '</span>' +
-          '</div>' +
-          '<div class="cooling-bar" id="g-cooling">' +
-          '  <div class="kicker" style="margin-bottom: 4px;">' + escapeHtml(reviewCopy.headline || 'Review window') + '</div>' +
-          '  <p class="cooling-line">' + escapeHtml(reviewCopy.body || '') + '</p>' +
-          '  <div class="cooling-meter"><div class="cooling-fill" id="g-cooling-fill" style="width: 100%;"></div></div>' +
-          '  <div class="mono" id="g-cooling-label" style="margin-top: 8px; font-size: 12px; color: var(--accent);"></div>' +
-          '</div>' +
-          '<div class="field" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">' +
-          '  <button id="g-send" class="btn-primary" type="button" disabled>Send to ' + escapeHtml(ho.email || 'grants@dascient.com') + '</button>' +
-          (ho.send_endpoint ? '  <button id="g-send-server" class="btn-ghost" type="button" disabled>Send via DaScient</button>' : '') +
-          '  <button id="g-copy" class="btn-ghost" type="button">Copy full draft</button>' +
-          '  <button id="g-reset" class="btn-ghost" type="button">Reset timer</button>' +
-          '</div>' +
-          '<div id="g-send-status" class="mono" style="margin-top: 10px; font-size: 12px; color: rgba(230,230,230,0.55);"></div>';
-
-        qs('#g-subject', host).value = draftSubject;
-        qs('#g-draft', host).value = review.draft;
-
-        // Cooling controller.
-        const ctx = {
-          host,
-          sol, out, id, p, review,
-          ho,
-          cooling,
-          remaining: cooling,
-          timer: null,
-        };
-        startCooling(ctx);
-
-        const onEdit = () => resetCooling(ctx);
-        ['g-subject', 'g-cover', 'g-draft'].forEach((idAttr) => {
-          const el = qs('#' + idAttr, host);
-          if (el) el.addEventListener('input', onEdit);
-        });
-        qs('#g-reset', host).addEventListener('click', () => resetCooling(ctx));
-        qs('#g-copy', host).addEventListener('click', () => {
-          const body = buildEmailBody(host, ctx);
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(body).then(() => {
-              qs('#g-send-status', host).textContent = 'Full draft copied to clipboard.';
-            }, () => fallbackCopy(body, host));
-          } else {
-            fallbackCopy(body, host);
-          }
-        });
-        qs('#g-send', host).addEventListener('click', () => {
-          if (ctx.remaining > 0) return;
-          sendViaMailto(host, ctx);
-        });
-        const serverBtn = qs('#g-send-server', host);
-        if (serverBtn) {
-          serverBtn.addEventListener('click', () => {
-            if (ctx.remaining > 0) return;
-            sendViaWorker(host, ctx);
-          });
-        }
-      }
-
-      function startCooling(ctx) {
-        if (ctx.timer) clearInterval(ctx.timer);
-        if (ctx.cooling <= 0) {
-          ctx.remaining = 0;
-          updateCoolingUI(ctx);
-          return;
-        }
-        ctx.timer = setInterval(() => {
-          ctx.remaining = Math.max(0, ctx.remaining - 1);
-          updateCoolingUI(ctx);
-          if (ctx.remaining <= 0) {
-            clearInterval(ctx.timer);
-            ctx.timer = null;
-            Log.push('EXEC', 'GRANT_LOGIC review window unlocked · REF ' + ctx.id);
-          }
-        }, 1000);
-        updateCoolingUI(ctx);
-      }
-      function resetCooling(ctx) {
-        ctx.remaining = ctx.cooling;
-        startCooling(ctx);
-      }
-      function updateCoolingUI(ctx) {
-        const fill = qs('#g-cooling-fill', ctx.host);
-        const label = qs('#g-cooling-label', ctx.host);
-        const send = qs('#g-send', ctx.host);
-        const sendServer = qs('#g-send-server', ctx.host);
-        const pct = ctx.cooling > 0 ? Math.round((ctx.remaining / ctx.cooling) * 100) : 0;
-        if (fill) fill.style.width = pct + '%';
-        const m = Math.floor(ctx.remaining / 60);
-        const sec = ctx.remaining % 60;
-        const fmt = m + ':' + (sec < 10 ? '0' + sec : sec);
-        if (label) {
-          label.textContent = ctx.remaining > 0
-            ? '[ REVIEWING · ' + fmt + ' ]'
-            : '[ REVIEW WINDOW COMPLETE — submission channel unlocked ]';
-        }
-        if (send) {
-          send.disabled = ctx.remaining > 0;
-          if (ctx.remaining > 0) {
-            send.textContent = '[ REVIEWING · ' + fmt + ' ]';
-          } else {
-            send.textContent = 'Send to ' + (ctx.ho.email || 'grants@dascient.com');
-          }
-        }
-        if (sendServer) {
-          sendServer.disabled = ctx.remaining > 0;
-        }
-      }
-
-      function buildEmailBody(host, ctx) {
-        const cover = qs('#g-cover', host).value.trim();
-        const draft = qs('#g-draft', host).value;
-        const params = [
-          '── Solicitation axis alignment · ' + ctx.p.alignment + '%',
-          '── Narrative coherence · ' + ctx.p.coherence + '%',
-          '── Adversarial risk flag · ' + ctx.p.risk,
-          (ctx.p.axes.length ? '── Key axes · ' + ctx.p.axes.join(' · ') : ''),
-          '── REF ' + ctx.id,
-        ].filter(Boolean).join('\n');
-        const footer =
-          '\n\n— Generated by DaScient Concierge · do not reply to this address before review. REF ' + ctx.id;
-        return (cover ? cover + '\n\n' : '') + draft + '\n\n— Stress parameters —\n' + params + footer;
-      }
-
-      function sendViaMailto(host, ctx) {
-        const subjectVal = qs('#g-subject', host).value.trim() ||
-          ((ctx.ho.subject || 'DaScient') + ' · REF ' + ctx.id);
-        const fullBody = buildEmailBody(host, ctx);
-        // mailto bodies are clipped at ~2000 chars in most clients; keep some
-        // headroom for the URL itself and trailing %0D%0A pairs.
-        const MAX = 1900;
-        let bodyForMailto = fullBody;
-        let truncated = false;
-        if (bodyForMailto.length > MAX) {
-          bodyForMailto = bodyForMailto.slice(0, MAX - 80) +
-            '\n\n[…truncated for mail client. Use "Copy full draft" to paste the complete version. REF ' + ctx.id + ']';
-          truncated = true;
-        }
-        // Encode line breaks as %0D%0A per RFC; encodeURIComponent handles the rest.
-        const encoded = encodeURIComponent(bodyForMailto).replace(/%0A/g, '%0D%0A');
-        const href = 'mailto:' + (ctx.ho.email || 'grants@dascient.com') +
-          '?subject=' + encodeURIComponent(subjectVal) +
-          '&body=' + encoded;
-        // Use a transient anchor so we don't trigger a navigation in the SPA.
-        const a = document.createElement('a');
-        a.href = href;
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        Log.push('EXEC', 'HANDOFF · VECTOR_A -> ' + (ctx.ho.email || 'grants@dascient.com') + ' · REF ' + ctx.id);
-        const status = qs('#g-send-status', host);
-        status.textContent = truncated
-          ? 'Mail client opened with a truncated draft. Use "Copy full draft" to paste the complete version into the email body.'
-          : 'Mail client opened with the synthesized draft.';
-      }
-
-      async function sendViaWorker(host, ctx) {
-        const endpoint = ctx.ho.send_endpoint;
-        if (!endpoint) return;
-        const status = qs('#g-send-status', host);
-        const subjectVal = qs('#g-subject', host).value.trim() ||
-          ((ctx.ho.subject || 'DaScient') + ' · REF ' + ctx.id);
-        const body = buildEmailBody(host, ctx);
-        status.textContent = 'Sending via DaScient…';
-        try {
-          const resp = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              subject: subjectVal,
-              body,
-              ref: ctx.id,
-              to: ctx.ho.email || 'grants@dascient.com',
-            }),
-          });
-          if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          const json = await resp.json().catch(() => ({}));
-          status.textContent = 'Submitted via DaScient · REF ' + (json.ref || ctx.id);
-          Log.push('EXEC', 'HANDOFF · server-send OK · REF ' + (json.ref || ctx.id));
-        } catch (e) {
-          status.textContent = 'Server-send failed (' + e.message + '). You can still use the mail client button.';
-          Log.push('WARN', 'server-send failed: ' + e.message);
-        }
-      }
-
-      function fallbackCopy(text, host) {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'absolute';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); }
-        catch (_) { /* */ }
-        ta.remove();
-        const status = qs('#g-send-status', host);
-        if (status) status.textContent = 'Full draft copied to clipboard.';
-      }
-
-      // ---------- Module: Booking ----------
-      function renderBookingModule(s) {
-        const card = ce('div', 'module-card');
-        card.innerHTML =
-          '<div class="kicker">Booking · Session</div>' +
-          '<h2>Initiate Session</h2>' +
-          '<div class="rule-accent"></div>' +
-          '<p class="lede" id="book-resp"></p>' +
-          '<div id="book-options" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;"></div>' +
-          '<div id="book-flow" class="field" style="margin-top: 18px;">' +
-          '  <div class="kicker">Select a session class to continue</div>' +
-          '</div>';
-        s.appendChild(card);
-        typewriter(qs('#book-resp', s), State.manifest.concierge_responses.booking, 10);
-
-        const opts = qs('#book-options', s);
-        State.manifest.session_options.forEach((o) => {
-          const b = ce('button', 'btn-ghost');
-          b.type = 'button';
-          b.style.textAlign = 'left';
-          b.style.padding = '14px 16px';
-          b.innerHTML =
-            '<div class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--accent);">' +
-              escapeHtml(o.duration.toUpperCase()) + '</div>' +
-            '<div style="font-size: 15px; margin-top: 6px;">' + escapeHtml(o.label) + '</div>';
-          b.addEventListener('click', () => beginBookingFlow(o));
-          opts.appendChild(b);
-        });
-      }
-
-      function beginBookingFlow(opt) {
-        const flow = qs('#book-flow');
-        flow.innerHTML =
-          '<div class="kicker">Step 02 · time selection · ' + escapeHtml(opt.label) + '</div>' +
-          '<div id="slots" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 12px;"></div>';
-        const slots = qs('#slots');
-        const now = new Date();
-        for (let d = 1; d <= 4; d++) {
-          for (const hr of [10, 14]) {
-            const dt = new Date(now);
-            dt.setDate(now.getDate() + d);
-            dt.setHours(hr, 0, 0, 0);
-            const b = ce('button', 'btn-ghost');
-            b.type = 'button';
-            b.style.fontFamily = "'JetBrains Mono', monospace";
-            b.style.fontSize = '12px';
-            const label =
-              dt.toLocaleDateString(undefined, { month: 'short', day: '2-digit' }) +
-              ' · ' + String(hr).padStart(2, '0') + ':00';
-            b.textContent = label;
-            b.addEventListener('click', () => confirmBooking(opt, dt, label));
-            slots.appendChild(b);
-          }
-        }
-        Log.push('EXEC', 'SESSION_OPEN · ' + opt.id);
-      }
-
-      function confirmBooking(opt, dt, label) {
-        const id = signedHash('book', opt.id + '|' + dt.toISOString());
-        State.memory.bookings.push({ id, option: opt.id, when: dt.toISOString(), label });
-        persistMemory();
-        const flow = qs('#book-flow');
-        flow.innerHTML =
-          '<div class="kicker">Step 03 · confirmation</div>' +
-          '<div class="display" style="font-size: 22px; margin-top: 10px;">' +
-            'Session locked — ' + escapeHtml(opt.label) + ', ' + escapeHtml(label) + '.' +
-          '</div>' +
-          '<p style="margin-top: 10px; color: rgba(230,230,230,0.78);">' +
-            'A confirmation channel will reach you. Reference this hash on first contact.' +
-          '</p>' +
-          '<div class="ref-chip" style="margin-top: 10px;"><span class="ref-label">SIGNED</span><span>' +
-            escapeHtml(id) + '</span></div>';
-        Log.push('EXEC', 'SESSION CONFIRMED · ' + id);
-      }
-
-      // ---------- Module: Artifact Carousel ----------
-      function renderArtifactCarousel(s) {
-        const card = ce('div', 'module-card');
-        card.innerHTML =
-          '<div class="kicker">Artifacts</div>' +
-          '<h2>Artifact Carousel</h2>' +
-          '<div class="rule-accent"></div>' +
-          '<p class="lede" id="art-resp"></p>' +
-          '<div id="art-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 8px;"></div>';
-        s.appendChild(card);
-        typewriter(qs('#art-resp', s), State.manifest.concierge_responses.modules, 10);
-
-        const grid = qs('#art-grid', s);
-        State.manifest.artifacts.forEach((a) => {
-          const cell = ce('div');
-          cell.style.border = '1px solid var(--rule)';
-          cell.style.borderRadius = '3px';
-          cell.style.padding = '18px';
-          cell.style.background = 'var(--ink)';
-          cell.innerHTML =
-            '<div class="kicker">' + escapeHtml(a.class) + '</div>' +
-            '<div class="display" style="font-size: 22px; margin-top: 4px;">' + escapeHtml(a.name) + '</div>' +
-            '<p style="margin: 12px 0 12px; color: rgba(230,230,230,0.78); font-size: 14px;">' +
-              escapeHtml(a.summary) + '</p>' +
-            '<div class="mono" style="font-size: 11px; color: var(--accent);">' + escapeHtml(a.signal) + '</div>';
-          grid.appendChild(cell);
-        });
-      }
-
-      // ---------- Module: Library ----------
-      function renderLibrary(s) {
-        const card = ce('div', 'module-card');
-        card.innerHTML =
-          '<div class="kicker">Library</div>' +
-          '<h2>Literacy Space</h2>' +
-          '<div class="rule-accent"></div>' +
-          '<p class="lede" id="lib-resp"></p>' +
-          '<div id="lib-shelf" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;"></div>';
-        s.appendChild(card);
-        typewriter(qs('#lib-resp', s), State.manifest.concierge_responses.library, 10);
-
-        const shelf = qs('#lib-shelf', s);
-        State.manifest.library.forEach((b) => {
-          const cell = ce('div');
-          cell.style.border = '1px solid var(--rule)';
-          cell.style.borderRadius = '3px';
-          cell.style.padding = '18px';
-          cell.style.background = 'var(--ink)';
-          cell.innerHTML =
-            '<div class="display" style="font-size: 22px; line-height: 1.2;">' + escapeHtml(b.title) + '</div>' +
-            '<div style="margin-top: 6px; color: rgba(230,230,230,0.65); font-size: 14px;">' +
-              escapeHtml(b.subtitle) + '</div>' +
-            '<div class="mono" style="margin-top: 10px; font-size: 10px; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase;">' +
-              escapeHtml(b.spine) + '</div>';
-          shelf.appendChild(cell);
-        });
-      }
-
-      // ---------- Module: Architect Briefing ----------
-      function renderArchitectBriefing(s) {
-        const card = ce('div', 'module-card');
-        card.innerHTML =
-          '<div class="kicker">About</div>' +
-          '<h2>The Operating Thesis</h2>' +
-          '<div class="rule-accent"></div>' +
-          '<p class="lede display" id="brief-resp" style="font-size: 17px;"></p>' +
-          '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px;">' +
-          '  <div style="border: 1px solid var(--rule); border-radius: 3px; padding: 14px;">' +
-          '    <div class="kicker">Doctrine</div><div style="margin-top: 4px;">Deterministic Design</div></div>' +
-          '  <div style="border: 1px solid var(--rule); border-radius: 3px; padding: 14px;">' +
-          '    <div class="kicker">Substrate</div><div style="margin-top: 4px;">Bio-Digital · Agentic</div></div>' +
-          '  <div style="border: 1px solid var(--rule); border-radius: 3px; padding: 14px;">' +
-          '    <div class="kicker">Focus</div><div style="margin-top: 4px;">Resilient Systems</div></div>' +
-          '</div>';
-        s.appendChild(card);
-        typewriter(qs('#brief-resp', s), State.manifest.concierge_responses.about, 12);
-      }
-
-      // ============================================================
-      // Architect Dialogue (Model Orchestration Layer)
-      // Logic preserved verbatim from prior build; render layer simplified.
-      // ============================================================
-      const Orchestrator = {
-        vectorById(id) {
-          const o = State.manifest && State.manifest.orchestration;
-          if (!o) return null;
-          return o.vectors.find((v) => v.id === id) || null;
-        },
-        route(text) {
-          const o = State.manifest.orchestration;
-          const t = text.toLowerCase();
-          let best = { id: null, score: 0 };
-          for (const v of o.vectors) {
-            let score = 0;
-            for (const k of v.keywords) {
-              if (t.includes(k)) score += k.length >= 5 ? 2 : 1;
-            }
-            if (score > best.score) best = { id: v.id, score };
-          }
-          return best.id || 'B';
-        },
-        setVector(vectorId, opts) {
-          opts = opts || {};
-          const v = this.vectorById(vectorId);
-          if (!v) return;
-          if (State.orchestration.currentVector === v.code && !opts.force) return;
-          const router = State.manifest.orchestration.router;
-          State.orchestration.currentVector = v.code;
-          State.orchestration.currentModel = v.model;
-          State.orchestration.progress = 0;
-          State.orchestration.handoffShown = false;
-          State.memory.dialogue.vector = v.id;
-          persistMemory();
-          Log.push('SWITCH', '-> Intent Detected: ' + v.code +
-            '. Loading ' + v.model + ' (' + v.mode + ')...');
-          Log.push('MEM', '-> Context transferred to Specialist Engine via ' + router.name + '.');
-          renderCurrentSpecialist();
-        },
-        setProgress(pct, ctx) {
-          const clamped = Math.max(0, Math.min(100, Math.round(pct)));
-          const prev = State.orchestration.progress;
-          State.orchestration.progress = clamped;
-          const meter = qs('#arch-meter-fill');
-          if (meter) meter.style.width = clamped + '%';
-          const label = qs('#arch-meter-label');
-          if (label) label.textContent = clamped + '%';
-          if (prev < 85 && clamped >= 85) {
-            Log.push('ALERT', '-> Conversion Threshold: ' + clamped +
-              '% reached. Displaying Human Hand-off...' + (ctx ? ' [' + ctx + ']' : ''));
-          }
-        },
-      };
-
-      function specialistRunA(vector, userText, threadEl) {
-        Orchestrator.setProgress(25, 'parse');
-        const id = signedHash('grant', userText);
-        const lines = [
-          '↳ Deconstructing solicitation (' + userText.length + ' chars)',
-          '↳ Mapping outcome onto program axes',
-          '↳ Stress-testing narrative for adversarial review',
-          '↳ Structural synthesis complete · REF ' + id,
-        ];
-        return streamSpecialistLines(threadEl, vector, lines, [25, 50, 75, 100]);
-      }
-
-      function specialistRunB(vector, userText, threadEl) {
-        const t = userText.toLowerCase();
-        let block;
-        if (t.includes('parse') || t.includes('document') || t.includes('manifest')) {
-          block = [
-            '↳ Homebrew guide · client-side document parsing',
-            '· Treat the manifest as the ground truth — render UI from it; never the inverse.',
-            '· For unstructured inputs: tokenize → segment → project onto a deterministic schema.',
-            '· Persist intermediate state in IndexedDB or LocalStorage; keep the network out of the loop.',
-          ];
-        } else if (t.includes('wasm') || t.includes('webgpu') || t.includes('webllm') || t.includes('inference')) {
-          block = [
-            '↳ Homebrew guide · WASM-based inference',
-            '· WebGPU + WebLLM gives you 1.5B–8B-class reasoning entirely on-device.',
-            '· Engage Qwen-class routers ahead of heavyweight specialists — keep the dispatcher cheap.',
-            '· Cache weights via the browser HTTP cache; first-load is the cost, every subsequent load is free.',
-          ];
-        } else {
-          block = [
-            '↳ Homebrew guide · agentic workflow pattern',
-            '· Decompose: Router → Specialist → Verifier — three roles, three separate model passes.',
-            '· Bound the agent by a manifest of allowed actions; emergent agency lives inside that frame.',
-            '· Surface every model swap in a System Log — observability is not optional in agentic work.',
-          ];
-        }
-        const cur = State.orchestration.progress || 20;
-        const next = Math.min(80, cur + 20);
-        return streamSpecialistLines(threadEl, vector, block, [cur + 5, next - 5, next, next + 5]);
-      }
-
-      function specialistRunC(vector, userText, threadEl) {
-        const r = State.memory.dialogue.recruitment;
-        if (!r.completed && r.step < vector.questions.length) {
-          const q = vector.questions[r.step];
-          r.answers.push({ id: q.id, label: q.label, answer: userText });
-          r.step += 1;
-          if (r.step >= vector.questions.length) r.completed = true;
-          persistMemory();
-        }
-        const total = vector.questions.length;
-        const pct = Math.round((r.step / total) * 100);
-        Orchestrator.setProgress(pct, 'interview ' + r.step + '/' + total);
-
-        if (r.completed) {
-          const lines = [
-            '↳ Intake captured · ' + total + '/' + total + ' responses recorded',
-            '↳ Provenance locked · signed-hash ' + signedHash('intake', JSON.stringify(r.answers)),
-            '↳ Initiating team handoff',
-          ];
-          return streamSpecialistLines(threadEl, vector, lines, [pct, pct, 100]);
-        }
-        const next = vector.questions[r.step];
-        const lines = [
-          'Question ' + (r.step + 1) + ' / ' + total + ' · ' + next.label,
-          next.prompt,
-        ];
-        return streamSpecialistLines(threadEl, vector, lines, [pct, pct]);
-      }
-
-      function streamSpecialistLines(threadEl, vector, lines, progressSteps) {
-        const bubble = ce('div', 'arch-msg-spec');
-        bubble.innerHTML =
-          '<div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: rgba(230,230,230,0.55); text-transform: uppercase;">' +
-          escapeHtml(vector.model) + ' · ' + escapeHtml(vector.role) +
-          '</div>' +
-          '<div class="body" style="margin-top: 6px;"></div>';
-        threadEl.appendChild(bubble);
-        threadEl.scrollTop = threadEl.scrollHeight;
-        const target = bubble.querySelector('.body');
-        return new Promise((resolve) => {
-          let i = 0;
-          const next = () => {
-            if (i >= lines.length) return resolve();
-            if (progressSteps && typeof progressSteps[i] === 'number') {
-              Orchestrator.setProgress(progressSteps[i], vector.code);
-            }
-            const ln = ce('div');
-            ln.textContent = lines[i++];
-            target.appendChild(ln);
-            threadEl.scrollTop = threadEl.scrollHeight;
-            setTimeout(next, 320);
-          };
-          next();
-        });
-      }
-
-      async function specialistRunWebLLM(vector, userText, threadEl) {
-        const eng = State.orchestration.webllm.engine;
-        if (!eng) return null;
-        const bubble = ce('div', 'arch-msg-spec');
-        bubble.innerHTML =
-          '<div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: rgba(230,230,230,0.55); text-transform: uppercase;">' +
-          escapeHtml(vector.model) + ' · ' + escapeHtml(vector.role) + ' · LIVE</div>' +
-          '<div class="body" style="margin-top: 6px;"></div>';
-        threadEl.appendChild(bubble);
-        const target = bubble.querySelector('.body');
-        try {
-          Orchestrator.setProgress(40, 'webllm');
-          const sys = 'You are ' + vector.role + ' for DaScient (' + vector.label +
-            '). Respond with deterministic, high-signal, in-voice prose. Be concise. ' +
-            'No preamble. Use mono-style step markers (↳) where appropriate.';
-          const messages = [{ role: 'system', content: sys }, { role: 'user', content: userText }];
-          const stream = await eng.chat.completions.create({ messages, stream: true });
-          let acc = '';
-          for await (const chunk of stream) {
-            const delta = chunk?.choices?.[0]?.delta?.content || '';
-            if (!delta) continue;
-            acc += delta;
-            target.textContent = acc;
-            threadEl.scrollTop = threadEl.scrollHeight;
-          }
-          Orchestrator.setProgress(95, 'webllm');
-          return acc;
-        } catch (e) {
-          Log.push('WARN', 'WebLLM stream failed — falling back');
-          bubble.remove();
-          return null;
-        }
-      }
-
-      // OpenAI streaming. Prefers the Cloudflare Worker proxy when configured
-      // (manifest.orchestration.proxy_endpoint); otherwise falls back to the
-      // direct API call using the build-time injected key.
-      async function specialistRunOpenAI(vector, userText, threadEl) {
-        const proxy = State.manifest.orchestration && State.manifest.orchestration.proxy_endpoint;
-        if (!proxy && !OPENAI_API_KEY) return null;
-        const bubble = ce('div', 'arch-msg-spec');
-        bubble.innerHTML =
-          '<div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: rgba(230,230,230,0.55); text-transform: uppercase;">' +
-          escapeHtml(vector.model) + ' · ' + escapeHtml(vector.role) +
-          ' · LIVE · ' + (proxy ? 'PROXY' : 'OPENAI') + '</div>' +
-          '<div class="body" style="margin-top: 6px;"></div>';
-        threadEl.appendChild(bubble);
-        const target = bubble.querySelector('.body');
-        try {
-          Orchestrator.setProgress(40, proxy ? 'proxy' : 'openai');
-          const sys = 'You are ' + vector.role + ' for DaScient (' + vector.label +
-            '). Respond with deterministic, high-signal, in-voice prose. Be concise. ' +
-            'No preamble. Use mono-style step markers (↳) where appropriate.';
-          const messages = [{ role: 'system', content: sys }, { role: 'user', content: userText }];
-          const headers = { 'Content-Type': 'application/json' };
-          let url;
-          let body;
-          if (proxy) {
-            url = proxy;
-            body = JSON.stringify({ model: OPENAI_MODEL, messages, stream: true });
-          } else {
-            url = 'https://api.openai.com/v1/chat/completions';
-            headers['Authorization'] = 'Bearer ' + OPENAI_API_KEY;
-            body = JSON.stringify({ model: OPENAI_MODEL, messages, stream: true });
-          }
-          const resp = await fetch(url, { method: 'POST', headers, body });
-          if (!resp.ok || !resp.body) throw new Error('http ' + resp.status);
-          const reader = resp.body.getReader();
-          const decoder = new TextDecoder();
-          let buf = '';
-          let acc = '';
-          while (true) {
-            const { value, done } = await reader.read();
-            if (done) break;
-            buf += decoder.decode(value, { stream: true });
-            let idx;
-            while ((idx = buf.indexOf('\n')) >= 0) {
-              const line = buf.slice(0, idx).trim();
-              buf = buf.slice(idx + 1);
-              if (!line.startsWith('data:')) continue;
-              const payload = line.slice(5).trim();
-              if (payload === '[DONE]') { buf = ''; break; }
-              try {
-                const json = JSON.parse(payload);
-                const delta = json?.choices?.[0]?.delta?.content || '';
-                if (delta) {
-                  acc += delta;
-                  target.textContent = acc;
-                  threadEl.scrollTop = threadEl.scrollHeight;
-                }
-              } catch (_) { /* tolerate partials */ }
-            }
-          }
-          Orchestrator.setProgress(95, proxy ? 'proxy' : 'openai');
-          return acc || null;
-        } catch (e) {
-          Log.push('WARN', 'OpenAI stream failed — falling back to deterministic');
-          bubble.remove();
-          return null;
-        }
-      }
-
-      function evaluateThreshold(vector, userText) {
-        const th = vector.threshold || {};
-        if (th.type === 'synthesis_complete') return State.orchestration.progress >= 100;
-        if (th.type === 'keyword_trigger') {
-          const t = (userText || '').toLowerCase();
-          return (th.words || []).some((w) => t.includes(w));
-        }
-        if (th.type === 'interview_complete') return !!(State.memory.dialogue.recruitment.completed);
-        return false;
-      }
-
-      // Inline conversion card for VECTOR_B / VECTOR_C. VECTOR_A uses the
-      // review→cooling→email flow inside the proposal module instead.
-      function triggerHandoff(vector) {
-        if (State.orchestration.handoffShown) return;
-        State.orchestration.handoffShown = true;
-        Orchestrator.setProgress(100, vector.code);
-
-        const ho = vector.handoff;
-        const ref = signedHash('handoff', vector.code + '|' + State.sessionId);
-        const subjectParam = encodeURIComponent((ho.subject || 'DaScient · ' + vector.label) + ' · REF ' + ref);
-        const mailto = 'mailto:' + ho.email + '?subject=' + subjectParam;
-
-        const card = ce('div');
-        card.style.border = '1px solid var(--rule)';
-        card.style.borderRadius = '3px';
-        card.style.padding = '20px';
-        card.style.marginTop = '16px';
-        card.style.background = 'var(--ink)';
-        card.innerHTML =
-          '<div class="kicker">Conversion · ' + escapeHtml(vector.code) + '</div>' +
-          '<div class="display" style="font-size: 22px; margin: 4px 0 6px;">' + escapeHtml(ho.headline) + '</div>' +
-          '<div class="rule-accent"></div>' +
-          '<p style="color: rgba(230,230,230,0.78); margin: 0 0 14px;">' + escapeHtml(ho.message) + '</p>' +
-          '<a class="btn-primary" href="' + mailto + '" rel="noopener">' + escapeHtml(ho.email) + '</a>' +
-          '<div class="ref-chip" style="margin-left: 10px;"><span class="ref-label">REF</span><span>' + escapeHtml(ref) + '</span></div>';
-        const thread = qs('#arch-thread');
-        if (thread) thread.appendChild(card);
-        Log.push('EXEC', 'HANDOFF · ' + vector.code + ' -> ' + ho.email + ' · REF ' + ref);
-      }
-
-      async function engageWebLLM(vector, btn) {
-        const w = State.orchestration.webllm;
-        if (w.loading) return;
-        if (!('gpu' in navigator)) {
-          Log.push('WARN', 'WebGPU unavailable — staying in deterministic mode');
-          if (btn) btn.textContent = 'WebGPU unavailable';
-          return;
-        }
-        w.loading = true;
-        if (btn) btn.textContent = 'Loading ' + vector.model + '…';
-        Log.push('MEM', 'engaging WebLLM · ' + vector.engine);
-        try {
-          const mod = await import('https://esm.run/@mlc-ai/web-llm');
-          const engine = await mod.CreateMLCEngine(vector.engine, {
-            initProgressCallback: (p) => {
-              const pct = Math.round((p && typeof p.progress === 'number' ? p.progress : 0) * 100);
-              if (btn) btn.textContent = 'Loading · ' + pct + '%';
-              if (pct % 10 === 0) Log.push('MEM', vector.engine + ' · ' + pct + '%');
-            },
-          });
-          w.engine = engine;
-          w.engaged = true;
-          w.modelId = vector.engine;
-          if (btn) btn.textContent = 'WebLLM engaged';
-          Log.push('SWITCH', '-> Live engine ready: ' + vector.model);
-        } catch (e) {
-          Log.push('WARN', 'WebLLM engagement failed — deterministic only');
-          if (btn) btn.textContent = 'WebLLM unavailable';
-        } finally {
-          w.loading = false;
-        }
-      }
-
-      function renderOrchestratorModule(s) {
-        const orch = State.manifest.orchestration;
-        const card = ce('div', 'module-card');
-        card.innerHTML =
-          '<div class="kicker">Architect Dialogue</div>' +
-          '<h2>Architect Dialogue</h2>' +
-          '<div class="rule-accent"></div>' +
-          '<p class="lede" id="arch-resp"></p>' +
-          '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 8px;">' +
-          '  <div style="border: 1px solid var(--rule); border-radius: 3px; padding: 12px;">' +
-          '    <div class="kicker">Dispatcher</div>' +
-          '    <div style="margin-top: 4px; font-size: 13px;">' + escapeHtml(orch.router.name) + '</div></div>' +
-          '  <div style="border: 1px solid var(--rule); border-radius: 3px; padding: 12px;">' +
-          '    <div class="kicker">Specialist</div>' +
-          '    <div id="arch-current" style="margin-top: 4px; font-size: 13px; color: rgba(230,230,230,0.55);">— awaiting intent —</div></div>' +
-          '  <div style="border: 1px solid var(--rule); border-radius: 3px; padding: 12px;">' +
-          '    <div style="display: flex; justify-content: space-between; align-items: center;">' +
-          '      <div class="kicker" style="margin: 0;">Conversion</div>' +
-          '      <div id="arch-meter-label" class="mono" style="font-size: 11px; color: var(--accent);">0%</div></div>' +
-          '    <div class="meter-track" style="margin-top: 8px;"><div id="arch-meter-fill" class="meter-fill" style="width: 0%;"></div></div></div>' +
-          '</div>' +
-          '<div style="display: flex; justify-content: flex-end; margin-top: 10px;">' +
-          '  <button id="arch-engage" class="btn-ghost" type="button" style="font-size: 12px; padding: 6px 12px;">Engage WebLLM</button>' +
-          '</div>' +
-          '<div id="arch-thread" style="max-height: 360px; overflow-y: auto; margin-top: 10px;"></div>' +
-          '<form id="arch-form" style="margin-top: 14px;">' +
-          '  <div class="concierge-input-wrap">' +
-          '    <input id="arch-input" class="concierge-input" autocomplete="off" placeholder="State intent — e.g. craft a DOE proposal, build an agent, join the team" />' +
-          '    <button type="submit" class="btn-ghost" style="padding: 6px 14px; font-size: 13px;">Dispatch</button>' +
-          '  </div>' +
-          '</form>';
-        s.appendChild(card);
-
-        typewriter(qs('#arch-resp', s), State.manifest.concierge_responses.dialogue, 10);
-
-        const thread = qs('#arch-thread', s);
-        const input = qs('#arch-input', s);
-        const form = qs('#arch-form', s);
-        const engageBtn = qs('#arch-engage', s);
-
-        const persisted = State.memory.dialogue;
-        if (persisted && Array.isArray(persisted.history) && persisted.history.length) {
-          for (const m of persisted.history) appendMessage(thread, m.role, m.text, m.modelLabel);
-        }
-        if (persisted.vector === 'C' && !persisted.recruitment.completed && persisted.recruitment.step > 0) {
-          const v = Orchestrator.vectorById('C');
-          if (v) {
-            Orchestrator.setVector('C', { force: true });
-            const total = v.questions.length;
-            const r = persisted.recruitment;
-            Orchestrator.setProgress(Math.round((r.step / total) * 100), 'interview-resume');
-            const next = v.questions[r.step];
-            const bubble = ce('div', 'arch-msg-spec');
-            bubble.innerHTML =
-              '<div class="mono" style="font-size: 10px; letter-spacing: 0.18em; color: rgba(230,230,230,0.55); text-transform: uppercase;">' +
-              escapeHtml(v.model) + ' · resuming · ' + escapeHtml(v.role) + '</div>' +
-              '<div class="body" style="margin-top: 6px;">' +
-                'Question ' + (r.step + 1) + ' / ' + total + ' · ' + escapeHtml(next.label) + '\n' +
-                escapeHtml(next.prompt) +
-              '</div>';
-            thread.appendChild(bubble);
-          }
-        }
-        renderCurrentSpecialist();
-
-        engageBtn.addEventListener('click', () => {
-          const v = State.orchestration.currentVector
-            ? Orchestrator.vectorById(State.orchestration.currentVector.replace('VECTOR_', ''))
-            : Orchestrator.vectorById('B');
-          engageWebLLM(v, engageBtn);
-        });
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const text = input.value.trim();
-          if (!text) return;
-          input.value = '';
-          await dispatchUserTurn(text, thread);
-        });
-      }
-
-      function renderCurrentSpecialist() {
-        const el = qs('#arch-current');
-        if (!el) return;
-        const o = State.orchestration;
-        if (!o.currentModel) {
-          el.textContent = '— awaiting intent —';
-          el.style.color = 'rgba(230,230,230,0.55)';
-        } else {
-          el.innerHTML = escapeHtml(o.currentModel) +
-            ' <span style="color: rgba(230,230,230,0.55);">· ' + escapeHtml(o.currentVector) + '</span>';
-          el.style.color = 'var(--accent)';
-        }
-      }
-
-      function appendMessage(threadEl, role, text, modelLabel) {
-        const bubble = ce('div', role === 'user' ? 'arch-msg-user' : 'arch-msg-spec');
-        const headerLabel = role === 'user' ? 'OPERATOR' : (modelLabel || 'SPECIALIST');
-        bubble.innerHTML =
-          '<div class="mono" style="font-size: 10px; letter-spacing: 0.18em; ' +
-            'color: ' + (role === 'user' ? 'var(--accent)' : 'rgba(230,230,230,0.55)') + '; ' +
-            'text-transform: uppercase;">' +
-            escapeHtml(headerLabel) +
-          '</div>' +
-          '<div class="body" style="margin-top: 6px; ' +
-            (role === 'user' ? "font-family: 'Inter', sans-serif;" : '') + '"></div>';
-        bubble.querySelector('.body').textContent = text;
-        threadEl.appendChild(bubble);
-        threadEl.scrollTop = threadEl.scrollHeight;
-      }
-
-      async function dispatchUserTurn(text, threadEl) {
-        State.memory.dialogue.history.push({ role: 'user', text });
-        if (State.memory.dialogue.history.length > 40) {
-          State.memory.dialogue.history = State.memory.dialogue.history.slice(-40);
-        }
-        persistMemory();
-        appendMessage(threadEl, 'user', text);
-
-        const vectorId = Orchestrator.route(text);
-        const vector = Orchestrator.vectorById(vectorId);
-        Orchestrator.setVector(vectorId);
-        renderCurrentSpecialist();
-
-        const earlyTrigger =
-          vector.threshold && vector.threshold.type === 'keyword_trigger' &&
-          evaluateThreshold(vector, text);
-
-        let liveOutput = null;
-        if (State.orchestration.webllm.engaged && State.orchestration.webllm.engine) {
-          liveOutput = await specialistRunWebLLM(vector, text, threadEl);
-        }
-        if (liveOutput == null) {
-          // OpenAI path attempted whenever a proxy_endpoint is configured OR a
-          // build-time key is present; specialistRunOpenAI returns null if neither.
-          liveOutput = await specialistRunOpenAI(vector, text, threadEl);
-        }
-        if (liveOutput == null) {
-          if (vector.id === 'A') await specialistRunA(vector, text, threadEl);
-          else if (vector.id === 'B') await specialistRunB(vector, text, threadEl);
-          else await specialistRunC(vector, text, threadEl);
-        }
-
-        State.memory.dialogue.history.push({
-          role: 'specialist',
-          text: '[' + vector.code + ' synthesis]',
-          modelLabel: vector.model + ' · ' + vector.role.toUpperCase(),
-        });
-        persistMemory();
-
-        if (earlyTrigger || evaluateThreshold(vector, text)) {
-          Orchestrator.setProgress(100, vector.code);
-          setTimeout(() => triggerHandoff(vector), 320);
-        }
-      }
-
-      // ---------- Boot ----------
-      async function boot() {
-        try {
-          const r = await fetch('manifest.json', { cache: 'no-cache' });
-          if (!r.ok) throw new Error('manifest http ' + r.status);
-          State.manifest = await r.json();
-        } catch (e) {
-          State.manifest = INLINE_MANIFEST;
-        }
-        loadMemory();
-
-        // Hero copy from manifest.
-        const m = State.manifest;
-        const heroTitle = qs('#hero-title');
-        const heroSyn   = qs('#hero-synopsis');
-        if (heroTitle) heroTitle.textContent = m.system.tagline || heroTitle.textContent;
-        if (heroSyn) heroSyn.textContent = m.system.concierge_prompt || heroSyn.textContent;
-
-        // Footer.
-        qs('#footer-year').textContent = new Date().getFullYear();
-        const ver = qs('#footer-version');
-        if (ver) ver.textContent = 'v' + (m.system.version || '—');
-
-        renderIntentList();
-
-        // Wire CTA, log drawer, concierge form.
-        const cta = qs('#hero-cta');
-        if (cta) cta.addEventListener('click', () => {
-          const i = qs('#concierge-input');
-          if (i) { i.focus(); i.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-        });
-        const navBegin = qs('#nav-begin');
-        if (navBegin) navBegin.addEventListener('click', (e) => {
-          e.preventDefault();
-          const i = qs('#concierge-input');
-          if (i) { i.focus(); i.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-        });
-        const cf = qs('#concierge-form');
-        if (cf) cf.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const v = qs('#concierge-input').value.trim();
-          parseIntent(v);
-          qs('#concierge-input').value = '';
-        });
-        const lt = qs('#log-toggle');
-        const drawer = qs('#log-drawer');
-        if (lt && drawer) lt.addEventListener('click', () => {
-          const open = drawer.classList.toggle('open');
-          drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
-          lt.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-
-        Log.push('BOOT', 'concierge online');
-        Log.push('NOTE', 'session ' + State.sessionId);
-      }
-
-      // ---------------------------------------------------------------
-      // Inline fallback manifest (mirrors public/manifest.json schema —
-      // keep both in sync). Includes the review→cooling→email handoff
-      // additions under vectors[A].handoff.
-      // ---------------------------------------------------------------
-      const INLINE_MANIFEST = {
-        system: {
-          name: 'DaScient',
-          designation: 'Atelier',
-          version: '1.1.0',
-          tagline: 'We engineer resilient systems.',
-          doctrine: 'Deterministic Design',
-          concierge_prompt: 'A focused interface for biological computing and agentic systems work.',
-          boot_sequence: ['Ready.'],
-        },
-        intents: [
-          { id: 'proposal', label: 'Proposal Crafting',  command: 'proposal',  synopsis: 'Synthesize stress parameters and a structured narrative for a grant submission.' },
-          { id: 'booking',  label: 'Initiate Session',   command: 'booking',   synopsis: 'Open a scheduling channel for a strategic consultation or engineering session.' },
-          { id: 'modules',  label: 'Artifact Carousel',  command: 'modules',   synopsis: 'Inspect manifests for Plan-Examiner, Organoid-Intelligence, and ARES-E.' },
-          { id: 'library',  label: 'Library',            command: 'library',   synopsis: 'Browse the published reference works behind the architecture.' },
-          { id: 'about',    label: 'About',              command: 'about',     synopsis: 'An overview of the thinking behind DaScient.' },
-          { id: 'dialogue', label: 'Architect Dialogue', command: 'dialogue',  synopsis: 'Open a conversational channel routed through the model orchestration layer.' },
-        ],
-        artifacts: [
-          { id: 'plan-examiner', name: 'Plan-Examiner', class: 'Client-side Logic Engine',
-            summary: 'A manifest-driven inspector that parses structured plans and renders UI from them.',
-            signal: '// parse → reflect → execute' },
-          { id: 'organoid-intelligence', name: 'Organoid-Intelligence', class: 'Biological Computing',
-            summary: 'Research bridging cortical organoids and silicon.',
-            signal: '// neurons ⇌ tensors' },
-          { id: 'ares-e', name: 'ARES-E', class: 'Agentic Resilience',
-            summary: 'Adversarially-Robust Evaluation Suite for evolving agents.',
-            signal: '// stress → adapt → harden' },
-        ],
-        library: [
-          { id: 'prompt-atlas', title: 'The Prompt Atlas', subtitle: 'A Cartography of Intent', spine: 'PROMPT ATLAS' },
-          { id: 'modern-psychology-of-ai', title: 'The Modern Psychology of AI', subtitle: 'Cognition, Constraint, Composure', spine: 'ψ AI' },
-          { id: 'agentic-resilience', title: 'Agentic Resilience', subtitle: 'Engineering Systems That Endure', spine: 'RESILIENCE' },
-        ],
-        session_options: [
-          { id: 'consult',  label: 'Strategic Consultation', duration: '45m' },
-          { id: 'engineer', label: 'Agentic Engineering',    duration: '90m' },
-          { id: 'review',   label: 'Manifest Review',        duration: '30m' },
-        ],
-        concierge_responses: {
-          proposal: 'Loading the Grant Logic module. Provide the program solicitation and target outcome.',
-          booking:  'Opening scheduling channel. Select a session class to continue.',
-          modules:  'Loading module manifests. Each entry references an active repository.',
-          library:  'Showing the published reference works behind the architecture.',
-          about:    'DaScient works at the intersection of biological computing and agentic systems.',
-          dialogue: 'Architect Dialogue ready. State your intent — the dispatcher routes to a specialist and surfaces a human hand-off when automated synthesis reaches its limit.',
-          default:  'Intent unresolved. Re-state your request or pick a chip.',
-        },
-        orchestration: {
-          // proxy_endpoint (optional): when set, the OpenAI fallback POSTs
-          // through the Cloudflare Worker proxy instead of the public OpenAI
-          // API directly. See cloudflare/functions/api/concierge.ts.
-          proxy_endpoint: null,
-          router: {
-            name: 'Qwen 2.5-Coder 1.5B',
-            engine: 'Qwen2.5-Coder-1.5B-Instruct-q4f16_1-MLC',
-            role: 'Dispatcher',
-            synopsis: 'Lightweight classifier — routes user intent to VECTOR_A / VECTOR_B / VECTOR_C.',
-          },
-          vectors: [
-            {
-              id: 'A', code: 'VECTOR_A', label: 'Grant Intelligence',
-              model: 'DeepSeek-R1-Distill-Llama-8B',
-              engine: 'DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC',
-              role: 'The Strategist', mode: 'Reasoning Mode',
-              synopsis: 'Deconstructs solicitation texts and maps outcomes to program axes.',
-              keywords: ['grant','proposal','doe','darpa','nih','nsf','arpa-h',
-                         'foa','baa','rfp','solicitation','funding','award','submission'],
-              threshold: { type: 'synthesis_complete', max_progress: 100 },
-              handoff: {
-                email: 'grants@dascient.com',
-                subject: 'Proposal Finalization · DaScient Grant Intelligence',
-                headline: 'Synthesis Complete',
-                message: 'Automated synthesis is complete. To finalize, verify, and submit this proposal to private, local, or federal pools, contact:',
-                // Review-then-cooling-then-email additions:
-                cooling_seconds: 120,
-                review_copy: {
-                  headline: 'Review window',
-                  body: 'Take a moment to review the synthesized feedback. The submission channel will unlock when the review window completes. Any edit to the draft, subject, or cover note resets the timer.',
-                },
-                // Optional Cloudflare Worker server-send endpoint. When set, a
-                // "Send via DaScient" button is rendered alongside the mailto.
-                send_endpoint: null,
-              },
-            },
-            {
-              id: 'B', code: 'VECTOR_B', label: 'Agentic AI Development',
-              model: 'DeepSeek-R1-Distill-Llama-8B',
-              engine: 'DeepSeek-R1-Distill-Llama-8B-q4f16_1-MLC',
-              role: 'The Senior Architect', mode: 'Reasoning Mode',
-              synopsis: 'Plan-Examiner-aware homebrew guidance for client-side parsing, WASM inference, and agentic workflows.',
-              keywords: ['agent','agentic','build','develop','developer',
-                         'plan-examiner','wasm','webgpu','webllm','homebrew',
-                         'code','engineer','architecture','client-side','rag','llm'],
-              threshold: {
-                type: 'keyword_trigger',
-                words: ['implement','implementation','specifics','specific',
-                        'scale','scaling','production','deploy','deployment',
-                        'enterprise','operational'],
-              },
-              handoff: {
-                email: 'agentic@dascient.com',
-                subject: 'Plan-Examiner API · Operational Engagement',
-                headline: 'Beyond Homebrew Scope',
-                message: 'To access the full Plan-Examiner API and move from a homebrew prototype to production, contact our development team:',
-              },
-            },
-            {
-              id: 'C', code: 'VECTOR_C', label: 'Recruitment & Evolution',
-              model: 'SmolLM3-3B',
-              engine: 'SmolLM3-3B-Instruct-q4f16_1-MLC',
-              role: 'The Talent Liaison', mode: 'Interview Mode',
-              synopsis: 'Conducts a 3-question intake instead of answering. Captures specialization, philosophy, and provenance.',
-              keywords: ['join','hire','career','careers','recruit','recruiting',
-                         'work','apply','team','employ','employment','portfolio',
-                         'position','role','opening','opportunity'],
-              questions: [
-                { id: 'specialization', label: 'TECHNICAL SPECIALIZATION',
-                  prompt: 'State your primary technical specialization, and where on the bio↔silicon axis your work sits.' },
-                { id: 'philosophy', label: 'PHILOSOPHY · AGENTIC AUTONOMY',
-                  prompt: 'State your view on agentic autonomy. Where do you draw the line between deterministic constraint and emergent agency?' },
-                { id: 'provenance', label: 'PROVENANCE',
-                  prompt: 'Provide a portfolio, GitHub, or representative artifact. One link is enough.' },
-              ],
-              threshold: { type: 'interview_complete', count: 3 },
-              handoff: {
-                email: 'join@dascient.com',
-                subject: 'DaScient · Talent Intake Follow-up',
-                headline: 'Intake Captured',
-                message: 'Intake captured. We will follow up. For immediate manual submission:',
-              },
-            },
-          ],
-        },
-      };
-
-      document.addEventListener('DOMContentLoaded', boot);
+      // Keep the footer year current without a build step.
+      document.getElementById('year').textContent = new Date().getFullYear();
     </script>
   </body>
 </html>
