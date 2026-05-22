@@ -11,5 +11,3 @@
 [instagram]: https://www.instagram.com/dascient/
 [linkedin]: https://www.linkedin.com/company/dascient/
 [kaggle]: https://www.kaggle.com/dascient/
-
-<iframe src="https://maps.deflock.org/?lat=39.7055&lng=-104.9603&zoom=11.12" width="100%" height="600" style="border: none;"></iframe>
