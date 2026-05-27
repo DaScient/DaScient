@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WAR.GOV/UFO — Live Analytic Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0e11">
+<meta name="description" content="WAR.GOV/UFO live analytic dashboard — mirrored, searchable, mobile-first view of the U.S. Department of War PURSUE program declassified UAP releases.">
+<title>WAR.GOV/UFO — Live Analytic Dashboard · UACP · Enriched Network Graph</title>
+<link rel="canonical" href="https://dascient.github.io/UACP/war-gov/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%2300d4aa'/%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0b0e11;
@@ -20,479 +24,387 @@
     --mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
     --radius: 6px;
     --shadow: 0 2px 8px rgba(0,0,0,.3);
+    --tap: 44px;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;min-height:100vh}
-  body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 0%, rgba(0,212,170,.03) 0%, transparent 60%);pointer-events:none;z-index:0}
-  .app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
-
-  /* HEADER */
-  .header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
-  .header-left{display:flex;align-items:center;gap:12px}
-  .logo{width:40px;height:40px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#000;font-family:var(--mono)}
-  .title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;min-height:100vh;overflow-x:hidden}
+  .app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+  @media(min-width:700px){.app{padding:16px;gap:16px}}
+  .hub-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);text-decoration:none;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);width:fit-content}
+  .hub-link:hover{color:var(--accent);border-color:var(--accent)}
+  .header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+  .header-left{display:flex;align-items:center;gap:10px}
+  .logo{width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#000;font-family:var(--mono)}
+  .title{font-size:15px;font-weight:700;letter-spacing:-0.3px}
+  @media(min-width:700px){.title{font-size:18px}}
   .title span{color:var(--accent)}
-  .status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+  .status{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text2)}
   .status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
   .status-dot.error{background:var(--danger)}
   .status-dot.warn{background:var(--warn)}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
   .header-actions{display:flex;gap:8px}
-  .btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-size:13px;transition:.2s;white-space:nowrap}
+  .btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0 14px;min-height:var(--tap);border-radius:var(--radius);cursor:pointer;font-size:13px;transition:.2s;display:inline-flex;align-items:center}
   .btn:hover{background:#242b36;border-color:#3a4353}
   .btn-accent{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
   .btn-accent:hover{background:#00e6b8}
-
-  /* TICKER */
-  .ticker-wrap{overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;position:relative}
-  .ticker-label{position:absolute;left:16px;top:50%;transform:translateY(-50%);background:var(--accent);color:#000;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;z-index:1;font-family:var(--mono)}
-  .ticker{overflow:hidden;white-space:nowrap;padding-left:70px}
+  .ticker-wrap{overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;position:relative}
+  .ticker-label{position:absolute;left:14px;top:50%;transform:translateY(-50%);background:var(--accent);color:#000;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;z-index:1}
+  .ticker{overflow:hidden;white-space:nowrap;padding-left:74px}
   .ticker-track{display:inline-block;animation:scroll 40s linear infinite}
   .ticker-item{display:inline-block;margin-right:48px;color:var(--text2);font-size:13px}
-  .ticker-item strong{color:var(--accent)}
   @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-
-  /* GRID */
-  .grid{display:grid;grid-template-columns:280px 1fr;gap:16px;min-height:0}
-  @media(max-width:900px){.grid{grid-template-columns:1fr}}
-
-  /* SIDEBAR */
-  .sidebar{display:flex;flex-direction:column;gap:16px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
-  .card-title{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:12px;font-weight:600}
+  @media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:900px){.grid{grid-template-columns:280px 1fr;gap:16px}}
+  .sidebar{display:flex;flex-direction:column;gap:12px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+  .card-title{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:10px;font-weight:600;display:flex;justify-content:space-between}
   .stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
-  .stat-row:last-child{border-bottom:none}
   .stat-val{font-weight:600;color:var(--accent);font-family:var(--mono)}
-  .stat-val.big{font-size:24px;display:block;line-height:1}
-  .agency-tag{display:inline-block;background:var(--surface2);padding:3px 8px;border-radius:3px;font-size:11px;margin:2px;cursor:pointer;border:1px solid transparent;transition:.2s}
-  .agency-tag:hover{border-color:var(--accent);color:var(--accent)}
-  .agency-tag.active{background:var(--accent);color:#000;border-color:var(--accent)}
-
-  /* MAIN */
-  .main{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .stat-val.big{font-size:22px}
+  .agency-tag{display:inline-block;background:var(--surface2);padding:6px 10px;border-radius:3px;font-size:12px;margin:2px;cursor:pointer;border:1px solid transparent}
+  .agency-tag.active{background:var(--accent);color:#000}
+  .main{display:flex;flex-direction:column;gap:12px}
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .search{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:13px;outline:none}
+  .search{flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0 12px;min-height:var(--tap);border-radius:var(--radius);font-size:14px}
   .search:focus{border-color:var(--accent)}
-  .count-info{font-size:12px;color:var(--text2)}
-
-  /* FILE LIST */
-  .file-list{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto;padding-right:4px}
-  .file-list::-webkit-scrollbar{width:4px}
-  .file-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-  .file-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:.2s;position:relative}
-  .file-item:hover{border-color:var(--accent);background:#1e2530}
+  .view-toggle{display:flex;gap:6px}
+  .view-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:0 14px;min-height:var(--tap);border-radius:var(--radius);cursor:pointer}
+  .view-btn.active{background:var(--accent);color:#000}
+  .file-list{display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 280px);overflow-y:auto;padding-right:4px}
+  .file-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;position:relative}
   .file-item.new{border-left:3px solid var(--accent)}
-  .file-item .badge{position:absolute;top:8px;right:12px;background:var(--accent);color:#000;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600}
-  .file-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+  .file-item .badge{position:absolute;top:8px;right:12px;background:var(--accent);color:#000;font-size:10px;padding:2px 6px;border-radius:3px}
+  .file-meta{display:flex;gap:8px;margin-bottom:6px}
   .file-agency{background:var(--surface);padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;color:var(--accent2)}
-  .file-date{font-size:11px;color:var(--text2)}
-  .file-title{font-weight:600;font-size:14px;margin-bottom:4px;color:#e0e6ed}
-  .file-blurb{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .file-link{color:var(--accent);font-size:11px;text-decoration:none;margin-top:6px;display:inline-block}
-  .file-link:hover{text-decoration:underline}
-
-  /* DETAIL MODAL */
-  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:700px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;position:relative}
-  .modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer;line-height:1}
-  .modal-close:hover{color:var(--text)}
-  .modal h2{font-size:16px;margin-bottom:12px}
-  .modal .file-blurb{display:block;-webkit-line-clamp:unset;overflow:visible;margin-bottom:12px}
-  .modal a{color:var(--accent)}
-
-  /* LOADING */
-  .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text2);gap:8px}
+  .file-title{font-weight:600;font-size:14px;color:#e0e6ed}
+  .file-blurb{font-size:12px;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .file-link{color:var(--accent);font-size:12px;text-decoration:none;margin-top:8px;display:inline-block}
+  .graph-container{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);height:60vh;min-height:360px;position:relative;overflow:hidden}
+  #mynetwork{width:100%;height:100%;background:var(--surface2)}
+  .graph-controls{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:12px}
+  .graph-controls select, .graph-controls input, .graph-controls button{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:var(--radius);font-size:12px}
+  .info-panel{position:absolute;bottom:12px;right:12px;background:rgba(20,24,31,0.95);backdrop-filter:blur(8px);border:1px solid var(--accent);border-radius:var(--radius);padding:12px;max-width:260px;z-index:10;font-size:12px;pointer-events:none;transition:0.2s;box-shadow:var(--shadow)}
+  .info-panel strong{color:var(--accent)}
+  .loading{display:flex;align-items:center;justify-content:center;padding:40px;gap:8px}
   .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
-
-  /* FOOTER */
-  .footer{text-align:center;padding:16px;color:var(--text2);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
-  .footer a{color:var(--accent);text-decoration:none}
-  .footer a:hover{text-decoration:underline}
-
-  .empty-state{text-align:center;padding:40px;color:var(--text2)}
-  .refresh-indicator{font-size:11px;color:var(--text2);margin-left:auto}
+  .footer{text-align:center;padding:14px;font-size:11px;border-top:1px solid var(--border);margin-top:4px}
+  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center}
+  .modal{background:var(--surface);border-radius:var(--radius);max-width:700px;width:100%;max-height:85vh;overflow-y:auto;padding:20px;position:relative}
+  .modal-close{position:absolute;top:8px;right:12px;background:none;border:none;color:var(--text2);font-size:28px;cursor:pointer}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden}
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- HEADER -->
+  <a href="../" class="hub-link">← UAP Intelligence Hub</a>
   <header class="header">
-    <div class="header-left">
-      <div class="logo">W</div>
-      <div>
-        <div class="title">WAR.GOV/<span>UFO</span> — Live Analytic Dashboard</div>
-        <div class="status"><span class="status-dot" id="statusDot"></span><span id="statusText">Initializing...</span></div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn" onclick="refreshData()" title="Force Refresh">Refresh</button>
-      <button class="btn btn-accent" onclick="window.open('https://www.war.gov/UFO','_blank')">Open Source</button>
-    </div>
+    <div class="header-left"><div class="logo">W</div><div><div class="title">WAR.GOV/<span>UFO</span> — Live Analytic Dashboard</div><div class="status"><span class="status-dot" id="statusDot"></span><span id="statusText">Initializing…</span></div></div></div>
+    <div class="header-actions"><button class="btn" id="refreshBtn">Refresh</button><a class="btn btn-accent" href="https://www.war.gov/UFO" target="_blank" rel="noopener noreferrer">Open Source</a></div>
   </header>
-
-  <!-- NEWS TICKER -->
-  <div class="ticker-wrap">
-    <div class="ticker-label">LATEST</div>
-    <div class="ticker" id="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
-  </div>
-
-  <!-- MAIN GRID -->
+  <div class="ticker-wrap"><div class="ticker-label">LATEST</div><div class="ticker" id="ticker"><div class="ticker-track" id="tickerTrack"></div></div></div>
   <div class="grid">
-    <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="card">
-        <div class="card-title">Repository Stats</div>
-        <div class="stat-row"><span>PDF Documents</span><span class="stat-val" id="statPDF">--</span></div>
-        <div class="stat-row"><span>Images</span><span class="stat-val" id="statIMG">--</span></div>
-        <div class="stat-row"><span>Video Exhibits</span><span class="stat-val" id="statVID">--</span></div>
-        <div class="stat-row"><span>Total Assets</span><span class="stat-val big" id="statTotal">--</span></div>
-        <div class="stat-row"><span>Release</span><span class="stat-val" id="statRel">--</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Filter by Agency</div>
-        <div id="agencyFilters"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Data Source</div>
-        <div style="font-size:12px;color:var(--text2);word-break:break-all">
-          <div>Mirror: <span id="sourceUrl" style="color:var(--accent)">--</span></div>
-          <div style="margin-top:4px">Origin: <a href="https://www.war.gov/UFO" target="_blank" style="color:var(--accent2)">war.gov/UFO</a></div>
-          <div style="margin-top:6px;font-size:11px;color:var(--danger)">Direct origin access blocked by Akamai. Using verified mirror.</div>
-        </div>
-      </div>
+      <div class="card"><div class="card-title">Repository Stats</div><div class="stat-row"><span>PDF</span><span class="stat-val" id="statPDF">--</span></div><div class="stat-row"><span>Images</span><span class="stat-val" id="statIMG">--</span></div><div class="stat-row"><span>Videos</span><span class="stat-val" id="statVID">--</span></div><div class="stat-row"><span>Total Assets</span><span class="stat-val big" id="statTotal">--</span></div><div class="stat-row"><span>Release</span><span class="stat-val" id="statRel">--</span></div></div>
+      <div class="card"><div class="card-title">Filter by Agency</div><div id="agencyFilters"></div></div>
+      <div class="card"><div class="card-title">Data Source</div><div style="font-size:12px"><div>Mirror: <span id="sourceUrl" style="color:var(--accent)">--</span></div><div>Origin: <a href="https://www.war.gov/UFO" target="_blank">war.gov/UFO</a></div></div></div>
     </aside>
-
-    <!-- MAIN CONTENT -->
     <main class="main">
       <div class="toolbar">
-        <input type="text" class="search" placeholder="Search files by title, agency, description..." id="searchInput" oninput="renderFiles()">
-        <span class="count-info" id="countInfo"></span>
+        <input type="search" class="search" placeholder="Search files…" id="searchInput" autocomplete="off">
+        <div class="view-toggle">
+          <button class="view-btn active" id="listViewBtn">📋 List</button>
+          <button class="view-btn" id="graphViewBtn">🕸️ Graph</button>
+        </div>
+        <span class="count-info" id="countInfo" aria-live="polite"></span>
       </div>
-      <div class="file-list" id="fileList">
-        <div class="loading"><div class="spinner"></div> Loading data from mirror...</div>
+      <div id="listContainer" class="file-list"><div class="loading"><div class="spinner"></div> Loading data…</div></div>
+      <div id="graphModeToolbar" class="view-toggle" style="display:none">
+        <button class="view-btn active" id="graphModeTopics">🧠 Topics</button>
+        <button class="view-btn" id="graphModeAgencies">🏛️ Agencies</button>
+        <span style="font-size:11px;margin-left:8px;color:var(--text2)">Node size ∝ frequency | Edge width ∝ co‑occurrence</span>
+      </div>
+      <div id="graphContainer" class="graph-container" style="display:none">
+        <div id="mynetwork"></div>
+        <div id="graphInfoPanel" class="info-panel" style="display:none; pointer-events: auto;"></div>
+      </div>
+      <div id="graphControls" class="graph-controls" style="display:none">
+        <select id="layoutSelect"><option value="barnesHut">Barnes‑Hut</option><option value="repulsion">Repulsion</option><option value="hierarchical">Hierarchical</option></select>
+        <input type="range" id="gravitySlider" min="-5000" max="0" step="50" value="-2000" style="width:100px"><span>Gravity</span>
+        <input type="range" id="springLength" min="50" max="300" value="150" style="width:100px"><span>Spring len</span>
+        <button id="resetLayoutBtn">Reset layout</button>
+        <button id="exportPNGBtn">📸 PNG</button>
+        <button id="exportJSONBtn">📄 JSON</button>
+        <label><input type="checkbox" id="showEdgeLabels"> edge labels</label>
+        <label><input type="checkbox" id="freezePhysics"> freeze physics</label>
       </div>
     </main>
   </div>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    Data sourced from the U.S. Department of War PURSUE program via public mirror. |
-    <a href="https://www.war.gov/UFO" target="_blank">Official Site</a> |
-    Last refresh: <span id="lastRefresh">--</span> |
-    Next refresh in <span id="countdown">30</span>s
-  </footer>
+  <footer class="footer">Data sourced from PURSUE program. Last refresh: <span id="lastRefresh">--</span> · Next refresh in <span id="countdown">30</span>s</footer>
 </div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
-  <div class="modal" id="modalContent"></div>
-</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none"><div class="modal" id="modalContent"></div></div>
 
 <script>
-// ──────────────────────────────────────
-// CONFIGURATION
-// ──────────────────────────────────────
-const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
-const FALLBACK_SOURCE = 'https://raw.githubusercontent.com/vng9trmgr8-pixel/war-gov-ufo-release-1/main/data.json';
-const REFRESH_INTERVAL = 30000; // 30 seconds
+(function(){
+  'use strict';
+  const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
+  const FALLBACK_SOURCE = 'https://raw.githubusercontent.com/vng9trmgr8-pixel/war-gov-ufo-release-1/main/data.json';
+  const isLowEnd = (navigator.hardwareConcurrency || 2) <= 4 || (navigator.deviceMemory || 2) <= 2;
+  const REFRESH_INTERVAL = isLowEnd ? 90000 : 30000;
+  const VIS_URL = 'https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js';
 
-// ──────────────────────────────────────
-// STATE
-// ──────────────────────────────────────
-let allFiles = [];
-let lastDataHash = null;
-let previousFileCount = 0;
-let selectedAgency = null;
-let refreshTimer = null;
-let countdownTimer = null;
-let secondsLeft = REFRESH_INTERVAL / 1000;
+  let allFiles = [], lastHash = null, prevCount = 0, selectedAgency = null;
+  let currentView = 'list', graphMode = 'topics', network = null, visPromise = null;
+  let refreshTimer, countdownTimer, seconds = REFRESH_INTERVAL/1000;
+  let activeGraphData = null;
 
-// ──────────────────────────────────────
-// DOM REFS
-// ──────────────────────────────────────
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => document.querySelectorAll(sel);
+  const $ = s => document.querySelector(s);
+  const escape = s => s ? String(s).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]) : '';
+  const formatTime = d => d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const formatDate = ds => (!ds || ds==='N/A') ? 'N/A' : ds;
+  const safeUrl = u => { try { let url = new URL(u, location.href); if(url.protocol.startsWith('http')) return url.href; } catch(e){} return ''; };
 
-// ──────────────────────────────────────
-// UTILITY
-// ──────────────────────────────────────
-function hashCode(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
+  async function fetchJSON(url){
+    const ctrl = new AbortController();
+    setTimeout(()=>ctrl.abort(),15000);
+    let r = await fetch(url, {cache:'no-cache', signal:ctrl.signal});
+    if(!r.ok) throw new Error(r.status);
+    return r.json();
   }
-  return hash.toString();
-}
 
-function formatTime(date) {
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
+  async function loadData(silent){
+    updateStatus('warn','Fetching…');
+    let data = null, src = '';
+    try { data = await fetchJSON(PRIMARY_SOURCE); src = PRIMARY_SOURCE; }
+    catch(e){ try { data = await fetchJSON(FALLBACK_SOURCE); src = FALLBACK_SOURCE; } catch(e2){ updateStatus('error','Failed'); if(!silent) $('#listContainer').innerHTML='<div class="empty-state">No data</div>'; return; } }
+    const files = [...(data.pdfs||[]).map(f=>({...f,type:'pdf'})), ...(data.images||[]).map(f=>({...f,type:'image'})), ...(data.videos||[]).map(f=>({...f,type:'video'}))];
+    const hash = JSON.stringify(files).length;
+    const isNew = lastHash !== null && lastHash !== hash;
+    if(isNew && !silent) notifyNew();
+    allFiles = files; lastHash = hash; prevCount = files.length;
+    updateStats(data); updateAgencyFilters();
+    if(currentView === 'list') renderFiles(); else buildGraph();
+    updateStatus('ok','Live');
+    $('#lastRefresh').textContent = formatTime(new Date());
+    $('#sourceUrl').textContent = src.replace(/^https?:\/\//,'');
+    seconds = REFRESH_INTERVAL/1000; updateCountdown();
+    updateTicker(data);
+  }
+  function updateStatus(state,text){ let d=$('#statusDot'); d.className='status-dot'; if(state==='error')d.classList.add('error'); else if(state==='warn')d.classList.add('warn'); $('#statusText').textContent=text; }
+  function updateStats(d){ let p = d.counts?.pdfs||d.pdfs?.length||0, i=d.counts?.images||d.images?.length||0, v=d.counts?.videos||d.videos?.length||0; $('#statPDF').textContent=p; $('#statIMG').textContent=i; $('#statVID').textContent=v; $('#statTotal').textContent=p+i+v; $('#statRel').textContent=d.release||'01'; }
+  function updateAgencyFilters(){ let agencies=[...new Set(allFiles.map(f=>f.agency).filter(Boolean))].sort(); let cont=$('#agencyFilters'); cont.innerHTML=''; agencies.forEach(a=>{ let span=document.createElement('span'); span.className='agency-tag'+(selectedAgency===a?' active':''); span.textContent=a; span.onclick=()=>{ selectedAgency=(selectedAgency===a)?null:a; updateAgencyFilters(); onSearchOrFilter(); }; cont.appendChild(span); }); }
+  function onSearchOrFilter(){ if(currentView==='list') renderFiles(); else buildGraph(); }
+  function renderFiles(){
+    let term = $('#searchInput').value.toLowerCase();
+    let filtered = allFiles.filter(f => (!selectedAgency || f.agency===selectedAgency) && (!term || (f.title||'').toLowerCase().includes(term) || (f.blurb||'').toLowerCase().includes(term)));
+    $('#countInfo').textContent = `Showing ${filtered.length} of ${allFiles.length}`;
+    let container = $('#listContainer');
+    if(!filtered.length){ container.innerHTML='<div class="empty-state">No matches</div>'; return; }
+    container.innerHTML = '';
+    filtered.forEach((f,idx)=>{
+      let d = document.createElement('div'); d.className='file-item'; if(idx<(allFiles.length-prevCount)&&prevCount)d.classList.add('new');
+      d.innerHTML = `<div class="file-meta"><span class="file-agency">${escape(f.agency||'Unknown')}</span><span class="file-date">${formatDate(f.releaseDate)}</span></div><div class="file-title">${escape(f.title||'Untitled')}</div><div class="file-blurb">${escape(f.blurb||f.officialBlurb||'')}</div>`;
+      if(f.url){ let a=document.createElement('a'); a.href=safeUrl(f.url); a.className='file-link'; a.target='_blank'; a.textContent='View Original →'; a.onclick=e=>e.stopPropagation(); d.appendChild(a); }
+      d.onclick=()=>openDetail(allFiles.indexOf(f));
+      container.appendChild(d);
+    });
+  }
+  function updateTicker(d){ let h=[`Release ${d.release||'01'} — ${d.releaseDate||'May 2026'} — ${(d.counts?.pdfs||0)+(d.counts?.images||0)+(d.counts?.videos||0)} assets`]; if(d.pdfs?.length){ let ag=[...new Set(d.pdfs.map(p=>p.agency).filter(Boolean))]; h.push(`Agencies: ${ag.slice(0,6).join(', ')}`); } h.push('PURSUE system','war.gov/UFO mirror'); let track=$('#tickerTrack'); track.innerHTML = ''; [...h,...h].forEach(t=>{ let s=document.createElement('span'); s.className='ticker-item'; s.textContent=t; track.appendChild(s); }); }
+  function notifyNew(){ let h=$('.header'); h.style.boxShadow='0 0 20px rgba(0,212,170,0.3)'; setTimeout(()=>h.style.boxShadow='',2000); }
+  function updateCountdown(){ $('#countdown').textContent=seconds; }
+  function refresh(){ loadData(false); }
+  function startAutoRefresh(){ clearInterval(refreshTimer); clearInterval(countdownTimer); refreshTimer=setInterval(()=>{ if(!document.hidden) loadData(true); }, REFRESH_INTERVAL); countdownTimer=setInterval(()=>{ if(!document.hidden){ seconds--; if(seconds<=0) seconds=REFRESH_INTERVAL/1000; updateCountdown(); } },1000); }
+  function openDetail(idx){ let f=allFiles[idx]; if(!f)return; let blurb=f.blurb||f.officialBlurb||'No description.'; $('#modalContent').innerHTML=`<button class="modal-close" onclick="closeModal()">&times;</button><span class="file-agency">${escape(f.agency||'Unknown')}</span><h2>${escape(f.title||'Untitled')}</h2><div>Release: ${formatDate(f.releaseDate)} · ${(f.type||'pdf').toUpperCase()}</div><div>${escape(blurb)}</div>${f.url?`<a href="${safeUrl(f.url)}" target="_blank">Open Original →</a>`:''}`; $('#modalOverlay').style.display='flex'; }
+  window.closeModal = ()=>{ $('#modalOverlay').style.display='none'; };
 
-function formatDate(dateStr) {
-  if (!dateStr || dateStr === 'N/A') return 'N/A';
-  return dateStr;
-}
+  function loadVis(){ if(window.vis?.Network) return Promise.resolve(); if(visPromise) return visPromise; visPromise = new Promise((res,rej)=>{ let s=document.createElement('script'); s.src=VIS_URL; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); return visPromise; }
 
-// ──────────────────────────────────────
-// DATA FETCHING
-// ──────────────────────────────────────
-async function fetchData(url) {
-  const resp = await fetch(url, { cache: 'no-cache' });
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return await resp.json();
-}
+  async function buildGraph(){
+    if(!allFiles.length) return;
+    let container = $('#mynetwork');
+    if(!window.vis?.Network){ container.innerHTML='<div class="loading"><div class="spinner"></div> Loading graph engine…</div>'; await loadVis(); container.innerHTML=''; }
+    let term = $('#searchInput').value.toLowerCase();
+    let filtered = allFiles.filter(f => (!selectedAgency || f.agency===selectedAgency) && (!term || (f.title||'').toLowerCase().includes(term) || (f.blurb||'').toLowerCase().includes(term)));
+    if(graphMode === 'topics') buildTopicGraph(filtered, container);
+    else buildAgencyGraph(filtered, container);
+  }
 
-async function loadData(silent = false) {
-  updateStatus('warn', 'Fetching...');
-  let data = null;
-  let sourceUsed = '';
+  // UAP keyword co‑occurrence (enhanced with thresholds, node info panel)
+  const STOP = new Set(['the','a','an','and','of','to','in','for','with','on','at','by','is','are','was','were','be','it','this','that','from','or','as','but','not','no','yes','if','then','so','too','can','will','would','should','may','might','do','does','did','have','has','had','having','about','into','over','under','after','before','between','through','during','up','down','off','again','once','any','all','each','every','some','such','only','same','other','more','most','less','least','also','here','there','when','where','why','how','what','which','who','whom','whose','said','one','two','three','new','now','per','via','vs','page','pages','pdf','image','video','release','document','file','title','description']);
+  const UAP_LEXICON = new Set(['uap','ufo','anomalous','phenomena','sighting','craft','tic-tac','radar','infrared','flir','hypersonic','transmedium','propulsion','classified','aaro','pursue','nimitz','roswell','disclosure','whistleblower','congressional','material','metamaterial','electromagnetic','plasma','signature','intelligence','briefing','testimony','foia']);
+  function tokenize(txt){ if(!txt) return []; return String(txt).toLowerCase().replace(/[^a-z0-9\-]/g,' ').split(/\s+/).filter(w=>w.length>=3 && w.length<=28 && !STOP.has(w) && !/^\d+$/.test(w)); }
+  function buildTopicGraph(filtered, container){
+    const TERM_CAP = isLowEnd ? 35 : 80;
+    const EDGE_CAP = isLowEnd ? 90 : 450;
+    const MIN_DF = filtered.length>20 ? 2 : 1;
+    let docTerms = filtered.map(f=>new Set(tokenize([f.title,f.blurb,f.officialBlurb,f.agency].filter(Boolean).join(' '))));
+    let df = new Map(), docIdx = new Map();
+    docTerms.forEach((set, i)=>{ set.forEach(t=>{ df.set(t, (df.get(t)||0)+1); if(!docIdx.has(t)) docIdx.set(t,[]); docIdx.get(t).push(i); }); });
+    let ranked = [...df.entries()].filter(([,c])=>c>=MIN_DF).sort((a,b)=>{ let aU=UAP_LEXICON.has(a[0])?1:0, bU=UAP_LEXICON.has(b[0])?1:0; if(aU!==bU) return bU-aU; return b[1]-a[1]; }).slice(0,TERM_CAP);
+    if(ranked.length<2){ container.innerHTML='<div class="loading">Not enough terms. Clear filters.</div>'; $('#countInfo').textContent='Topic graph: low data'; return; }
+    let keep = new Set(ranked.map(r=>r[0]));
+    let pairW = new Map();
+    docTerms.forEach(set=>{ let arr = [...set].filter(t=>keep.has(t)).sort(); for(let i=0;i<arr.length;i++) for(let j=i+1;j<arr.length;j++){ let k=arr[i]+'|'+arr[j]; pairW.set(k, (pairW.get(k)||0)+1); } });
+    let maxDf = ranked[0][1];
+    let nodes = ranked.map(([t,c])=>({ id:'topic_'+t, label:t, value:c, shape:'dot', size:12+Math.round((c/maxDf)*28), color:{background:UAP_LEXICON.has(t)?'#00d4aa':'#5a6e8a', border:'#3a4353'}, title:`${t} · appears in ${c} doc(s)`, font:{color:'#eee',size:UAP_LEXICON.has(t)?14:12} }));
+    let edges = [...pairW.entries()].map(([k,w])=>{ let [a,b]=k.split('|'); return {a,b,w}; }).sort((x,y)=>y.w-x.w).slice(0,EDGE_CAP);
+    let maxW = edges.length?edges[0].w:1;
+    let edgeObjs = edges.map(e=>({ from:'topic_'+e.a, to:'topic_'+e.b, value:e.w, width:1+(e.w/maxW)*7, color:{color:`rgba(0,212,170,${0.3+(e.w/maxW)*0.5})`}, title:`co‑occur in ${e.w} docs` }));
+    $('#countInfo').textContent = `Topic graph: ${nodes.length} terms, ${edgeObjs.length} links over ${filtered.length} docs`;
+    let data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edgeObjs) };
+    let options = getBaseOptions();
+    options.physics.barnesHut = { gravitationalConstant: -2200, springLength: 140 };
+    renderNetwork(container, data, options, (nodeId)=>{
+      if(nodeId.startsWith('topic_')){
+        let term = nodeId.slice(6);
+        $('#searchInput').value = term;
+        switchView('list');
+        onSearchOrFilter();
+      } else showNodeInfo(nodeId, data);
+    });
+  }
 
-  // Try primary mirror
-  try {
-    data = await fetchData(PRIMARY_SOURCE);
-    sourceUsed = PRIMARY_SOURCE;
-  } catch (e) {
-    console.warn('Primary mirror failed:', e.message);
-    // Try fallback
-    try {
-      data = await fetchData(FALLBACK_SOURCE);
-      sourceUsed = FALLBACK_SOURCE;
-    } catch (e2) {
-      console.error('All sources failed:', e2.message);
-      updateStatus('error', 'Connection failed');
-      if (!silent) {
-        $('#fileList').innerHTML = '<div class="empty-state">Unable to fetch data. Check connection and try again.</div>';
-      }
-      return;
+  function buildAgencyGraph(filtered, container){
+    const cap = isLowEnd ? 120 : 600;
+    let capped = filtered.slice(0,cap);
+    let agencies = [...new Set(capped.map(f=>f.agency).filter(Boolean))];
+    let nodes = agencies.map(a=>({ id:'agency_'+a, label:a, shape:'dot', size:20, color:{background:'#00d4aa',border:'#00a3ff'}, font:{color:'white',size:14} }));
+    let fileMap = new Map();
+    capped.forEach((f,i)=>{ let fid='file_'+i+'_'+(f.title||'').slice(0,20); nodes.push({ id:fid, label:(f.title||'Untitled').slice(0,40), shape:'box', size:12, color:{background:'#3a6ea5',border:'#88c0ff'}, font:{color:'#eee',size:11}, title:(f.agency||'')+': '+(f.title||'') }); fileMap.set(fid,f); });
+    let edges = [];
+    capped.forEach((f,i)=>{ let fid='file_'+i+'_'+(f.title||'').slice(0,20); if(f.agency) edges.push({ from:fid, to:'agency_'+f.agency, arrows:'to', color:{color:'#7a8798'}, smooth:true }); });
+    let trunc = filtered.length>cap?` (first ${cap})`:'';
+    $('#countInfo').textContent = `Agency graph: ${agencies.length} agencies, ${capped.length} docs${trunc}`;
+    let data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+    let options = getBaseOptions();
+    renderNetwork(container, data, options, (nodeId)=>{
+      if(nodeId.startsWith('file_')){
+        let f = fileMap.get(nodeId);
+        if(f) openDetail(allFiles.indexOf(f));
+      } else if(nodeId.startsWith('agency_')){
+        let a = nodeId.slice(7);
+        selectedAgency = a; updateAgencyFilters(); switchView('list'); onSearchOrFilter();
+      } else showNodeInfo(nodeId, data);
+    });
+  }
+
+  function getBaseOptions(){
+    return {
+      nodes:{ borderWidth:1, shadow:!isLowEnd, scaling:{ min:10, max:40, label:{ enabled:true, min:10, max:18 } } },
+      edges:{ smooth:{ type: isLowEnd?'continuous':'cubicBezier' }, scaling:{ min:1, max:8 } },
+      physics:{ enabled: true, stabilization:{ iterations: isLowEnd?60:150 }, barnesHut:{ gravitationalConstant:-2000, springLength:150 } },
+      interaction:{ hover:!matchMedia('(pointer:coarse)').matches, tooltipDelay:200, dragView:true, zoomView:true }
+    };
+  }
+
+  function renderNetwork(container, data, options, onClick){
+    if(network){ network.setData(data); network.setOptions(options); network.fit(); }
+    else { network = new vis.Network(container, data, options); }
+    network.off('click');
+    network.on('click', params=>{ if(params.nodes.length) onClick(params.nodes[0]); });
+    activeGraphData = data;
+    // show info panel on node hover
+    network.off('hoverNode');
+    network.on('hoverNode', params=>{ if(params.node) showNodeInfo(params.node, data); });
+    network.off('blurNode');
+    network.on('blurNode', ()=>{ $('#graphInfoPanel').style.display='none'; });
+  }
+
+  function showNodeInfo(nodeId, data){
+    let node = data.nodes.get(nodeId);
+    if(!node) return;
+    let panel = $('#graphInfoPanel');
+    if(nodeId.startsWith('topic_')){
+      let term = nodeId.slice(6);
+      let freq = node.value || '?';
+      panel.innerHTML = `<strong>📊 ${term}</strong><br>Document frequency: ${freq}<br><span style="color:var(--accent)">UAP‑priority: ${UAP_LEXICON.has(term)?'✓':'—'}</span><br><button id="filterTermBtn" style="margin-top:6px;background:var(--surface);border:1px solid var(--accent);padding:4px 8px;border-radius:4px;cursor:pointer">🔍 Filter list</button>`;
+      panel.style.display = 'block';
+      let btn = document.getElementById('filterTermBtn');
+      if(btn) btn.onclick = (e)=>{ e.stopPropagation(); $('#searchInput').value=term; switchView('list'); onSearchOrFilter(); panel.style.display='none'; };
+    } else if(nodeId.startsWith('agency_')){
+      let agency = nodeId.slice(7);
+      let count = allFiles.filter(f=>f.agency===agency).length;
+      panel.innerHTML = `<strong>🏛️ ${agency}</strong><br>Documents: ${count}<br><button id="filterAgencyBtn" style="margin-top:6px;background:var(--surface);border:1px solid var(--accent);padding:4px 8px;border-radius:4px;cursor:pointer">🎯 Filter agency</button>`;
+      panel.style.display = 'block';
+      let btn = document.getElementById('filterAgencyBtn');
+      if(btn) btn.onclick = (e)=>{ e.stopPropagation(); selectedAgency=agency; updateAgencyFilters(); switchView('list'); onSearchOrFilter(); panel.style.display='none'; };
+    } else {
+      panel.innerHTML = `<strong>📄 ${node.label}</strong><br>Click to open details.`;
+      panel.style.display = 'block';
+      setTimeout(()=>{ panel.style.display='none'; }, 3000);
     }
   }
 
-  // Process data
-  const files = (data.pdfs || []).map(f => ({
-    ...f,
-    type: 'pdf'
-  })).concat((data.images || []).map(f => ({
-    ...f,
-    type: 'image'
-  }))).concat((data.videos || []).map(f => ({
-    ...f,
-    type: 'video'
-  })));
-
-  // Compute hash for change detection
-  const hash = hashCode(JSON.stringify(files));
-  const isNewData = lastDataHash !== null && lastDataHash !== hash;
-  const newFileCount = files.length - previousFileCount;
-
-  if (isNewData && newFileCount > 0 && !silent) {
-    // Flash notification
-    notifyUpdate(newFileCount);
+  function applyGraphSettings(){
+    if(!network) return;
+    let gravity = parseInt($('#gravitySlider').value);
+    let spring = parseInt($('#springLength').value);
+    let layoutType = $('#layoutSelect').value;
+    let physics = !$('#freezePhysics').checked;
+    let opts = { physics: { enabled: physics, barnesHut: { gravitationalConstant: gravity, springLength: spring } } };
+    if(layoutType === 'hierarchical') opts.layout = { hierarchical: { enabled: true, direction:'UD', sortMethod:'directed' } };
+    else if(layoutType === 'repulsion') opts.physics.solver = 'repulsion';
+    else opts.physics.solver = 'barnesHut';
+    network.setOptions(opts);
+    if(physics && !network.physics.physicsEnabled) network.startSimulation();
   }
 
-  allFiles = files;
-  lastDataHash = hash;
-  previousFileCount = files.length;
-
-  // Update UI
-  updateStats(data);
-  updateAgencyFilters();
-  renderFiles();
-  updateStatus('ok', 'Live');
-  $('#lastRefresh').textContent = formatTime(new Date());
-  $('#sourceUrl').textContent = sourceUsed.replace('https://', '');
-  secondsLeft = REFRESH_INTERVAL / 1000;
-  updateCountdown();
-
-  // Update ticker
-  updateTicker(data);
-}
-
-// ──────────────────────────────────────
-// UI UPDATES
-// ──────────────────────────────────────
-function updateStatus(state, text) {
-  const dot = $('#statusDot');
-  dot.className = 'status-dot';
-  if (state === 'error') dot.classList.add('error');
-  if (state === 'warn') dot.classList.add('warn');
-  $('#statusText').textContent = text;
-}
-
-function updateStats(data) {
-  const pdfs = data.counts?.pdfs || data.pdfs?.length || 0;
-  const images = data.counts?.images || data.images?.length || 0;
-  const videos = data.counts?.videos || data.videos?.length || 0;
-  $('#statPDF').textContent = pdfs;
-  $('#statIMG').textContent = images;
-  $('#statVID').textContent = videos;
-  $('#statTotal').textContent = pdfs + images + videos;
-  $('#statRel').textContent = data.release || '01';
-}
-
-function updateAgencyFilters() {
-  const agencies = [...new Set(allFiles.map(f => f.agency).filter(Boolean))].sort();
-  const container = $('#agencyFilters');
-  container.innerHTML = agencies.map(a =>
-    `<span class="agency-tag${selectedAgency === a ? ' active' : ''}" onclick="filterByAgency('${a.replace(/'/g, "\\'")}')">${a}</span>`
-  ).join('');
-}
-
-function filterByAgency(agency) {
-  if (selectedAgency === agency) {
-    selectedAgency = null;
-  } else {
-    selectedAgency = agency;
+  function exportGraphPNG(){
+    if(!network) return;
+    let canvas = document.querySelector('#mynetwork canvas');
+    if(canvas){
+      let link = document.createElement('a');
+      link.download = 'war_gov_network.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
   }
-  updateAgencyFilters();
-  renderFiles();
-}
-
-function renderFiles() {
-  const searchTerm = $('#searchInput').value.toLowerCase();
-  let filtered = allFiles;
-
-  if (selectedAgency) {
-    filtered = filtered.filter(f => f.agency === selectedAgency);
-  }
-  if (searchTerm) {
-    filtered = filtered.filter(f =>
-      (f.title || '').toLowerCase().includes(searchTerm) ||
-      (f.agency || '').toLowerCase().includes(searchTerm) ||
-      (f.blurb || '').toLowerCase().includes(searchTerm) ||
-      (f.officialBlurb || '').toLowerCase().includes(searchTerm)
-    );
+  function exportGraphJSON(){
+    if(!activeGraphData) return;
+    let nodes = activeGraphData.nodes.get();
+    let edges = activeGraphData.edges.get();
+    let json = JSON.stringify({ nodes, edges }, null, 2);
+    let blob = new Blob([json], {type:'application/json'});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url; a.download = 'war_gov_graph.json'; a.click();
+    URL.revokeObjectURL(url);
   }
 
-  $('#countInfo').textContent = `Showing ${filtered.length} of ${allFiles.length} files`;
-
-  if (filtered.length === 0) {
-    $('#fileList').innerHTML = '<div class="empty-state">No files match your criteria.</div>';
-    return;
+  function switchView(view){
+    currentView = view;
+    $('#listViewBtn').classList.toggle('active', view==='list');
+    $('#graphViewBtn').classList.toggle('active', view==='graph');
+    $('#listContainer').style.display = view==='list' ? 'flex' : 'none';
+    $('#graphContainer').style.display = view==='graph' ? 'block' : 'none';
+    $('#graphModeToolbar').style.display = view==='graph' ? 'flex' : 'none';
+    $('#graphControls').style.display = view==='graph' ? 'flex' : 'none';
+    if(view==='list') renderFiles();
+    else buildGraph();
   }
+  function setGraphMode(mode){ graphMode = mode; $('#graphModeTopics').classList.toggle('active',mode==='topics'); $('#graphModeAgencies').classList.toggle('active',mode==='agencies'); if(currentView==='graph') buildGraph(); }
 
-  $('#fileList').innerHTML = filtered.map((f, i) => {
-    const isNew = i < (allFiles.length - previousFileCount) && previousFileCount > 0;
-    const blurb = f.blurb || f.officialBlurb || 'No description available.';
-    return `
-      <div class="file-item${isNew ? ' new' : ''}" onclick="openDetail(${allFiles.indexOf(f)})">
-        ${isNew ? '<span class="badge">NEW</span>' : ''}
-        <div class="file-meta">
-          <span class="file-agency">${f.agency || 'Unknown'}</span>
-          <span class="file-date">${formatDate(f.releaseDate)}</span>
-          ${f.type ? `<span style="font-size:11px;color:var(--text2)">${f.type.toUpperCase()}</span>` : ''}
-        </div>
-        <div class="file-title">${f.title || 'Untitled'}</div>
-        <div class="file-blurb">${blurb}</div>
-        ${f.url ? `<a class="file-link" href="${f.url}" target="_blank" onclick="event.stopPropagation()">View Original &rarr;</a>` : ''}
-      </div>
-    `;
-  }).join('');
-}
-
-function updateTicker(data) {
-  const headlines = [];
-  headlines.push(`Release ${data.release || '01'} — ${data.releaseDate || 'May 2026'} — ${(data.counts?.pdfs||0)+(data.counts?.images||0)+(data.counts?.videos||0)} total assets`);
-  if (data.pdfs && data.pdfs.length > 0) {
-    const agencies = [...new Set(data.pdfs.map(p => p.agency).filter(Boolean))];
-    headlines.push(`Agencies contributing: ${agencies.slice(0,6).join(', ')}${agencies.length>6?'...':''}`);
-  }
-  headlines.push('Rolling releases — new tranches published every few weeks');
-  headlines.push('PURSUE: Presidential Unsealing and Reporting System for UAP Encounters');
-  headlines.push('Source: U.S. Department of War — All-domain Anomaly Resolution Office (AARO)');
-
-  const track = $('#tickerTrack');
-  // Duplicate for seamless loop
-  track.innerHTML = headlines.map(h => `<span class="ticker-item">${h}</span>`).join('') +
-                    headlines.map(h => `<span class="ticker-item">${h}</span>`).join('');
-}
-
-function notifyUpdate(count) {
-  // Simple flash on the header
-  const header = $('.header');
-  header.style.boxShadow = '0 0 20px rgba(0,212,170,0.3)';
-  setTimeout(() => { header.style.boxShadow = ''; }, 2000);
-}
-
-function updateCountdown() {
-  $('#countdown').textContent = secondsLeft;
-}
-
-// ──────────────────────────────────────
-// MODAL
-// ──────────────────────────────────────
-function openDetail(index) {
-  const f = allFiles[index];
-  if (!f) return;
-  const blurb = f.blurb || f.officialBlurb || 'No description available.';
-  $('#modalContent').innerHTML = `
-    <button class="modal-close" onclick="closeModal()">&times;</button>
-    <span class="file-agency" style="margin-bottom:8px;display:inline-block">${f.agency || 'Unknown'}</span>
-    <h2>${f.title || 'Untitled'}</h2>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
-      Release Date: ${formatDate(f.releaseDate)} &middot; Type: ${(f.type||'pdf').toUpperCase()}
-    </div>
-    <div class="file-blurb" style="display:block;-webkit-line-clamp:unset;overflow:visible">${blurb}</div>
-    ${f.url ? `<a href="${f.url}" target="_blank" style="color:var(--accent)">Open Original File &rarr;</a>` : ''}
-  `;
-  $('#modalOverlay').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(e) {
-  if (e && e.target !== $('#modalOverlay')) return;
-  $('#modalOverlay').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-// ──────────────────────────────────────
-// REFRESH LOGIC
-// ──────────────────────────────────────
-function refreshData() {
-  loadData(false);
-}
-
-function startAutoRefresh() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  if (countdownTimer) clearInterval(countdownTimer);
-
-  refreshTimer = setInterval(() => {
-    loadData(true);
-  }, REFRESH_INTERVAL);
-
-  countdownTimer = setInterval(() => {
-    secondsLeft--;
-    if (secondsLeft <= 0) secondsLeft = REFRESH_INTERVAL / 1000;
-    updateCountdown();
-  }, 1000);
-}
-
-// ──────────────────────────────────────
-// KEYBOARD SHORTCUTS
-// ──────────────────────────────────────
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    $('#modalOverlay').style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  if (e.ctrlKey && e.key === 'r') {
-    e.preventDefault();
-    refreshData();
-  }
-  if (e.ctrlKey && e.key === 'k') {
-    e.preventDefault();
-    $('#searchInput').focus();
-  }
-});
-
-// ──────────────────────────────────────
-// INIT
-// ──────────────────────────────────────
-loadData(false).then(() => {
-  startAutoRefresh();
-});
+  // Event bindings
+  $('#searchInput').addEventListener('input', ()=> onSearchOrFilter());
+  $('#refreshBtn').addEventListener('click', refresh);
+  $('#listViewBtn').addEventListener('click', ()=> switchView('list'));
+  $('#graphViewBtn').addEventListener('click', ()=> switchView('graph'));
+  $('#graphModeTopics').addEventListener('click', ()=> setGraphMode('topics'));
+  $('#graphModeAgencies').addEventListener('click', ()=> setGraphMode('agencies'));
+  $('#layoutSelect').addEventListener('change', applyGraphSettings);
+  $('#gravitySlider').addEventListener('input', applyGraphSettings);
+  $('#springLength').addEventListener('input', applyGraphSettings);
+  $('#resetLayoutBtn').addEventListener('click', ()=>{ if(network){ network.setOptions({physics:{stabilization:{enabled:true}}}); network.startSimulation(); setTimeout(()=>network.fit(), 500); } });
+  $('#exportPNGBtn').addEventListener('click', exportGraphPNG);
+  $('#exportJSONBtn').addEventListener('click', exportGraphJSON);
+  $('#freezePhysics').addEventListener('change', ()=> applyGraphSettings());
+  window.addEventListener('resize', ()=>{ if(currentView==='graph' && network) network.fit(); });
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && allFiles.length) loadData(true); });
+  $('#modalOverlay').addEventListener('click', (e)=>{ if(e.target === $('#modalOverlay')) closeModal(); });
+  loadData(false).then(()=>{ startAutoRefresh(); switchView('list'); });
+})();
 </script>
 </body>
 </html>
