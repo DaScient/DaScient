@@ -481,6 +481,363 @@
         .cta { padding: 40px 28px; border-radius: 18px; }
       }
 
+      /* ---------- Field Dashboard (WAR.GOV/UFO) ---------- */
+      .dashboard {
+        background: linear-gradient(180deg, var(--bg-warm) 0%, var(--bg) 100%);
+      }
+      .wg-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--ink-muted);
+        margin-top: 12px;
+      }
+      .wg-status .dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px rgba(126, 20, 255, 0.12);
+        animation: wg-pulse 2.4s ease-in-out infinite;
+      }
+      .wg-status .dot.warn { background: #d97706; box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.15); }
+      .wg-status .dot.error { background: #d6336c; box-shadow: 0 0 0 4px rgba(214, 51, 108, 0.18); animation: none; }
+      @keyframes wg-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.45; }
+      }
+
+      .wg-ticker {
+        margin: 24px 0 28px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 14px 10px 78px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+      .wg-ticker-label {
+        position: absolute;
+        left: 14px; top: 50%;
+        transform: translateY(-50%);
+        background: var(--bg-soft);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        padding: 3px 8px;
+        border-radius: 999px;
+      }
+      .wg-ticker-track-wrap {
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .wg-ticker-track {
+        display: inline-block;
+        animation: wg-scroll 48s linear infinite;
+      }
+      .wg-ticker-item {
+        display: inline-block;
+        margin-right: 56px;
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+      .wg-ticker-item strong { color: var(--accent); font-weight: 600; }
+      @keyframes wg-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      .wg-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      @media (max-width: 880px) { .wg-stat-grid { grid-template-columns: repeat(2, 1fr); } }
+      .wg-stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px 20px;
+        box-shadow: var(--shadow-sm);
+      }
+      .wg-stat .label {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        font-weight: 600;
+      }
+      .wg-stat .value {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 34px;
+        line-height: 1.05;
+        margin-top: 6px;
+        color: var(--ink);
+      }
+      .wg-stat .value.accent {
+        background: linear-gradient(120deg, var(--accent) 20%, var(--accent-2) 90%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .wg-toolbar {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .wg-search {
+        flex: 1;
+        min-width: 220px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--ink);
+        padding: 12px 16px;
+        border-radius: 999px;
+        font: inherit;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 150ms ease, box-shadow 150ms ease;
+      }
+      .wg-search::placeholder { color: var(--ink-muted); }
+      .wg-search:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(126, 20, 255, 0.12);
+      }
+      .wg-refresh {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+      .wg-count {
+        font-size: 13px;
+        color: var(--ink-muted);
+      }
+
+      .wg-agencies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 22px;
+      }
+      .wg-chip {
+        display: inline-block;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+        font-size: 12px;
+        font-weight: 500;
+        padding: 5px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+      }
+      .wg-chip:hover { border-color: #d6cdea; color: var(--ink); }
+      .wg-chip.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+
+      .wg-file-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      @media (max-width: 880px) { .wg-file-list { grid-template-columns: 1fr; } }
+      .wg-file {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px 20px;
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: transform 150ms ease, box-shadow 200ms ease, border-color 200ms ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .wg-file:hover {
+        transform: translateY(-2px);
+        border-color: #d6cdea;
+        box-shadow: var(--shadow-md);
+      }
+      .wg-file.is-new { border-left: 3px solid var(--accent-warm); }
+      .wg-file .new-badge {
+        position: absolute;
+        top: 12px; right: 14px;
+        background: var(--accent-warm);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        padding: 3px 8px;
+        border-radius: 999px;
+      }
+      .wg-file .meta {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .wg-file .agency {
+        background: var(--bg-soft);
+        color: var(--accent);
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+      .wg-file .date {
+        font-size: 12px;
+        color: var(--ink-muted);
+      }
+      .wg-file .type {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        font-weight: 600;
+      }
+      .wg-file h4 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 22px;
+        line-height: 1.2;
+        margin: 0 0 8px;
+        color: var(--ink);
+      }
+      .wg-file .blurb {
+        color: var(--ink-soft);
+        font-size: 14px;
+        line-height: 1.55;
+        margin: 0 0 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .wg-file .link {
+        margin-top: auto;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--accent);
+      }
+      .wg-file .link::after { content: " →"; }
+
+      .wg-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 40px;
+        color: var(--ink-muted);
+        font-size: 14px;
+        grid-column: 1 / -1;
+      }
+      .wg-spinner {
+        width: 18px; height: 18px;
+        border: 2px solid var(--line);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: wg-spin 0.7s linear infinite;
+      }
+      @keyframes wg-spin { to { transform: rotate(360deg); } }
+      .wg-empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        color: var(--ink-muted);
+        font-size: 14px;
+      }
+
+      .wg-meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 22px;
+        font-size: 13px;
+        color: var(--ink-muted);
+      }
+      .wg-meta-row a { color: var(--accent); }
+      .wg-source-note {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--ink-muted);
+      }
+
+      /* ---------- Detail modal (shared with dashboard) ---------- */
+      .wg-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 16, 40, 0.55);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 100;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .wg-modal-overlay.open { display: flex; }
+      .wg-modal {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        max-width: 680px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 28px 32px;
+        position: relative;
+        box-shadow: var(--shadow-md);
+      }
+      .wg-modal-close {
+        position: absolute;
+        top: 12px; right: 16px;
+        background: none;
+        border: none;
+        color: var(--ink-muted);
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+      .wg-modal-close:hover { color: var(--ink); background: var(--bg-soft); }
+      .wg-modal h3 {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 600;
+        font-size: 28px;
+        line-height: 1.15;
+        margin: 8px 0 10px;
+        color: var(--ink);
+      }
+      .wg-modal .meta {
+        font-size: 12px;
+        color: var(--ink-muted);
+        margin-bottom: 14px;
+      }
+      .wg-modal .body {
+        color: var(--ink-soft);
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 18px;
+        white-space: pre-wrap;
+      }
+      .wg-modal .original-link {
+        color: var(--accent);
+        font-weight: 500;
+      }
+
       /* ---------- Footer ---------- */
       footer.foot {
         border-top: 1px solid var(--line);
@@ -509,6 +866,7 @@
         <nav class="nav-links" aria-label="Primary">
           <a href="#products">Products</a>
           <a href="#books">Books</a>
+          <a href="#field-dashboard">Field Dashboard</a>
           <a href="#connect">Connect</a>
           <a href="#contact" class="btn btn-primary nav-cta">Get in touch</a>
         </nav>
@@ -661,6 +1019,102 @@
         </div>
       </section>
 
+      <!-- ---------- Field Dashboard (WAR.GOV/UFO) ---------- -->
+      <section id="field-dashboard" class="block dashboard">
+        <div class="container">
+          <div class="section-head">
+            <p class="section-kicker">Field Dashboard</p>
+            <h2>WAR.GOV/UFO — Live PURSUE repository</h2>
+            <p>
+              A live read on the U.S. Department of War&rsquo;s rolling PURSUE
+              releases — declassified UAP documents, imagery, and video exhibits.
+              Data is fetched from a verified public mirror and refreshes every 30
+              seconds. Search, filter by agency, and open any file in a detail view.
+            </p>
+            <div class="wg-status">
+              <span class="dot" id="wgStatusDot" aria-hidden="true"></span>
+              <span id="wgStatusText">Initializing&hellip;</span>
+            </div>
+          </div>
+
+          <!-- Ticker -->
+          <div class="wg-ticker" aria-label="Latest headlines">
+            <span class="wg-ticker-label">LATEST</span>
+            <div class="wg-ticker-track-wrap">
+              <div class="wg-ticker-track" id="wgTickerTrack"></div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="wg-stat-grid">
+            <div class="wg-stat">
+              <div class="label">PDF Documents</div>
+              <div class="value" id="wgStatPdf">—</div>
+            </div>
+            <div class="wg-stat">
+              <div class="label">Images</div>
+              <div class="value" id="wgStatImg">—</div>
+            </div>
+            <div class="wg-stat">
+              <div class="label">Video Exhibits</div>
+              <div class="value" id="wgStatVid">—</div>
+            </div>
+            <div class="wg-stat">
+              <div class="label">Total Assets</div>
+              <div class="value accent" id="wgStatTotal">—</div>
+            </div>
+            <div class="wg-stat">
+              <div class="label">Release</div>
+              <div class="value" id="wgStatRel">—</div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="wg-toolbar">
+            <input
+              type="text"
+              class="wg-search"
+              id="wgSearch"
+              placeholder="Search files by title, agency, or description&hellip;"
+              aria-label="Search files"
+            />
+            <span class="wg-count" id="wgCount"></span>
+            <button class="btn btn-ghost wg-refresh" id="wgRefreshBtn" type="button">
+              Refresh now
+            </button>
+          </div>
+
+          <!-- Agency filters -->
+          <div class="wg-agencies" id="wgAgencies" aria-label="Filter by agency"></div>
+
+          <!-- File list -->
+          <div class="wg-file-list" id="wgFileList">
+            <div class="wg-loading"><div class="wg-spinner"></div> Loading data from mirror&hellip;</div>
+          </div>
+
+          <div class="wg-meta-row">
+            <span>
+              Mirror: <span id="wgSourceUrl">—</span>
+              &middot; Origin:
+              <a href="https://www.war.gov/UFO" target="_blank" rel="noopener">war.gov/UFO</a>
+            </span>
+            <span>
+              Last refresh: <span id="wgLastRefresh">—</span>
+              &middot; Next in <span id="wgCountdown">30</span>s
+            </span>
+          </div>
+          <p class="wg-source-note">
+            Direct origin access is blocked by Akamai; the dashboard reads from a
+            verified public mirror of the PURSUE release manifest.
+          </p>
+        </div>
+      </section>
+
+      <!-- Detail modal (used by Field Dashboard) -->
+      <div class="wg-modal-overlay" id="wgModalOverlay" role="dialog" aria-modal="true" aria-labelledby="wgModalTitle">
+        <div class="wg-modal" id="wgModalContent"></div>
+      </div>
+
       <!-- ---------- Connect ---------- -->
       <section id="connect" class="block connect">
         <div class="container">
@@ -747,6 +1201,336 @@
     <script>
       // Keep the footer year current without a build step.
       document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- ---------- Field Dashboard (WAR.GOV/UFO) live data ---------- -->
+    <script>
+      (function () {
+        const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
+        const FALLBACK_SOURCE = 'https://raw.githubusercontent.com/vng9trmgr8-pixel/war-gov-ufo-release-1/main/data.json';
+        const REFRESH_INTERVAL = 30000;
+
+        const $ = (id) => document.getElementById(id);
+
+        const els = {
+          statusDot: $('wgStatusDot'),
+          statusText: $('wgStatusText'),
+          tickerTrack: $('wgTickerTrack'),
+          statPdf: $('wgStatPdf'),
+          statImg: $('wgStatImg'),
+          statVid: $('wgStatVid'),
+          statTotal: $('wgStatTotal'),
+          statRel: $('wgStatRel'),
+          search: $('wgSearch'),
+          count: $('wgCount'),
+          refreshBtn: $('wgRefreshBtn'),
+          agencies: $('wgAgencies'),
+          fileList: $('wgFileList'),
+          sourceUrl: $('wgSourceUrl'),
+          lastRefresh: $('wgLastRefresh'),
+          countdown: $('wgCountdown'),
+          modalOverlay: $('wgModalOverlay'),
+          modalContent: $('wgModalContent'),
+        };
+
+        if (!els.fileList) return; // section not present
+
+        let allFiles = [];
+        let lastDataHash = null;
+        let previousFileCount = 0;
+        let newFilesCount = 0;
+        let selectedAgency = null;
+        let refreshTimer = null;
+        let countdownTimer = null;
+        let secondsLeft = REFRESH_INTERVAL / 1000;
+
+        function escapeHtml(s) {
+          return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+        function safeUrl(u) {
+          if (typeof u !== 'string') return '';
+          // Allow only http(s) URLs to avoid javascript: payloads from the feed
+          try {
+            const parsed = new URL(u, window.location.href);
+            if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.href;
+          } catch (_) { /* invalid */ }
+          return '';
+        }
+        function hashCode(str) {
+          let hash = 0;
+          for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0;
+          }
+          return hash.toString();
+        }
+        function formatTime(date) {
+          return date.toLocaleTimeString('en-US', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+          });
+        }
+        function formatDate(dateStr) {
+          if (!dateStr || dateStr === 'N/A') return 'N/A';
+          return dateStr;
+        }
+
+        function updateStatus(state, text) {
+          if (!els.statusDot) return;
+          els.statusDot.classList.remove('warn', 'error');
+          if (state === 'warn') els.statusDot.classList.add('warn');
+          if (state === 'error') els.statusDot.classList.add('error');
+          els.statusText.textContent = text;
+        }
+
+        async function fetchData(url) {
+          const resp = await fetch(url, { cache: 'no-cache' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return await resp.json();
+        }
+
+        async function loadData(silent) {
+          updateStatus('warn', 'Fetching…');
+          let data = null;
+          let sourceUsed = '';
+          try {
+            data = await fetchData(PRIMARY_SOURCE);
+            sourceUsed = PRIMARY_SOURCE;
+          } catch (e) {
+            try {
+              data = await fetchData(FALLBACK_SOURCE);
+              sourceUsed = FALLBACK_SOURCE;
+            } catch (e2) {
+              updateStatus('error', 'Connection failed');
+              if (!silent) {
+                els.fileList.innerHTML =
+                  '<div class="wg-empty">Unable to fetch data. Check connection and try refreshing.</div>';
+              }
+              return;
+            }
+          }
+
+          const files = []
+            .concat((data.pdfs || []).map((f) => Object.assign({}, f, { type: 'pdf' })))
+            .concat((data.images || []).map((f) => Object.assign({}, f, { type: 'image' })))
+            .concat((data.videos || []).map((f) => Object.assign({}, f, { type: 'video' })));
+
+          const hash = hashCode(JSON.stringify(files));
+          const isNewData = lastDataHash !== null && lastDataHash !== hash;
+          const delta = files.length - previousFileCount;
+          newFilesCount = isNewData && delta > 0 ? delta : 0;
+
+          allFiles = files;
+          lastDataHash = hash;
+          previousFileCount = files.length;
+
+          updateStats(data);
+          updateAgencyFilters();
+          renderFiles();
+          updateTicker(data);
+          updateStatus('ok', 'Live');
+          els.lastRefresh.textContent = formatTime(new Date());
+          els.sourceUrl.textContent = sourceUsed.replace(/^https?:\/\//, '');
+          secondsLeft = REFRESH_INTERVAL / 1000;
+          updateCountdown();
+        }
+
+        function updateStats(data) {
+          const pdfs = (data.counts && data.counts.pdfs) || (data.pdfs && data.pdfs.length) || 0;
+          const imgs = (data.counts && data.counts.images) || (data.images && data.images.length) || 0;
+          const vids = (data.counts && data.counts.videos) || (data.videos && data.videos.length) || 0;
+          els.statPdf.textContent = pdfs;
+          els.statImg.textContent = imgs;
+          els.statVid.textContent = vids;
+          els.statTotal.textContent = pdfs + imgs + vids;
+          els.statRel.textContent = data.release || '01';
+        }
+
+        function updateAgencyFilters() {
+          const agencies = Array.from(
+            new Set(allFiles.map((f) => f.agency).filter(Boolean))
+          ).sort();
+          els.agencies.innerHTML = agencies
+            .map((a) => {
+              const active = selectedAgency === a ? ' active' : '';
+              return '<span class="wg-chip' + active + '" data-agency="' +
+                escapeHtml(a) + '" tabindex="0" role="button">' +
+                escapeHtml(a) + '</span>';
+            })
+            .join('');
+        }
+
+        function renderFiles() {
+          const searchTerm = (els.search.value || '').toLowerCase();
+          let filtered = allFiles;
+          if (selectedAgency) {
+            filtered = filtered.filter((f) => f.agency === selectedAgency);
+          }
+          if (searchTerm) {
+            filtered = filtered.filter((f) =>
+              (f.title || '').toLowerCase().includes(searchTerm) ||
+              (f.agency || '').toLowerCase().includes(searchTerm) ||
+              (f.blurb || '').toLowerCase().includes(searchTerm) ||
+              (f.officialBlurb || '').toLowerCase().includes(searchTerm)
+            );
+          }
+
+          els.count.textContent =
+            'Showing ' + filtered.length + ' of ' + allFiles.length + ' files';
+
+          if (filtered.length === 0) {
+            els.fileList.innerHTML =
+              '<div class="wg-empty">No files match your criteria.</div>';
+            return;
+          }
+
+          els.fileList.innerHTML = filtered
+            .map((f) => {
+              const idx = allFiles.indexOf(f);
+              const isNew = newFilesCount > 0 && idx < newFilesCount;
+              const blurb = f.blurb || f.officialBlurb || 'No description available.';
+              const url = safeUrl(f.url);
+              return (
+                '<article class="wg-file' + (isNew ? ' is-new' : '') + '" data-index="' + idx + '" tabindex="0">' +
+                  (isNew ? '<span class="new-badge">NEW</span>' : '') +
+                  '<div class="meta">' +
+                    '<span class="agency">' + escapeHtml(f.agency || 'Unknown') + '</span>' +
+                    '<span class="date">' + escapeHtml(formatDate(f.releaseDate)) + '</span>' +
+                    (f.type ? '<span class="type">' + escapeHtml(f.type) + '</span>' : '') +
+                  '</div>' +
+                  '<h4>' + escapeHtml(f.title || 'Untitled') + '</h4>' +
+                  '<p class="blurb">' + escapeHtml(blurb) + '</p>' +
+                  (url
+                    ? '<span class="link">Open detail</span>'
+                    : '<span class="link">Open detail</span>') +
+                '</article>'
+              );
+            })
+            .join('');
+        }
+
+        function updateTicker(data) {
+          const total =
+            ((data.counts && data.counts.pdfs) || 0) +
+            ((data.counts && data.counts.images) || 0) +
+            ((data.counts && data.counts.videos) || 0);
+          const headlines = [];
+          headlines.push(
+            '<strong>Release ' + escapeHtml(data.release || '01') + '</strong> — ' +
+              escapeHtml(data.releaseDate || 'May 2026') + ' — ' + total + ' total assets'
+          );
+          if (data.pdfs && data.pdfs.length > 0) {
+            const agencies = Array.from(new Set(data.pdfs.map((p) => p.agency).filter(Boolean)));
+            headlines.push(
+              'Agencies contributing: ' +
+                escapeHtml(agencies.slice(0, 6).join(', ')) +
+                (agencies.length > 6 ? '…' : '')
+            );
+          }
+          headlines.push('Rolling releases — new tranches published every few weeks');
+          headlines.push('PURSUE: Presidential Unsealing and Reporting System for UAP Encounters');
+          headlines.push('Source: U.S. Department of War — All-domain Anomaly Resolution Office (AARO)');
+
+          const itemsHtml = headlines
+            .map((h) => '<span class="wg-ticker-item">' + h + '</span>')
+            .join('');
+          // Duplicate the list so the marquee loops seamlessly.
+          els.tickerTrack.innerHTML = itemsHtml + itemsHtml;
+        }
+
+        function updateCountdown() {
+          els.countdown.textContent = secondsLeft;
+        }
+
+        function openDetail(index) {
+          const f = allFiles[index];
+          if (!f) return;
+          const blurb = f.blurb || f.officialBlurb || 'No description available.';
+          const url = safeUrl(f.url);
+          els.modalContent.innerHTML =
+            '<button class="wg-modal-close" type="button" id="wgModalCloseBtn" aria-label="Close">&times;</button>' +
+            '<span class="agency" style="display:inline-block;background:var(--bg-soft);color:var(--accent);padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.04em">' +
+              escapeHtml(f.agency || 'Unknown') + '</span>' +
+            '<h3 id="wgModalTitle">' + escapeHtml(f.title || 'Untitled') + '</h3>' +
+            '<div class="meta">Release date: ' + escapeHtml(formatDate(f.releaseDate)) +
+              ' &middot; Type: ' + escapeHtml((f.type || 'pdf').toUpperCase()) + '</div>' +
+            '<div class="body">' + escapeHtml(blurb) + '</div>' +
+            (url
+              ? '<a class="original-link" href="' + escapeHtml(url) +
+                '" target="_blank" rel="noopener">Open original file →</a>'
+              : '');
+          els.modalOverlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+          const closeBtn = document.getElementById('wgModalCloseBtn');
+          if (closeBtn) closeBtn.focus();
+        }
+        function closeModal() {
+          els.modalOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+
+        // ── Event wiring ────────────────────────────────────
+        els.search.addEventListener('input', renderFiles);
+        els.refreshBtn.addEventListener('click', () => loadData(false));
+
+        els.agencies.addEventListener('click', (e) => {
+          const chip = e.target.closest('.wg-chip');
+          if (!chip) return;
+          const a = chip.getAttribute('data-agency');
+          selectedAgency = selectedAgency === a ? null : a;
+          updateAgencyFilters();
+          renderFiles();
+        });
+        els.agencies.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          const chip = e.target.closest('.wg-chip');
+          if (!chip) return;
+          e.preventDefault();
+          chip.click();
+        });
+
+        els.fileList.addEventListener('click', (e) => {
+          const card = e.target.closest('.wg-file');
+          if (!card) return;
+          openDetail(Number(card.getAttribute('data-index')));
+        });
+        els.fileList.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          const card = e.target.closest('.wg-file');
+          if (!card) return;
+          e.preventDefault();
+          openDetail(Number(card.getAttribute('data-index')));
+        });
+
+        els.modalOverlay.addEventListener('click', (e) => {
+          if (e.target === els.modalOverlay) closeModal();
+        });
+        els.modalContent.addEventListener('click', (e) => {
+          if (e.target && e.target.id === 'wgModalCloseBtn') closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && els.modalOverlay.classList.contains('open')) {
+            closeModal();
+          }
+        });
+
+        function startAutoRefresh() {
+          if (refreshTimer) clearInterval(refreshTimer);
+          if (countdownTimer) clearInterval(countdownTimer);
+          refreshTimer = setInterval(() => loadData(true), REFRESH_INTERVAL);
+          countdownTimer = setInterval(() => {
+            secondsLeft -= 1;
+            if (secondsLeft <= 0) secondsLeft = REFRESH_INTERVAL / 1000;
+            updateCountdown();
+          }, 1000);
+        }
+
+        loadData(false).then(startAutoRefresh);
+      })();
     </script>
   </body>
 </html>
