@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAR.GOV/UFO — Live Analytic Dashboard</title>
+<style>
+  :root {
+    --bg: #0b0e11;
+    --surface: #14181f;
+    --surface2: #1a1f28;
+    --border: #2a303c;
+    --text: #b8c5d6;
+    --text2: #7a8798;
+    --accent: #00d4aa;
+    --accent2: #00a3ff;
+    --warn: #f0b90b;
+    --danger: #f6465d;
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --radius: 6px;
+    --shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;min-height:100vh}
+  body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 0%, rgba(0,212,170,.03) 0%, transparent 60%);pointer-events:none;z-index:0}
+  .app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+
+  /* HEADER */
+  .header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+  .header-left{display:flex;align-items:center;gap:12px}
+  .logo{width:40px;height:40px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#000;font-family:var(--mono)}
+  .title{font-size:18px;font-weight:700;letter-spacing:-0.3px}
+  .title span{color:var(--accent)}
+  .status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+  .status-dot.error{background:var(--danger)}
+  .status-dot.warn{background:var(--warn)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .header-actions{display:flex;gap:8px}
+  .btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:var(--radius);cursor:pointer;font-size:13px;transition:.2s;white-space:nowrap}
+  .btn:hover{background:#242b36;border-color:#3a4353}
+  .btn-accent{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+  .btn-accent:hover{background:#00e6b8}
+
+  /* TICKER */
+  .ticker-wrap{overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;position:relative}
+  .ticker-label{position:absolute;left:16px;top:50%;transform:translateY(-50%);background:var(--accent);color:#000;font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;z-index:1;font-family:var(--mono)}
+  .ticker{overflow:hidden;white-space:nowrap;padding-left:70px}
+  .ticker-track{display:inline-block;animation:scroll 40s linear infinite}
+  .ticker-item{display:inline-block;margin-right:48px;color:var(--text2);font-size:13px}
+  .ticker-item strong{color:var(--accent)}
+  @keyframes scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+  /* GRID */
+  .grid{display:grid;grid-template-columns:280px 1fr;gap:16px;min-height:0}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+  /* SIDEBAR */
+  .sidebar{display:flex;flex-direction:column;gap:16px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+  .card-title{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:12px;font-weight:600}
+  .stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .stat-row:last-child{border-bottom:none}
+  .stat-val{font-weight:600;color:var(--accent);font-family:var(--mono)}
+  .stat-val.big{font-size:24px;display:block;line-height:1}
+  .agency-tag{display:inline-block;background:var(--surface2);padding:3px 8px;border-radius:3px;font-size:11px;margin:2px;cursor:pointer;border:1px solid transparent;transition:.2s}
+  .agency-tag:hover{border-color:var(--accent);color:var(--accent)}
+  .agency-tag.active{background:var(--accent);color:#000;border-color:var(--accent)}
+
+  /* MAIN */
+  .main{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .search{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:13px;outline:none}
+  .search:focus{border-color:var(--accent)}
+  .count-info{font-size:12px;color:var(--text2)}
+
+  /* FILE LIST */
+  .file-list{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto;padding-right:4px}
+  .file-list::-webkit-scrollbar{width:4px}
+  .file-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+  .file-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:.2s;position:relative}
+  .file-item:hover{border-color:var(--accent);background:#1e2530}
+  .file-item.new{border-left:3px solid var(--accent)}
+  .file-item .badge{position:absolute;top:8px;right:12px;background:var(--accent);color:#000;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:600}
+  .file-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+  .file-agency{background:var(--surface);padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;color:var(--accent2)}
+  .file-date{font-size:11px;color:var(--text2)}
+  .file-title{font-weight:600;font-size:14px;margin-bottom:4px;color:#e0e6ed}
+  .file-blurb{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .file-link{color:var(--accent);font-size:11px;text-decoration:none;margin-top:6px;display:inline-block}
+  .file-link:hover{text-decoration:underline}
+
+  /* DETAIL MODAL */
+  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);max-width:700px;width:100%;max-height:80vh;overflow-y:auto;padding:24px;position:relative}
+  .modal-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--text2);font-size:24px;cursor:pointer;line-height:1}
+  .modal-close:hover{color:var(--text)}
+  .modal h2{font-size:16px;margin-bottom:12px}
+  .modal .file-blurb{display:block;-webkit-line-clamp:unset;overflow:visible;margin-bottom:12px}
+  .modal a{color:var(--accent)}
+
+  /* LOADING */
+  .loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text2);gap:8px}
+  .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* FOOTER */
+  .footer{text-align:center;padding:16px;color:var(--text2);font-size:11px;border-top:1px solid var(--border);margin-top:8px}
+  .footer a{color:var(--accent);text-decoration:none}
+  .footer a:hover{text-decoration:underline}
+
+  .empty-state{text-align:center;padding:40px;color:var(--text2)}
+  .refresh-indicator{font-size:11px;color:var(--text2);margin-left:auto}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">W</div>
+      <div>
+        <div class="title">WAR.GOV/<span>UFO</span> — Live Analytic Dashboard</div>
+        <div class="status"><span class="status-dot" id="statusDot"></span><span id="statusText">Initializing...</span></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" onclick="refreshData()" title="Force Refresh">Refresh</button>
+      <button class="btn btn-accent" onclick="window.open('https://www.war.gov/UFO','_blank')">Open Source</button>
+    </div>
+  </header>
+
+  <!-- NEWS TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-label">LATEST</div>
+    <div class="ticker" id="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="card">
+        <div class="card-title">Repository Stats</div>
+        <div class="stat-row"><span>PDF Documents</span><span class="stat-val" id="statPDF">--</span></div>
+        <div class="stat-row"><span>Images</span><span class="stat-val" id="statIMG">--</span></div>
+        <div class="stat-row"><span>Video Exhibits</span><span class="stat-val" id="statVID">--</span></div>
+        <div class="stat-row"><span>Total Assets</span><span class="stat-val big" id="statTotal">--</span></div>
+        <div class="stat-row"><span>Release</span><span class="stat-val" id="statRel">--</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Filter by Agency</div>
+        <div id="agencyFilters"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Data Source</div>
+        <div style="font-size:12px;color:var(--text2);word-break:break-all">
+          <div>Mirror: <span id="sourceUrl" style="color:var(--accent)">--</span></div>
+          <div style="margin-top:4px">Origin: <a href="https://www.war.gov/UFO" target="_blank" style="color:var(--accent2)">war.gov/UFO</a></div>
+          <div style="margin-top:6px;font-size:11px;color:var(--danger)">Direct origin access blocked by Akamai. Using verified mirror.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <div class="toolbar">
+        <input type="text" class="search" placeholder="Search files by title, agency, description..." id="searchInput" oninput="renderFiles()">
+        <span class="count-info" id="countInfo"></span>
+      </div>
+      <div class="file-list" id="fileList">
+        <div class="loading"><div class="spinner"></div> Loading data from mirror...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    Data sourced from the U.S. Department of War PURSUE program via public mirror. |
+    <a href="https://www.war.gov/UFO" target="_blank">Official Site</a> |
+    Last refresh: <span id="lastRefresh">--</span> |
+    Next refresh in <span id="countdown">30</span>s
+  </footer>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ──────────────────────────────────────
+// CONFIGURATION
+// ──────────────────────────────────────
+const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
+const FALLBACK_SOURCE = 'https://raw.githubusercontent.com/vng9trmgr8-pixel/war-gov-ufo-release-1/main/data.json';
+const REFRESH_INTERVAL = 30000; // 30 seconds
+
+// ──────────────────────────────────────
+// STATE
+// ──────────────────────────────────────
+let allFiles = [];
+let lastDataHash = null;
+let previousFileCount = 0;
+let selectedAgency = null;
+let refreshTimer = null;
+let countdownTimer = null;
+let secondsLeft = REFRESH_INTERVAL / 1000;
+
+// ──────────────────────────────────────
+// DOM REFS
+// ──────────────────────────────────────
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+
+// ──────────────────────────────────────
+// UTILITY
+// ──────────────────────────────────────
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return hash.toString();
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr || dateStr === 'N/A') return 'N/A';
+  return dateStr;
+}
+
+// ──────────────────────────────────────
+// DATA FETCHING
+// ──────────────────────────────────────
+async function fetchData(url) {
+  const resp = await fetch(url, { cache: 'no-cache' });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return await resp.json();
+}
+
+async function loadData(silent = false) {
+  updateStatus('warn', 'Fetching...');
+  let data = null;
+  let sourceUsed = '';
+
+  // Try primary mirror
+  try {
+    data = await fetchData(PRIMARY_SOURCE);
+    sourceUsed = PRIMARY_SOURCE;
+  } catch (e) {
+    console.warn('Primary mirror failed:', e.message);
+    // Try fallback
+    try {
+      data = await fetchData(FALLBACK_SOURCE);
+      sourceUsed = FALLBACK_SOURCE;
+    } catch (e2) {
+      console.error('All sources failed:', e2.message);
+      updateStatus('error', 'Connection failed');
+      if (!silent) {
+        $('#fileList').innerHTML = '<div class="empty-state">Unable to fetch data. Check connection and try again.</div>';
+      }
+      return;
+    }
+  }
+
+  // Process data
+  const files = (data.pdfs || []).map(f => ({
+    ...f,
+    type: 'pdf'
+  })).concat((data.images || []).map(f => ({
+    ...f,
+    type: 'image'
+  }))).concat((data.videos || []).map(f => ({
+    ...f,
+    type: 'video'
+  })));
+
+  // Compute hash for change detection
+  const hash = hashCode(JSON.stringify(files));
+  const isNewData = lastDataHash !== null && lastDataHash !== hash;
+  const newFileCount = files.length - previousFileCount;
+
+  if (isNewData && newFileCount > 0 && !silent) {
+    // Flash notification
+    notifyUpdate(newFileCount);
+  }
+
+  allFiles = files;
+  lastDataHash = hash;
+  previousFileCount = files.length;
+
+  // Update UI
+  updateStats(data);
+  updateAgencyFilters();
+  renderFiles();
+  updateStatus('ok', 'Live');
+  $('#lastRefresh').textContent = formatTime(new Date());
+  $('#sourceUrl').textContent = sourceUsed.replace('https://', '');
+  secondsLeft = REFRESH_INTERVAL / 1000;
+  updateCountdown();
+
+  // Update ticker
+  updateTicker(data);
+}
+
+// ──────────────────────────────────────
+// UI UPDATES
+// ──────────────────────────────────────
+function updateStatus(state, text) {
+  const dot = $('#statusDot');
+  dot.className = 'status-dot';
+  if (state === 'error') dot.classList.add('error');
+  if (state === 'warn') dot.classList.add('warn');
+  $('#statusText').textContent = text;
+}
+
+function updateStats(data) {
+  const pdfs = data.counts?.pdfs || data.pdfs?.length || 0;
+  const images = data.counts?.images || data.images?.length || 0;
+  const videos = data.counts?.videos || data.videos?.length || 0;
+  $('#statPDF').textContent = pdfs;
+  $('#statIMG').textContent = images;
+  $('#statVID').textContent = videos;
+  $('#statTotal').textContent = pdfs + images + videos;
+  $('#statRel').textContent = data.release || '01';
+}
+
+function updateAgencyFilters() {
+  const agencies = [...new Set(allFiles.map(f => f.agency).filter(Boolean))].sort();
+  const container = $('#agencyFilters');
+  container.innerHTML = agencies.map(a =>
+    `<span class="agency-tag${selectedAgency === a ? ' active' : ''}" onclick="filterByAgency('${a.replace(/'/g, "\\'")}')">${a}</span>`
+  ).join('');
+}
+
+function filterByAgency(agency) {
+  if (selectedAgency === agency) {
+    selectedAgency = null;
+  } else {
+    selectedAgency = agency;
+  }
+  updateAgencyFilters();
+  renderFiles();
+}
+
+function renderFiles() {
+  const searchTerm = $('#searchInput').value.toLowerCase();
+  let filtered = allFiles;
+
+  if (selectedAgency) {
+    filtered = filtered.filter(f => f.agency === selectedAgency);
+  }
+  if (searchTerm) {
+    filtered = filtered.filter(f =>
+      (f.title || '').toLowerCase().includes(searchTerm) ||
+      (f.agency || '').toLowerCase().includes(searchTerm) ||
+      (f.blurb || '').toLowerCase().includes(searchTerm) ||
+      (f.officialBlurb || '').toLowerCase().includes(searchTerm)
+    );
+  }
+
+  $('#countInfo').textContent = `Showing ${filtered.length} of ${allFiles.length} files`;
+
+  if (filtered.length === 0) {
+    $('#fileList').innerHTML = '<div class="empty-state">No files match your criteria.</div>';
+    return;
+  }
+
+  $('#fileList').innerHTML = filtered.map((f, i) => {
+    const isNew = i < (allFiles.length - previousFileCount) && previousFileCount > 0;
+    const blurb = f.blurb || f.officialBlurb || 'No description available.';
+    return `
+      <div class="file-item${isNew ? ' new' : ''}" onclick="openDetail(${allFiles.indexOf(f)})">
+        ${isNew ? '<span class="badge">NEW</span>' : ''}
+        <div class="file-meta">
+          <span class="file-agency">${f.agency || 'Unknown'}</span>
+          <span class="file-date">${formatDate(f.releaseDate)}</span>
+          ${f.type ? `<span style="font-size:11px;color:var(--text2)">${f.type.toUpperCase()}</span>` : ''}
+        </div>
+        <div class="file-title">${f.title || 'Untitled'}</div>
+        <div class="file-blurb">${blurb}</div>
+        ${f.url ? `<a class="file-link" href="${f.url}" target="_blank" onclick="event.stopPropagation()">View Original &rarr;</a>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function updateTicker(data) {
+  const headlines = [];
+  headlines.push(`Release ${data.release || '01'} — ${data.releaseDate || 'May 2026'} — ${(data.counts?.pdfs||0)+(data.counts?.images||0)+(data.counts?.videos||0)} total assets`);
+  if (data.pdfs && data.pdfs.length > 0) {
+    const agencies = [...new Set(data.pdfs.map(p => p.agency).filter(Boolean))];
+    headlines.push(`Agencies contributing: ${agencies.slice(0,6).join(', ')}${agencies.length>6?'...':''}`);
+  }
+  headlines.push('Rolling releases — new tranches published every few weeks');
+  headlines.push('PURSUE: Presidential Unsealing and Reporting System for UAP Encounters');
+  headlines.push('Source: U.S. Department of War — All-domain Anomaly Resolution Office (AARO)');
+
+  const track = $('#tickerTrack');
+  // Duplicate for seamless loop
+  track.innerHTML = headlines.map(h => `<span class="ticker-item">${h}</span>`).join('') +
+                    headlines.map(h => `<span class="ticker-item">${h}</span>`).join('');
+}
+
+function notifyUpdate(count) {
+  // Simple flash on the header
+  const header = $('.header');
+  header.style.boxShadow = '0 0 20px rgba(0,212,170,0.3)';
+  setTimeout(() => { header.style.boxShadow = ''; }, 2000);
+}
+
+function updateCountdown() {
+  $('#countdown').textContent = secondsLeft;
+}
+
+// ──────────────────────────────────────
+// MODAL
+// ──────────────────────────────────────
+function openDetail(index) {
+  const f = allFiles[index];
+  if (!f) return;
+  const blurb = f.blurb || f.officialBlurb || 'No description available.';
+  $('#modalContent').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <span class="file-agency" style="margin-bottom:8px;display:inline-block">${f.agency || 'Unknown'}</span>
+    <h2>${f.title || 'Untitled'}</h2>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">
+      Release Date: ${formatDate(f.releaseDate)} &middot; Type: ${(f.type||'pdf').toUpperCase()}
+    </div>
+    <div class="file-blurb" style="display:block;-webkit-line-clamp:unset;overflow:visible">${blurb}</div>
+    ${f.url ? `<a href="${f.url}" target="_blank" style="color:var(--accent)">Open Original File &rarr;</a>` : ''}
+  `;
+  $('#modalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== $('#modalOverlay')) return;
+  $('#modalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ──────────────────────────────────────
+// REFRESH LOGIC
+// ──────────────────────────────────────
+function refreshData() {
+  loadData(false);
+}
+
+function startAutoRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  if (countdownTimer) clearInterval(countdownTimer);
+
+  refreshTimer = setInterval(() => {
+    loadData(true);
+  }, REFRESH_INTERVAL);
+
+  countdownTimer = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft <= 0) secondsLeft = REFRESH_INTERVAL / 1000;
+    updateCountdown();
+  }, 1000);
+}
+
+// ──────────────────────────────────────
+// KEYBOARD SHORTCUTS
+// ──────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    $('#modalOverlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  if (e.ctrlKey && e.key === 'r') {
+    e.preventDefault();
+    refreshData();
+  }
+  if (e.ctrlKey && e.key === 'k') {
+    e.preventDefault();
+    $('#searchInput').focus();
+  }
+});
+
+// ──────────────────────────────────────
+// INIT
+// ──────────────────────────────────────
+loadData(false).then(() => {
+  startAutoRefresh();
+});
+</script>
+</body>
+</html>
