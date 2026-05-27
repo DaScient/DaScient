@@ -1,0 +1,1413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>UFO Intel Widget — Embeddable Live Intelligence Feed</title>
+<meta name="description" content="Plug-and-play, client-side intelligence feed and agentic assistant for UFO/UAP release archives. BYO LLM key, fully in-browser RAG." />
+<meta name="theme-color" content="#0b0d12" />
+<style>
+  /* Host page styling — the widget itself ships its own styles inside Shadow DOM. */
+  :root { color-scheme: dark; }
+  html, body {
+    margin: 0; background: #0b0d12; color: #d9deea;
+    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+  }
+  header.demo { padding: 28px 32px 8px; max-width: 1200px; margin: 0 auto; }
+  header.demo h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.02em; margin: 0 0 4px; }
+  header.demo p  { margin: 0; color: #8a93a8; max-width: 720px; }
+  main.demo { padding: 18px 32px 48px; max-width: 1200px; margin: 0 auto; }
+  pre.usage {
+    background: #11141b; border: 1px solid #1f2532; border-radius: 8px;
+    padding: 12px 14px; color: #b9c0d2; overflow:auto; font-size:12px; margin: 16px 0 24px;
+  }
+  pre.usage code { white-space: pre; }
+  footer.demo { padding: 8px 32px 32px; max-width: 1200px; margin: 0 auto; color:#6b7388; font-size:12px;}
+  footer.demo a { color:#8aa6ff; }
+</style>
+</head>
+<body>
+
+<header class="demo">
+  <h1>UFO Intel Widget</h1>
+  <p>
+    A self-contained, embeddable Web Component delivering a live intelligence feed,
+    a BYO-key agentic assistant with fully client-side RAG, and interactive
+    deep-analytics over UFO/UAP release archives. Drop the tag into any page and go.
+  </p>
+</header>
+
+<main class="demo">
+  <pre class="usage"><code>&lt;script type="module" src="ufo-intel-widget.html#component"&gt;&lt;/script&gt;
+&lt;ufo-intel-widget
+   data-source="https://example.gov/ufo/manifest.json"
+   llm-provider="openai"
+   refresh-interval="30000"
+   theme="dark"&gt;&lt;/ufo-intel-widget&gt;</code></pre>
+
+  <!-- The live widget instance. -->
+  <ufo-intel-widget
+     data-source=""
+     llm-provider="openai"
+     refresh-interval="30000"
+     theme="dark"></ufo-intel-widget>
+</main>
+
+<footer class="demo">
+  All processing is local. API keys live only in <code>localStorage</code>. Visualisation libraries
+  (D3, Chart.js) and the embeddings model (Transformers.js / Xenova MiniLM) are loaded lazily from CDNs
+  only when their feature is first used &mdash; URLs are configurable in the settings panel.
+</footer>
+
+<!--
+  ============================================================================
+  <ufo-intel-widget> — Embeddable Web Component
+  ============================================================================
+  Single-file, zero-build, no-framework. All UI, state, and logic live in this
+  one module. Loaded as an ES module via `<script type="module">`.
+
+  Modules (logical, all inside one closure):
+    1. Config          — attribute parsing + defaults + theme tokens
+    2. AuditLog        — append-only in-browser log (localStorage backed)
+    3. CacheDB         — IndexedDB cache (raw manifests + embeddings)
+    4. DataSource      — multi-feed fetcher (JSON + RSS), normaliser, change detection
+    5. EmbeddingsEngine— lazy Transformers.js loader, chunking, vector index
+    6. RAGRetriever    — cosine-similarity retrieval, plus keyword fallback
+    7. LLMClient       — OpenAI/Anthropic/local provider abstraction w/ SSE streaming
+    8. SlashCommands   — registered agentic skills
+    9. Visualisations  — D3 timeline, force-graph, Chart.js stats (lazy)
+   10. ExportUtils     — CSV/JSON/Markdown export
+   11. UI              — Shadow-DOM render, tabs, feed, chat, modal, settings,
+                         keyboard nav, ARIA, reduced-motion
+
+  Security posture:
+    • No telemetry. No outbound calls except (a) the configured data source,
+      (b) the configured LLM endpoint when the user submits a query, and
+      (c) lazy CDN loads for D3/Chart.js/Transformers.js, all of which are
+      user-overridable in Settings.
+    • API keys never leave the browser except in the request to the chosen
+      LLM endpoint; stored in localStorage under a namespaced key.
+    • Shadow DOM isolates styles from the host page.
+  ============================================================================
+-->
+<script type="module" id="component">
+"use strict";
+
+/* ===========================================================================
+ * 1. CONFIG
+ * ========================================================================= */
+const DEFAULTS = Object.freeze({
+  dataSource: "",                       // primary manifest URL; falls back to demo data when empty
+  refreshInterval: 30_000,              // ms
+  llmProvider: "openai",                // openai | anthropic | local
+  apiKey: "",
+  theme: "dark",                        // dark | light
+  density: "full",                      // full | compact
+  // External, lazily-loaded resources (overridable in Settings).
+  cdn: {
+    d3:           "https://cdn.jsdelivr.net/npm/d3@7/+esm",
+    chartjs:      "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/+esm",
+    transformers: "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2",
+  },
+  // Default LLM endpoints/models per provider.
+  llm: {
+    openai:    { url: "https://api.openai.com/v1/chat/completions",     model: "gpt-4o-mini" },
+    anthropic: { url: "https://api.anthropic.com/v1/messages",           model: "claude-3-5-sonnet-latest" },
+    local:     { url: "http://localhost:11434/v1/chat/completions",      model: "llama3" },
+  },
+  embeddingsModel: "Xenova/all-MiniLM-L6-v2",
+});
+
+const STORAGE_NS = "ufo-intel-widget:v1:";
+const ls = {
+  get(k, def) { try { const v = localStorage.getItem(STORAGE_NS + k); return v == null ? def : JSON.parse(v); } catch { return def; } },
+  set(k, v)   { try { localStorage.setItem(STORAGE_NS + k, JSON.stringify(v)); } catch { /* quota */ } },
+  del(k)      { try { localStorage.removeItem(STORAGE_NS + k); } catch { /* noop */ } },
+};
+
+/* ===========================================================================
+ * 2. AUDIT LOG  — append-only local journal of significant actions.
+ *    Persisted in localStorage (capped to 1k entries). Never exfiltrated.
+ * ========================================================================= */
+const AuditLog = (() => {
+  const KEY = "audit";
+  const MAX = 1000;
+  const load = () => ls.get(KEY, []);
+  let cache = load();
+  const subs = new Set();
+  return {
+    entries: () => cache.slice(),
+    add(kind, detail) {
+      const entry = { t: Date.now(), kind, detail };
+      cache.push(entry);
+      if (cache.length > MAX) cache.splice(0, cache.length - MAX);
+      ls.set(KEY, cache);
+      subs.forEach(fn => { try { fn(entry); } catch { /* swallow */ } });
+    },
+    clear() { cache = []; ls.set(KEY, cache); subs.forEach(fn => { try { fn(null); } catch { /* swallow */ }}); },
+    subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
+  };
+})();
+
+/* ===========================================================================
+ * 3. CACHE DB  — IndexedDB wrapper for offline resilience and embedding reuse.
+ *    Stores: manifest snapshots (by source URL) + per-item embedding vectors.
+ * ========================================================================= */
+const CacheDB = (() => {
+  const DB = "ufo-intel-widget";
+  const VER = 1;
+  let _p;
+  function open() {
+    if (_p) return _p;
+    _p = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB, VER);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains("manifests"))  db.createObjectStore("manifests",  { keyPath: "source" });
+        if (!db.objectStoreNames.contains("embeddings")) db.createObjectStore("embeddings", { keyPath: "id" });
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror   = () => reject(req.error);
+    });
+    return _p;
+  }
+  const tx = async (store, mode, fn) => {
+    const db = await open();
+    return new Promise((resolve, reject) => {
+      const t = db.transaction(store, mode);
+      const s = t.objectStore(store);
+      const r = fn(s);
+      t.oncomplete = () => resolve(r && "result" in r ? r.result : undefined);
+      t.onerror    = () => reject(t.error);
+      t.onabort    = () => reject(t.error);
+    });
+  };
+  return {
+    saveManifest: (source, manifest) =>
+      tx("manifests", "readwrite", s => s.put({ source, manifest, t: Date.now() })),
+    loadManifest: (source) =>
+      new Promise(async (resolve, reject) => {
+        const db = await open();
+        const r = db.transaction("manifests", "readonly").objectStore("manifests").get(source);
+        r.onsuccess = () => resolve(r.result || null);
+        r.onerror   = () => reject(r.error);
+      }),
+    saveEmbedding: (id, vector, meta) =>
+      tx("embeddings", "readwrite", s => s.put({ id, vector, meta, t: Date.now() })),
+    loadEmbedding: (id) =>
+      new Promise(async (resolve, reject) => {
+        const db = await open();
+        const r = db.transaction("embeddings", "readonly").objectStore("embeddings").get(id);
+        r.onsuccess = () => resolve(r.result || null);
+        r.onerror   = () => reject(r.error);
+      }),
+  };
+})();
+
+/* ===========================================================================
+ * 4. DATA SOURCE — multi-feed fetcher + normaliser.
+ *    Accepts JSON manifests of shape { pdfs:[], images:[], videos:[] }
+ *    where each item has { title, agency, url, blurb, releaseDate }.
+ *    Also accepts arbitrary JSON arrays and RSS (atom/rss2) feeds.
+ *    Emits normalised items and change deltas for the live ticker.
+ * ========================================================================= */
+const DataSource = (() => {
+  // Small, schema-correct demo manifest so the widget is useful with no network.
+  const DEMO = {
+    pdfs: [
+      { title: "AARO Annual Historical Report 2024",  agency: "DoD/AARO",  url: "#",
+        releaseDate: "2024-11-12", blurb: "Consolidated review of UAP cases reported through DoD channels, 1945–2023, including legacy USAP cross-references." },
+      { title: "ODNI UAP Assessment Addendum",        agency: "ODNI",      url: "#",
+        releaseDate: "2024-09-30", blurb: "Classified annex declassification: trajectory anomalies near restricted airspace and sensor cross-validation methodology." },
+      { title: "NASA UAP Independent Study Team Report", agency: "NASA",   url: "#",
+        releaseDate: "2023-09-14", blurb: "Findings on data hygiene, stigma reduction, and recommended sensor fusion baselines for civilian observation." },
+    ],
+    images: [
+      { title: "FLIR Pod Frame 0142 — USS Roosevelt",  agency: "USN",      url: "#",
+        releaseDate: "2023-04-21", blurb: "Forward-looking infrared still extracted from Tic-Tac engagement; high-contrast thermal signature with no visible exhaust plume." },
+      { title: "Holloman AFB Range Capture A-7",       agency: "USAF",     url: "#",
+        releaseDate: "2022-12-02", blurb: "Optical capture during EW exercise; transient spheroid observed at altitude inconsistent with known platforms." },
+    ],
+    videos: [
+      { title: "GIMBAL Declassified",                  agency: "USN",      url: "#",
+        releaseDate: "2017-12-16", blurb: "Rotational object engaged by F/A-18 ATFLIR; sensor data released under public affairs review." },
+      { title: "GOFAST Declassified",                  agency: "USN",      url: "#",
+        releaseDate: "2017-12-16", blurb: "Low-altitude high-speed object over Atlantic test range; debate persists over apparent vs. true ground-relative velocity." },
+    ],
+  };
+
+  function normaliseManifest(manifest, sourceUrl = "primary") {
+    const out = [];
+    const visit = (arr, kind) => Array.isArray(arr) && arr.forEach((it, i) => {
+      if (!it || typeof it !== "object") return;
+      const id = (sourceUrl + "::" + kind + "::" + (it.url || it.title || i)).slice(0, 220);
+      out.push({
+        id,
+        kind,                                  // pdf | image | video
+        title:       String(it.title || "Untitled"),
+        agency:      String(it.agency || "Unknown"),
+        url:         String(it.url    || "#"),
+        blurb:       String(it.blurb  || ""),
+        releaseDate: String(it.releaseDate || ""),
+        source:      sourceUrl,
+      });
+    });
+    visit(manifest?.pdfs,   "pdf");
+    visit(manifest?.images, "image");
+    visit(manifest?.videos, "video");
+    if (Array.isArray(manifest)) visit(manifest, "item");
+    return out;
+  }
+
+  function normaliseRSS(xmlText, sourceUrl) {
+    const doc = new DOMParser().parseFromString(xmlText, "application/xml");
+    const items = [...doc.querySelectorAll("item, entry")];
+    return items.map((el, i) => {
+      const get = sel => el.querySelector(sel)?.textContent?.trim() || "";
+      const link = el.querySelector("link")?.getAttribute?.("href") || get("link");
+      const id = sourceUrl + "::rss::" + (link || get("guid") || i);
+      return {
+        id, kind: "feed",
+        title:  get("title")        || "Untitled",
+        agency: get("author > name") || get("dc\\:creator") || (new URL(sourceUrl, location.href)).hostname,
+        url:    link || "#",
+        blurb:  (get("summary") || get("description") || "").replace(/<[^>]+>/g, "").slice(0, 600),
+        releaseDate: (get("pubDate") || get("updated") || "").slice(0, 25),
+        source: sourceUrl,
+      };
+    });
+  }
+
+  async function fetchOne(sourceUrl) {
+    const r = await fetch(sourceUrl, { credentials: "omit", cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status + " for " + sourceUrl);
+    const ct = r.headers.get("content-type") || "";
+    if (ct.includes("xml") || ct.includes("rss") || ct.includes("atom")) {
+      return normaliseRSS(await r.text(), sourceUrl);
+    }
+    const data = await r.json();
+    return normaliseManifest(data, sourceUrl);
+  }
+
+  /**
+   * Fetches every configured source in parallel. On total failure returns the
+   * cached (stale) snapshot for each source, or the DEMO manifest if there is
+   * nothing cached at all. Returns { items, stale, errors }.
+   */
+  async function fetchAll(sources) {
+    const out = []; const errors = []; let stale = false;
+    if (!sources.length) {
+      return { items: normaliseManifest(DEMO, "demo://built-in"), stale: false, errors: [] };
+    }
+    await Promise.all(sources.map(async src => {
+      try {
+        const items = await fetchOne(src);
+        await CacheDB.saveManifest(src, items);
+        out.push(...items);
+      } catch (e) {
+        errors.push({ src, error: String(e) });
+        const cached = await CacheDB.loadManifest(src).catch(() => null);
+        if (cached?.manifest) { out.push(...cached.manifest); stale = true; }
+      }
+    }));
+    if (!out.length) { out.push(...normaliseManifest(DEMO, "demo://built-in")); stale = true; }
+    return { items: out, stale, errors };
+  }
+
+  return { fetchAll, normaliseManifest, DEMO };
+})();
+
+/* ===========================================================================
+ * 5. EMBEDDINGS ENGINE — lazy-loads Transformers.js (MiniLM), chunks docs,
+ *    and maintains an in-memory + IndexedDB-backed vector index.
+ * ========================================================================= */
+const EmbeddingsEngine = (() => {
+  let _extractor = null;
+  let _loading = null;
+  const index = new Map();    // id -> { vector: Float32Array, item }
+
+  async function load(modelId, transformersCdn) {
+    if (_extractor) return _extractor;
+    if (_loading)   return _loading;
+    _loading = (async () => {
+      const mod = await import(/* @vite-ignore */ transformersCdn);
+      // Run fully offline-capable once cached; never call back home.
+      if (mod.env) mod.env.allowLocalModels = false;
+      _extractor = await mod.pipeline("feature-extraction", modelId, { quantized: true });
+      return _extractor;
+    })();
+    return _loading;
+  }
+
+  function chunkText(text, max = 480) {
+    const t = (text || "").trim();
+    if (!t) return [];
+    if (t.length <= max) return [t];
+    const out = []; const sents = t.split(/(?<=[.!?])\s+/);
+    let buf = "";
+    for (const s of sents) {
+      if ((buf + " " + s).trim().length > max) { if (buf) out.push(buf.trim()); buf = s; }
+      else buf = (buf + " " + s).trim();
+    }
+    if (buf) out.push(buf);
+    return out;
+  }
+
+  async function embed(text, modelId, transformersCdn) {
+    const extractor = await load(modelId, transformersCdn);
+    const out = await extractor(text, { pooling: "mean", normalize: true });
+    return Float32Array.from(out.data);
+  }
+
+  /**
+   * Indexes a list of normalised items. Reuses cached vectors by id when
+   * available (keyed on title+blurb hash) so repeated refreshes are cheap.
+   */
+  async function indexItems(items, modelId, transformersCdn, onProgress) {
+    let done = 0;
+    for (const it of items) {
+      const docText = `${it.title}. Agency: ${it.agency}. ${it.blurb}`;
+      const key = it.id + "::v1";
+      let vec = null;
+      const cached = await CacheDB.loadEmbedding(key).catch(() => null);
+      if (cached?.vector) vec = new Float32Array(cached.vector);
+      if (!vec) {
+        try {
+          vec = await embed(docText, modelId, transformersCdn);
+          await CacheDB.saveEmbedding(key, Array.from(vec), { id: it.id });
+        } catch (e) {
+          // If embeddings unavailable, leave entry unindexed; RAG falls back to keyword search.
+          done++; onProgress?.(done, items.length, e); continue;
+        }
+      }
+      index.set(it.id, { vector: vec, item: it });
+      done++; onProgress?.(done, items.length, null);
+    }
+    return index;
+  }
+
+  function size() { return index.size; }
+  function clear() { index.clear(); }
+  function ready() { return !!_extractor; }
+  function getIndex() { return index; }
+
+  return { indexItems, embed, chunkText, size, clear, ready, load, getIndex };
+})();
+
+/* ===========================================================================
+ * 6. RAG RETRIEVER — cosine similarity; falls back to BM25-lite keyword score
+ *    when the embedding index is empty (e.g. user declined the model download).
+ * ========================================================================= */
+const RAGRetriever = (() => {
+  function cosine(a, b) {
+    let s = 0; const n = Math.min(a.length, b.length);
+    for (let i = 0; i < n; i++) s += a[i] * b[i];
+    return s; // vectors are already L2-normalised
+  }
+  function keywordScore(q, text) {
+    const tokens = q.toLowerCase().split(/\W+/).filter(t => t.length > 2);
+    if (!tokens.length) return 0;
+    const lc = text.toLowerCase();
+    let s = 0;
+    for (const t of tokens) {
+      const c = lc.split(t).length - 1;
+      if (c) s += 1 + Math.log(1 + c);
+    }
+    return s;
+  }
+  async function retrieve(query, items, opts) {
+    const k = opts?.k ?? 6;
+    const idx = EmbeddingsEngine.getIndex();
+    if (idx.size && opts?.queryVector) {
+      const scored = [];
+      for (const { vector, item } of idx.values()) {
+        scored.push({ item, score: cosine(opts.queryVector, vector) });
+      }
+      scored.sort((a, b) => b.score - a.score);
+      return scored.slice(0, k);
+    }
+    // Keyword fallback.
+    const scored = items.map(item => ({
+      item,
+      score: keywordScore(query, `${item.title} ${item.blurb} ${item.agency}`),
+    })).filter(x => x.score > 0);
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, k);
+  }
+  return { retrieve };
+})();
+
+/* ===========================================================================
+ * 7. LLM CLIENT — provider-agnostic chat with SSE streaming where supported.
+ *    Returns an async iterator of token deltas. Errors propagate; the UI is
+ *    responsible for displaying them. Keys live only in localStorage.
+ * ========================================================================= */
+const LLMClient = (() => {
+  async function* streamOpenAI(endpoint, key, model, messages, signal) {
+    const r = await fetch(endpoint, {
+      method: "POST",
+      signal,
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
+      body: JSON.stringify({ model, messages, stream: true, temperature: 0.2 }),
+    });
+    if (!r.ok || !r.body) throw new Error("LLM HTTP " + r.status + ": " + (await r.text().catch(() => "")));
+    const reader = r.body.getReader();
+    const dec = new TextDecoder(); let buf = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let idx;
+      while ((idx = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
+        if (!line.startsWith("data:")) continue;
+        const data = line.slice(5).trim();
+        if (data === "[DONE]") return;
+        try {
+          const j = JSON.parse(data);
+          const tok = j.choices?.[0]?.delta?.content;
+          if (tok) yield tok;
+        } catch { /* keep-alive */ }
+      }
+    }
+  }
+  async function* streamAnthropic(endpoint, key, model, messages, signal) {
+    // Translate to Anthropic's messages API; system prompt is hoisted out.
+    const sys = messages.find(m => m.role === "system")?.content || "";
+    const rest = messages.filter(m => m.role !== "system");
+    const r = await fetch(endpoint, {
+      method: "POST",
+      signal,
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": key,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true",
+      },
+      body: JSON.stringify({ model, system: sys, messages: rest, stream: true, max_tokens: 1024 }),
+    });
+    if (!r.ok || !r.body) throw new Error("LLM HTTP " + r.status + ": " + (await r.text().catch(() => "")));
+    const reader = r.body.getReader();
+    const dec = new TextDecoder(); let buf = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let idx;
+      while ((idx = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, idx).trim(); buf = buf.slice(idx + 1);
+        if (!line.startsWith("data:")) continue;
+        try {
+          const j = JSON.parse(line.slice(5).trim());
+          if (j.type === "content_block_delta" && j.delta?.text) yield j.delta.text;
+        } catch { /* noop */ }
+      }
+    }
+  }
+
+  async function* chat({ provider, endpoint, key, model, messages, signal }) {
+    AuditLog.add("llm.request", { provider, model, messages: messages.length });
+    try {
+      if (provider === "anthropic") yield* streamAnthropic(endpoint, key, model, messages, signal);
+      else                          yield* streamOpenAI(endpoint, key, model, messages, signal);
+    } finally {
+      AuditLog.add("llm.complete", { provider, model });
+    }
+  }
+
+  return { chat };
+})();
+
+/* ===========================================================================
+ * 8. SLASH COMMANDS — pre-built agentic skills. Each returns either a direct
+ *    response (sync) or augments the messages to send to the LLM (async).
+ * ========================================================================= */
+function buildSlashCommands(getItems) {
+  const fmt = d => { const t = Date.parse(d); return Number.isFinite(t) ? new Date(t).toISOString().slice(0, 10) : d || "—"; };
+  return {
+    "/help": {
+      help: "Show available agentic commands.",
+      run: () => ({ direct: true, content:
+`Available commands:
+• /summarize latest [n]   – Condense the n most-recent releases.
+• /compare agencies        – Cross-agency release-cadence and theme comparison.
+• /generate report         – Produce a one-page intel brief from the current dataset.
+• /risk assess <term>      – Risk posture summary for a topic, grounded in the corpus.
+• /timeline                – Chronological synopsis of major releases.
+• /find patterns           – Surface recurring keywords, agencies, and clusters.
+• /help                    – This list.` }),
+    },
+    "/summarize": {
+      help: "Summarize latest releases. Usage: /summarize latest [n]",
+      run: (args) => {
+        const n = Math.min(20, parseInt(args.match(/\d+/)?.[0] || "5", 10));
+        const items = [...getItems()].sort((a, b) => Date.parse(b.releaseDate || 0) - Date.parse(a.releaseDate || 0)).slice(0, n);
+        return { augment:
+          "Summarize the following recent releases. Be concise, neutral, and source-cite by title.\n\n" +
+          items.map(i => `• [${fmt(i.releaseDate)}] (${i.agency}) ${i.title} — ${i.blurb}`).join("\n") };
+      },
+    },
+    "/compare": {
+      help: "Compare agencies across the dataset.",
+      run: () => {
+        const items = getItems();
+        const byAgency = {};
+        for (const it of items) (byAgency[it.agency] ||= []).push(it);
+        const summary = Object.entries(byAgency)
+          .map(([a, l]) => `${a}: ${l.length} releases (${l.map(i => i.kind).join(",")})`).join("\n");
+        return { augment:
+          "Compare the following agency release portfolios. Highlight thematic differences, cadence, and any unique disclosures.\n\n" + summary };
+      },
+    },
+    "/generate": {
+      help: "Generate a one-page intel report.",
+      run: () => ({ augment:
+        "Produce a one-page intelligence brief over the loaded UAP/UFO release corpus. " +
+        "Use the headings: BLUF, Key Releases, Agency Posture, Anomalies, Recommended Collection. " +
+        "Cite items by title. Use sober, declarative prose; no speculation beyond evidence." }),
+    },
+    "/risk": {
+      help: "Risk assess a term. Usage: /risk assess <term>",
+      run: (args) => {
+        const term = args.replace(/^assess\s+/i, "").trim() || "general UAP activity";
+        return { augment:
+          `Provide a structured risk assessment for: "${term}". Use sections — Indicators, Likelihood, Impact, Confidence, Gaps. ` +
+          `Anchor every claim in the provided corpus by title.` };
+      },
+    },
+    "/timeline": {
+      help: "Chronological synopsis.",
+      run: () => {
+        const items = [...getItems()].filter(i => i.releaseDate).sort((a, b) => Date.parse(a.releaseDate) - Date.parse(b.releaseDate));
+        return { augment:
+          "Produce a chronological synopsis grouped by year. Note inflection points and cross-agency clusters.\n\n" +
+          items.map(i => `${fmt(i.releaseDate)} | ${i.agency} | ${i.title}`).join("\n") };
+      },
+    },
+    "/find": {
+      help: "Find recurring patterns.",
+      run: () => ({ augment:
+        "Identify recurring keywords, repeated phenomena, and clusters across agencies. " +
+        "List top 10 patterns with supporting titles and a one-line interpretation each." }),
+    },
+  };
+}
+
+/* ===========================================================================
+ * 9. VISUALISATIONS — lazy D3 timeline, force-graph; lazy Chart.js statistics.
+ *    Each renderer takes a container and a snapshot of items, and is safe to
+ *    re-call on data refresh (it tears down and rebuilds).
+ * ========================================================================= */
+const Visualisations = (() => {
+  let _d3, _chart;
+  async function d3(cdn)    { return _d3    ||= await import(/* @vite-ignore */ cdn); }
+  async function chart(cdn) { return _chart ||= await import(/* @vite-ignore */ cdn); }
+
+  function color(agency) {
+    // Stable hash → hue for agency colour-coding.
+    let h = 0; for (const c of agency) h = (h * 31 + c.charCodeAt(0)) | 0;
+    return `hsl(${Math.abs(h) % 360} 70% 60%)`;
+  }
+
+  async function timeline(container, items, cdnUrl) {
+    const d3 = await d3Module(cdnUrl);
+    container.innerHTML = "";
+    const data = items.filter(i => i.releaseDate && Number.isFinite(Date.parse(i.releaseDate)))
+                      .map(i => ({ ...i, date: new Date(i.releaseDate) }));
+    if (!data.length) { container.textContent = "No dated items to plot."; return; }
+    const W = container.clientWidth || 800, H = 280, M = { l: 40, r: 16, t: 16, b: 28 };
+    const svg = d3.select(container).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role","img").attr("aria-label","Release timeline");
+    const x = d3.scaleTime().domain(d3.extent(data, d => d.date)).range([M.l, W - M.r]);
+    const agencies = [...new Set(data.map(d => d.agency))];
+    const y = d3.scalePoint().domain(agencies).range([M.t + 10, H - M.b - 10]).padding(0.5);
+    svg.append("g").attr("transform", `translate(0,${H - M.b})`).call(d3.axisBottom(x).ticks(6)).attr("color","#8a93a8");
+    svg.append("g").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(y)).attr("color","#8a93a8");
+    const brushGroup = svg.append("g");
+    svg.append("g").selectAll("circle").data(data).join("circle")
+      .attr("cx", d => x(d.date)).attr("cy", d => y(d.agency)).attr("r", 5)
+      .attr("fill", d => color(d.agency)).attr("opacity", 0.85)
+      .append("title").text(d => `${d.releaseDate} — ${d.agency}\n${d.title}`);
+    const brush = d3.brushX().extent([[M.l, M.t], [W - M.r, H - M.b]])
+      .on("end", ev => {
+        if (!ev.selection) { container.dispatchEvent(new CustomEvent("vis:brush", { detail: null, bubbles: true, composed: true })); return; }
+        const [a, b] = ev.selection.map(x.invert);
+        container.dispatchEvent(new CustomEvent("vis:brush", { detail: { from: a, to: b }, bubbles: true, composed: true }));
+      });
+    brushGroup.call(brush);
+  }
+  async function d3Module(cdnUrl) { return await d3(cdnUrl); }
+
+  async function network(container, items, cdnUrl) {
+    const d3 = await d3Module(cdnUrl);
+    container.innerHTML = "";
+    // Build nodes (agencies + top keywords) and edges (file ↔ keyword, file ↔ agency).
+    const stop = new Set("the a an of and or to for in on with from by is are be as that this it not at over under into about within between".split(" "));
+    const tf = {};
+    for (const it of items) for (const w of (it.blurb + " " + it.title).toLowerCase().split(/[^a-z0-9]+/)) {
+      if (w.length < 5 || stop.has(w)) continue;
+      tf[w] = (tf[w] || 0) + 1;
+    }
+    const topKeywords = Object.entries(tf).sort((a, b) => b[1] - a[1]).slice(0, 24).map(([w]) => w);
+    const kwSet = new Set(topKeywords);
+    const nodes = new Map();
+    const add = (id, type) => { if (!nodes.has(id)) nodes.set(id, { id, type }); };
+    items.forEach(it => add("a:" + it.agency, "agency"));
+    topKeywords.forEach(k => add("k:" + k, "keyword"));
+    const links = [];
+    items.forEach(it => {
+      const text = (it.blurb + " " + it.title).toLowerCase();
+      for (const k of kwSet) if (text.includes(k)) links.push({ source: "a:" + it.agency, target: "k:" + k, value: 1 });
+    });
+    const W = container.clientWidth || 800, H = 360;
+    const svg = d3.select(container).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role","img").attr("aria-label","Network graph of agencies and keywords");
+    const sim = d3.forceSimulation([...nodes.values()])
+      .force("link", d3.forceLink(links).id(d => d.id).distance(60).strength(0.2))
+      .force("charge", d3.forceManyBody().strength(-90))
+      .force("center", d3.forceCenter(W / 2, H / 2));
+    const link = svg.append("g").attr("stroke", "#2a3142").selectAll("line").data(links).join("line").attr("stroke-width", 1);
+    const node = svg.append("g").selectAll("circle").data([...nodes.values()]).join("circle")
+      .attr("r", d => d.type === "agency" ? 9 : 5)
+      .attr("fill", d => d.type === "agency" ? color(d.id.slice(2)) : "#8aa6ff")
+      .call(d3.drag()
+        .on("start", (ev, d) => { if (!ev.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+        .on("drag",  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+        .on("end",   (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; }));
+    node.append("title").text(d => d.id);
+    const label = svg.append("g").selectAll("text").data([...nodes.values()]).join("text")
+      .text(d => d.id.slice(2)).attr("font-size", 10).attr("fill", "#b9c0d2").attr("dx", 8).attr("dy", 3);
+    sim.on("tick", () => {
+      link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+      node.attr("cx", d => d.x).attr("cy", d => d.y);
+      label.attr("x", d => d.x).attr("y", d => d.y);
+    });
+  }
+
+  async function stats(container, items, cdnUrl) {
+    const Chart = (await chart(cdnUrl)).default ?? (await chart(cdnUrl)).Chart ?? (await chart(cdnUrl));
+    container.innerHTML = "";
+    // Bar: files per agency by kind.
+    const agencies = [...new Set(items.map(i => i.agency))];
+    const kinds    = [...new Set(items.map(i => i.kind))];
+    const grid = document.createElement("div");
+    grid.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px";
+    container.appendChild(grid);
+
+    const c1 = document.createElement("canvas"); grid.appendChild(c1);
+    new Chart(c1, {
+      type: "bar",
+      data: {
+        labels: agencies,
+        datasets: kinds.map(k => ({
+          label: k,
+          data: agencies.map(a => items.filter(i => i.agency === a && i.kind === k).length),
+          backgroundColor: color(k),
+        })),
+      },
+      options: { responsive: true, plugins: { legend: { labels: { color: "#b9c0d2" } } },
+        scales: { x: { stacked: true, ticks: { color: "#8a93a8" } }, y: { stacked: true, ticks: { color: "#8a93a8" } } } },
+    });
+
+    // Line: cadence over time (releases per month).
+    const buckets = {};
+    items.forEach(i => {
+      if (!i.releaseDate) return;
+      const k = i.releaseDate.slice(0, 7);
+      buckets[k] = (buckets[k] || 0) + 1;
+    });
+    const labels = Object.keys(buckets).sort();
+    const c2 = document.createElement("canvas"); grid.appendChild(c2);
+    new Chart(c2, {
+      type: "line",
+      data: { labels, datasets: [{ label: "Releases / month", data: labels.map(l => buckets[l]),
+        borderColor: "#8aa6ff", backgroundColor: "rgba(138,166,255,0.15)", tension: 0.3, fill: true }] },
+      options: { responsive: true, plugins: { legend: { labels: { color: "#b9c0d2" } } },
+        scales: { x: { ticks: { color: "#8a93a8" } }, y: { ticks: { color: "#8a93a8" } } } },
+    });
+  }
+
+  return { timeline, network, stats };
+})();
+
+/* ===========================================================================
+ * 10. EXPORT UTILS — CSV/JSON/Markdown.
+ * ========================================================================= */
+const ExportUtils = (() => {
+  function download(name, mime, text) {
+    const blob = new Blob([text], { type: mime });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+  }
+  function toCSV(items) {
+    const cols = ["releaseDate", "agency", "kind", "title", "url", "blurb", "source"];
+    const esc = v => `"${String(v ?? "").replace(/"/g, '""').replace(/\r?\n/g, " ")}"`;
+    return [cols.join(","), ...items.map(it => cols.map(c => esc(it[c])).join(","))].join("\n");
+  }
+  function exportItems(items, format) {
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    if (format === "csv") download(`ufo-intel-${stamp}.csv`, "text/csv", toCSV(items));
+    else                  download(`ufo-intel-${stamp}.json`, "application/json", JSON.stringify(items, null, 2));
+    AuditLog.add("export.items", { format, count: items.length });
+  }
+  function exportTranscript(messages) {
+    const md = messages.map(m => `### ${m.role}\n\n${m.content}\n`).join("\n");
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    download(`ufo-intel-chat-${stamp}.md`, "text/markdown", md);
+    AuditLog.add("export.transcript", { messages: messages.length });
+  }
+  return { exportItems, exportTranscript };
+})();
+
+/* ===========================================================================
+ * 11. UI / WEB COMPONENT
+ * ========================================================================= */
+class UFOIntelWidget extends HTMLElement {
+  static get observedAttributes() {
+    return ["data-source", "llm-provider", "api-key", "refresh-interval", "theme", "density"];
+  }
+  constructor() {
+    super();
+    this._root = this.attachShadow({ mode: "open" });
+    this._state = {
+      items: [],
+      stale: false,
+      lastRefresh: 0,
+      activeTab: "feed",
+      filterText: "",
+      filterAgency: "",
+      filterKind: "",
+      brush: null,                          // {from, to} from timeline brush
+      analystNotes: ls.get("notes", []),    // [{t, text}]
+      alerts: [],
+      chat: { open: false, busy: false, messages: [], abort: null },
+      settings: {
+        sources: ls.get("sources", []),     // additional URLs
+        cdn:     ls.get("cdn",     DEFAULTS.cdn),
+        llmEndpoints: ls.get("llmEndpoints", DEFAULTS.llm),
+        embeddingsModel: ls.get("embeddingsModel", DEFAULTS.embeddingsModel),
+      },
+      indexedCount: 0,
+      indexingTotal: 0,
+    };
+    this._cfg = { ...DEFAULTS };
+    this._timer = null;
+    this._slash = buildSlashCommands(() => this._filteredItems());
+    this._unsubAudit = AuditLog.subscribe(() => { if (this._state.activeTab === "audit") this._render(); });
+  }
+
+  connectedCallback() {
+    this._applyAttrs();
+    this._render();
+    this._refresh().catch(e => this._pushAlert("error", "Initial load failed: " + e.message));
+    this._timer = setInterval(() => this._refresh().catch(() => {}), this._cfg.refreshInterval);
+  }
+  disconnectedCallback() {
+    clearInterval(this._timer);
+    this._state.chat.abort?.abort();
+    this._unsubAudit?.();
+  }
+  attributeChangedCallback() {
+    this._applyAttrs();
+    clearInterval(this._timer);
+    this._timer = setInterval(() => this._refresh().catch(() => {}), this._cfg.refreshInterval);
+    this._render();
+  }
+
+  _applyAttrs() {
+    const a = (k, def) => this.getAttribute(k) ?? def;
+    this._cfg.dataSource     = a("data-source",      DEFAULTS.dataSource);
+    this._cfg.llmProvider    = a("llm-provider",     DEFAULTS.llmProvider);
+    this._cfg.refreshInterval= Math.max(5000, parseInt(a("refresh-interval", DEFAULTS.refreshInterval), 10) || DEFAULTS.refreshInterval);
+    this._cfg.theme          = a("theme",            DEFAULTS.theme);
+    this._cfg.density        = a("density",          DEFAULTS.density);
+    const k = a("api-key", "");
+    if (k) ls.set("apiKey:" + this._cfg.llmProvider, k);
+    this._cfg.apiKey         = ls.get("apiKey:" + this._cfg.llmProvider, "");
+  }
+
+  // -------- Data flow --------
+  _sources() {
+    const list = [];
+    if (this._cfg.dataSource) list.push(this._cfg.dataSource);
+    for (const s of this._state.settings.sources) if (s) list.push(s);
+    return list;
+  }
+  async _refresh() {
+    const prevIds = new Set(this._state.items.map(i => i.id));
+    const { items, stale, errors } = await DataSource.fetchAll(this._sources());
+    this._state.items = items;
+    this._state.stale = stale;
+    this._state.lastRefresh = Date.now();
+    for (const e of errors) this._pushAlert("warn", `Source failed: ${e.src}`);
+    const fresh = items.filter(i => !prevIds.has(i.id));
+    if (prevIds.size && fresh.length) this._pushAlert("info", `New tranche detected: ${fresh.length} item${fresh.length === 1 ? "" : "s"}.`);
+    AuditLog.add("data.refresh", { count: items.length, fresh: fresh.length, stale });
+    this._kickEmbeddings(items).catch(() => {});  // best-effort; fully optional
+    this._render();
+  }
+  async _kickEmbeddings(items) {
+    // Only do this if the user has interacted with the assistant at least once,
+    // to avoid surprise CDN traffic on first paint.
+    if (!ls.get("indexConsent", false)) return;
+    this._state.indexingTotal = items.length;
+    await EmbeddingsEngine.indexItems(items, this._state.settings.embeddingsModel, this._state.settings.cdn.transformers,
+      (done) => { this._state.indexedCount = done; });
+    this._render();
+  }
+
+  _pushAlert(level, text) {
+    const a = { t: Date.now(), level, text };
+    this._state.alerts.unshift(a);
+    if (this._state.alerts.length > 25) this._state.alerts.length = 25;
+    AuditLog.add("alert", a);
+  }
+  _filteredItems() {
+    const s = this._state;
+    const q = s.filterText.toLowerCase();
+    return s.items.filter(it => {
+      if (s.filterAgency && it.agency !== s.filterAgency) return false;
+      if (s.filterKind   && it.kind   !== s.filterKind)   return false;
+      if (q && !(it.title + " " + it.blurb + " " + it.agency).toLowerCase().includes(q)) return false;
+      if (s.brush && it.releaseDate) {
+        const t = Date.parse(it.releaseDate);
+        if (Number.isFinite(t) && (t < +s.brush.from || t > +s.brush.to)) return false;
+      }
+      return true;
+    });
+  }
+
+  // -------- Chat --------
+  async _sendChat(text) {
+    const t = text.trim();
+    if (!t || this._state.chat.busy) return;
+    this._state.chat.messages.push({ role: "user", content: t });
+    this._render();
+
+    // Slash command pre-processing.
+    let augment = "";
+    if (t.startsWith("/")) {
+      const [head, ...rest] = t.slice(1).split(/\s+/);
+      const cmd = this._slash["/" + head];
+      if (!cmd) {
+        this._state.chat.messages.push({ role: "assistant", content: `Unknown command: /${head}. Try /help.` });
+        this._render(); return;
+      }
+      const out = cmd.run(rest.join(" "));
+      if (out.direct) {
+        this._state.chat.messages.push({ role: "assistant", content: out.content });
+        this._render(); return;
+      }
+      augment = out.augment || "";
+    }
+
+    // RAG: retrieve context.
+    let context = "";
+    let sources = [];
+    try {
+      let qv = null;
+      if (ls.get("indexConsent", false)) {
+        await EmbeddingsEngine.indexItems(this._state.items, this._state.settings.embeddingsModel, this._state.settings.cdn.transformers);
+        qv = await EmbeddingsEngine.embed(t, this._state.settings.embeddingsModel, this._state.settings.cdn.transformers);
+      }
+      const hits = await RAGRetriever.retrieve(t, this._state.items, { k: 6, queryVector: qv });
+      sources = hits.map(h => h.item);
+      context = hits.map((h, i) => `[#${i + 1}] (${h.item.agency}, ${h.item.releaseDate}) ${h.item.title} — ${h.item.blurb} | ${h.item.url}`).join("\n");
+    } catch (e) {
+      this._pushAlert("warn", "RAG retrieval degraded: " + e.message);
+    }
+
+    // Compose LLM messages.
+    const sys = "You are an intelligence analyst assistant. Answer concisely and only from the provided corpus. " +
+                "Cite items by their [#] index. If unsure, say so. Never fabricate URLs.";
+    const userMsg = (augment ? augment + "\n\n" : "") +
+                    (context ? "Corpus excerpts:\n" + context + "\n\nQuestion: " + t : t);
+    const messages = [
+      { role: "system", content: sys },
+      ...this._state.chat.messages.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
+      { role: "user", content: userMsg },
+    ];
+
+    if (!this._cfg.apiKey && this._cfg.llmProvider !== "local") {
+      this._state.chat.messages.push({ role: "assistant", content:
+        "No API key configured. Open Settings and add a key for the selected provider, or switch to a local model endpoint." });
+      this._render(); return;
+    }
+
+    const provider = this._cfg.llmProvider;
+    const ep = this._state.settings.llmEndpoints[provider];
+    const ac = new AbortController();
+    this._state.chat.abort = ac;
+    this._state.chat.busy = true;
+    const assistantMsg = { role: "assistant", content: "", sources };
+    this._state.chat.messages.push(assistantMsg);
+    this._render();
+
+    try {
+      const iter = LLMClient.chat({
+        provider, endpoint: ep.url, key: this._cfg.apiKey, model: ep.model, messages, signal: ac.signal,
+      });
+      for await (const tok of iter) {
+        assistantMsg.content += tok;
+        this._renderChatStream();
+      }
+    } catch (e) {
+      assistantMsg.content += (assistantMsg.content ? "\n\n" : "") + "⚠ " + e.message;
+    } finally {
+      this._state.chat.busy = false;
+      this._state.chat.abort = null;
+      this._render();
+    }
+  }
+
+  // -------- Render --------
+  _styles() {
+    const dark = this._cfg.theme !== "light";
+    return /* css */ `
+      :host {
+        --bg:       ${dark ? "#0b0d12" : "#fbfaf7"};
+        --panel:    ${dark ? "#11141b" : "#ffffff"};
+        --panel-2:  ${dark ? "#161a23" : "#f3eeff"};
+        --ink:      ${dark ? "#d9deea" : "#15131f"};
+        --ink-soft: ${dark ? "#8a93a8" : "#4b465a"};
+        --ink-mute: ${dark ? "#6b7388" : "#6f6a7d"};
+        --line:     ${dark ? "#1f2532" : "#e7e2f0"};
+        --accent:   ${dark ? "#8aa6ff" : "#7e14ff"};
+        --warn:     #f0b429;
+        --err:      #ff6a6a;
+        --ok:       #4ade80;
+        --radius:   10px;
+        display:block; color:var(--ink); background:var(--bg);
+        font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        container-type: inline-size;
+      }
+      @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+      *, *::before, *::after { box-sizing: border-box; }
+      .wrap { display:grid; grid-template-rows:auto auto 1fr; min-height:520px; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--bg); position:relative;}
+      header.bar { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line); background:var(--panel); }
+      header.bar h2 { margin:0; font-size:13px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft); font-weight:600; }
+      header.bar .grow { flex:1; }
+      .stale { background:rgba(240,180,41,0.12); color:var(--warn); padding:6px 14px; font-size:12px; border-bottom:1px solid var(--line);}
+      nav.tabs { display:flex; gap:2px; padding:0 8px; background:var(--panel); border-bottom:1px solid var(--line);}
+      nav.tabs button { background:transparent; border:0; color:var(--ink-soft); padding:10px 14px; font:inherit; cursor:pointer; border-bottom:2px solid transparent;}
+      nav.tabs button[aria-selected="true"] { color:var(--ink); border-bottom-color: var(--accent); }
+      nav.tabs button:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
+      .main { display:grid; grid-template-columns: 1fr; min-height:0; }
+      .pane { padding:14px; overflow:auto; min-height:0; }
+      .filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+      .filters input, .filters select, .settings input, .settings select, .chat input {
+        background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:7px 10px; font:inherit;
+      }
+      .filters input { min-width: 200px; }
+      .feed { display:grid; gap:8px; }
+      .row { display:grid; grid-template-columns: 110px 1fr auto; gap:10px; padding:10px 12px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); cursor:pointer; }
+      .row:hover, .row:focus-visible { border-color: var(--accent); outline: none; }
+      .row .date { color:var(--ink-soft); font-variant-numeric: tabular-nums; font-size:12px; }
+      .row .title { color:var(--ink); font-weight:600; }
+      .row .blurb { color:var(--ink-soft); font-size:12px; margin-top:2px;}
+      .badge { display:inline-flex; align-items:center; gap:6px; font-size:11px; padding:3px 8px; border-radius:999px; background:var(--panel-2); color:var(--ink-soft); border:1px solid var(--line); }
+      .badge.kind-pdf{} .badge.kind-image{} .badge.kind-video{} .badge.kind-note{ color:var(--accent); } .badge.kind-alert{ color: var(--warn); }
+      .toolbar { display:flex; gap:8px; flex-wrap:wrap; margin: 8px 0 12px; }
+      .btn { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:7px 12px; font:inherit; cursor:pointer; }
+      .btn:hover, .btn:focus-visible { border-color: var(--accent); outline:none; }
+      .btn.primary { background:var(--accent); color:#0b0d12; border-color:var(--accent); }
+      .modal { position:absolute; inset:0; background:rgba(0,0,0,0.55); display:flex; align-items:center; justify-content:center; padding:18px; }
+      .modal .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; max-width:720px; width:100%; padding:18px; max-height:80%; overflow:auto;}
+      /* Chat panel */
+      .chat-fab { position:absolute; right:14px; bottom:14px; width:44px; height:44px; border-radius:50%; background:var(--accent); color:#0b0d12; border:0; font-weight:700; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+      .chat-panel { position:absolute; top:0; right:0; bottom:0; width:min(420px, 92%); background:var(--panel); border-left:1px solid var(--line); display:flex; flex-direction:column; transform:translateX(100%); transition:transform 200ms ease; }
+      .chat-panel[aria-hidden="false"] { transform: translateX(0); }
+      .chat-head { display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line); }
+      .chat-head .grow { flex:1; }
+      .chat-log { flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px; }
+      .msg { padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:var(--panel-2); }
+      .msg.user { background:transparent; border-color:var(--line); }
+      .msg .role { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
+      .msg .body { white-space:pre-wrap; word-wrap:break-word; }
+      .msg .sources { margin-top:8px; font-size:12px; color:var(--ink-soft); display:grid; gap:3px; }
+      .msg .sources a { color:var(--accent); }
+      .chat-input { display:flex; gap:8px; padding:10px; border-top:1px solid var(--line); }
+      .chat-input input { flex:1; }
+      .vis { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:8px; margin-bottom:12px; }
+      .settings .row2 { display:grid; grid-template-columns: 220px 1fr; gap:10px; align-items:center; margin-bottom:10px; }
+      .audit table { width:100%; border-collapse:collapse; font-size:12px; }
+      .audit td, .audit th { padding:6px 8px; border-bottom:1px solid var(--line); text-align:left; vertical-align: top; }
+      .audit td.kind { color:var(--ink-soft); white-space:nowrap; }
+      .stats { font-size:12px; color:var(--ink-soft); }
+      .stats b { color: var(--ink); }
+      .empty { padding:24px; color:var(--ink-mute); text-align:center; }
+      :host([density="compact"]) .row { grid-template-columns: 90px 1fr auto; padding:6px 8px; }
+      @container (max-width: 540px) { .row { grid-template-columns: 1fr; } .row .date { order: 2; } }
+    `;
+  }
+
+  _render() {
+    const s = this._state;
+    const items = this._filteredItems();
+    const agencies = [...new Set(s.items.map(i => i.agency))].sort();
+    const kinds    = [...new Set(s.items.map(i => i.kind))].sort();
+    const lastTxt  = s.lastRefresh ? new Date(s.lastRefresh).toLocaleString() : "—";
+
+    // Merge feed: items + analyst notes + alerts.
+    const feed = [
+      ...items.map(i => ({ kind: i.kind, t: Date.parse(i.releaseDate) || 0, item: i, source: "release" })),
+      ...s.analystNotes.map(n => ({ kind: "note", t: n.t, item: n, source: "note" })),
+      ...s.alerts.map(a => ({ kind: "alert", t: a.t, item: a, source: "alert" })),
+    ].sort((a, b) => b.t - a.t);
+
+    this._root.innerHTML = `
+      <style>${this._styles()}</style>
+      <div class="wrap" role="region" aria-label="UFO Intel Widget">
+        <header class="bar">
+          <h2>UFO Intel Widget</h2>
+          <span class="badge" title="Items loaded">${s.items.length} items</span>
+          <span class="badge" title="Last refresh">⟳ ${lastTxt}</span>
+          <span class="grow"></span>
+          <button class="btn" data-act="refresh" aria-label="Refresh now">Refresh</button>
+          <button class="btn" data-act="export-json" aria-label="Export JSON">Export JSON</button>
+          <button class="btn" data-act="export-csv"  aria-label="Export CSV">Export CSV</button>
+        </header>
+        ${s.stale ? `<div class="stale" role="status">Showing cached data; live source unreachable. Last refresh: ${lastTxt}.</div>` : ""}
+        <nav class="tabs" role="tablist" aria-label="Widget views">
+          ${["feed","timeline","network","stats","settings","audit"].map(t =>
+            `<button role="tab" aria-selected="${s.activeTab===t}" data-tab="${t}">${t[0].toUpperCase()+t.slice(1)}</button>`
+          ).join("")}
+        </nav>
+        <div class="main">
+          <section class="pane" role="tabpanel" aria-label="${s.activeTab}">
+            ${this._renderTab(s.activeTab, items, feed, agencies, kinds)}
+          </section>
+        </div>
+        <button class="chat-fab" aria-label="Open intelligence assistant" data-act="chat-toggle">AI</button>
+        <aside class="chat-panel" aria-hidden="${!s.chat.open}" aria-label="Intelligence assistant">
+          ${this._renderChat()}
+        </aside>
+        ${this._state.modalItem ? this._renderModal(this._state.modalItem) : ""}
+      </div>
+    `;
+    this._bind();
+    if (s.activeTab === "timeline") this._mountTimeline();
+    if (s.activeTab === "network")  this._mountNetwork();
+    if (s.activeTab === "stats")    this._mountStats();
+  }
+
+  _renderTab(tab, items, feed, agencies, kinds) {
+    const s = this._state;
+    if (tab === "feed") {
+      return `
+        <div class="filters" role="search">
+          <input type="search" placeholder="Search title, blurb, agency…" value="${escapeAttr(s.filterText)}" data-filter="text" aria-label="Filter text" />
+          <select data-filter="agency" aria-label="Filter by agency">
+            <option value="">All agencies</option>
+            ${agencies.map(a => `<option ${a===s.filterAgency?"selected":""}>${escapeHTML(a)}</option>`).join("")}
+          </select>
+          <select data-filter="kind" aria-label="Filter by type">
+            <option value="">All types</option>
+            ${kinds.map(k => `<option ${k===s.filterKind?"selected":""}>${escapeHTML(k)}</option>`).join("")}
+          </select>
+          ${s.brush ? `<button class="btn" data-act="clear-brush">Clear timeline range</button>` : ""}
+          <button class="btn" data-act="add-note">+ Analyst note</button>
+        </div>
+        <div class="stats">Showing <b>${items.length}</b> of <b>${s.items.length}</b> items. ${s.indexedCount ? `Indexed for retrieval: <b>${s.indexedCount}/${s.indexingTotal}</b>.` : ""}</div>
+        <div class="feed" role="list">
+          ${feed.length ? feed.map(f => this._renderFeedRow(f)).join("") : `<div class="empty">No items match the current filters.</div>`}
+        </div>
+      `;
+    }
+    if (tab === "timeline") return `<div class="vis" id="vis-timeline" style="min-height:300px"></div><div class="stats">Drag horizontally to brush a date range; the Feed tab will filter accordingly.</div>`;
+    if (tab === "network")  return `<div class="vis" id="vis-network"  style="min-height:380px"></div><div class="stats">Force-directed graph of agencies (coloured) and top keywords (blue) extracted from blurbs.</div>`;
+    if (tab === "stats")    return `<div class="vis" id="vis-stats"></div>`;
+    if (tab === "settings") return this._renderSettings();
+    if (tab === "audit")    return this._renderAudit();
+    return "";
+  }
+
+  _renderFeedRow(f) {
+    if (f.source === "release") {
+      const it = f.item;
+      return `<div class="row" role="listitem" tabindex="0" data-open="${escapeAttr(it.id)}">
+        <div class="date">${escapeHTML(it.releaseDate || "—")}<br/><span class="badge kind-${escapeHTML(it.kind)}">${escapeHTML(it.kind)}</span></div>
+        <div><div class="title">${escapeHTML(it.title)}</div><div class="blurb">${escapeHTML(it.blurb).slice(0, 220)}</div></div>
+        <div><span class="badge">${escapeHTML(it.agency)}</span></div>
+      </div>`;
+    }
+    if (f.source === "note") {
+      return `<div class="row" role="listitem">
+        <div class="date">${new Date(f.t).toISOString().slice(0,10)}<br/><span class="badge kind-note">note</span></div>
+        <div><div class="title">Analyst note</div><div class="blurb">${escapeHTML(f.item.text)}</div></div>
+        <div></div>
+      </div>`;
+    }
+    return `<div class="row" role="listitem">
+      <div class="date">${new Date(f.t).toISOString().slice(11,19)}<br/><span class="badge kind-alert">${escapeHTML(f.item.level)}</span></div>
+      <div><div class="title">${escapeHTML(f.item.text)}</div></div>
+      <div></div>
+    </div>`;
+  }
+
+  _renderSettings() {
+    const s = this._state.settings;
+    const provider = this._cfg.llmProvider;
+    const ep = s.llmEndpoints[provider];
+    return `<div class="settings">
+      <div class="row2"><label>Primary data source</label><input data-set="dataSource" value="${escapeAttr(this._cfg.dataSource)}" placeholder="https://example.gov/ufo/manifest.json"/></div>
+      <div class="row2"><label>Additional sources (one per line, JSON or RSS)</label>
+        <textarea data-set="sources" rows="4" style="font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 10px;">${escapeHTML(s.sources.join("\n"))}</textarea></div>
+      <div class="row2"><label>Refresh interval (ms)</label><input data-set="refreshInterval" value="${this._cfg.refreshInterval}" type="number" min="5000" step="1000"/></div>
+      <div class="row2"><label>Theme</label>
+        <select data-set="theme"><option value="dark" ${this._cfg.theme==='dark'?'selected':''}>dark</option><option value="light" ${this._cfg.theme==='light'?'selected':''}>light</option></select></div>
+      <div class="row2"><label>Density</label>
+        <select data-set="density"><option value="full" ${this._cfg.density==='full'?'selected':''}>full</option><option value="compact" ${this._cfg.density==='compact'?'selected':''}>compact</option></select></div>
+      <hr style="border-color:var(--line);"/>
+      <div class="row2"><label>LLM provider</label>
+        <select data-set="llmProvider">
+          <option value="openai"    ${provider==='openai'   ?'selected':''}>OpenAI</option>
+          <option value="anthropic" ${provider==='anthropic'?'selected':''}>Anthropic</option>
+          <option value="local"     ${provider==='local'    ?'selected':''}>Local (OpenAI-compatible)</option>
+        </select></div>
+      <div class="row2"><label>LLM endpoint</label><input data-set="llmUrl"   value="${escapeAttr(ep.url)}"/></div>
+      <div class="row2"><label>LLM model</label>   <input data-set="llmModel" value="${escapeAttr(ep.model)}"/></div>
+      <div class="row2"><label>API key (stored in localStorage only)</label><input data-set="apiKey" type="password" value="${escapeAttr(this._cfg.apiKey)}" placeholder="sk-…"/></div>
+      <hr style="border-color:var(--line);"/>
+      <div class="row2"><label>Embeddings model</label><input data-set="embeddingsModel" value="${escapeAttr(s.embeddingsModel)}"/></div>
+      <div class="row2"><label>Transformers.js URL</label><input data-set="cdn.transformers" value="${escapeAttr(s.cdn.transformers)}"/></div>
+      <div class="row2"><label>D3 URL</label><input data-set="cdn.d3" value="${escapeAttr(s.cdn.d3)}"/></div>
+      <div class="row2"><label>Chart.js URL</label><input data-set="cdn.chartjs" value="${escapeAttr(s.cdn.chartjs)}"/></div>
+      <div class="row2"><label>Local embedding index</label>
+        <div><label><input type="checkbox" data-set="indexConsent" ${ls.get("indexConsent",false)?'checked':''}/> Allow downloading the embeddings model to enable in-browser RAG</label></div></div>
+      <div class="toolbar">
+        <button class="btn primary" data-act="save-settings">Save settings</button>
+        <button class="btn" data-act="clear-cache">Clear cache &amp; embeddings</button>
+        <button class="btn" data-act="clear-audit">Clear audit log</button>
+      </div>
+    </div>`;
+  }
+
+  _renderAudit() {
+    const rows = AuditLog.entries().slice().reverse().slice(0, 250);
+    return `<div class="audit">
+      <div class="stats" style="margin-bottom:8px;">In-browser only. No telemetry. ${rows.length} entries shown.</div>
+      <table><thead><tr><th>Time</th><th>Kind</th><th>Detail</th></tr></thead>
+      <tbody>${rows.map(e => `<tr><td>${new Date(e.t).toISOString().replace("T"," ").slice(0,19)}</td><td class="kind">${escapeHTML(e.kind)}</td><td><code>${escapeHTML(JSON.stringify(e.detail))}</code></td></tr>`).join("")}</tbody></table>
+    </div>`;
+  }
+
+  _renderChat() {
+    const s = this._state.chat;
+    return `
+      <div class="chat-head">
+        <strong>Assistant</strong>
+        <span class="badge">${escapeHTML(this._cfg.llmProvider)}</span>
+        <span class="grow"></span>
+        <button class="btn" data-act="chat-export">Export</button>
+        <button class="btn" data-act="chat-toggle" aria-label="Close assistant">Close</button>
+      </div>
+      <div class="chat-log" id="chat-log" aria-live="polite">
+        ${s.messages.length ? s.messages.map(m => this._renderMsg(m)).join("") : `
+          <div class="msg">
+            <div class="role">assistant</div>
+            <div class="body">Hello. Connect a provider in Settings (or use a local endpoint), then ask a question.
+Try: <code>/help</code>, <code>/summarize latest 5</code>, <code>/risk assess Tic-Tac</code>.</div>
+          </div>`}
+      </div>
+      <form class="chat-input" data-act="chat-send">
+        <input name="q" placeholder='Ask, or type "/" for commands…' aria-label="Assistant prompt" autocomplete="off" />
+        <button class="btn primary" type="submit" ${s.busy ? "disabled" : ""}>${s.busy ? "…" : "Send"}</button>
+        ${s.busy ? `<button class="btn" type="button" data-act="chat-stop">Stop</button>` : ""}
+      </form>
+    `;
+  }
+  _renderMsg(m) {
+    const srcs = (m.sources || []).slice(0, 6);
+    return `<div class="msg ${m.role}">
+      <div class="role">${escapeHTML(m.role)}</div>
+      <div class="body">${escapeHTML(m.content)}</div>
+      ${srcs.length ? `<div class="sources">${srcs.map((it, i) => `<span>[#${i+1}] <a href="${escapeAttr(safeUrl(it.url))}" target="_blank" rel="noopener noreferrer">${escapeHTML(it.title)}</a> — ${escapeHTML(it.agency)} ${escapeHTML(it.releaseDate||"")}</span>`).join("")}</div>` : ""}
+    </div>`;
+  }
+  // Update only the streaming message body without re-rendering everything.
+  _renderChatStream() {
+    const log = this._root.getElementById("chat-log");
+    if (!log) return;
+    log.innerHTML = this._state.chat.messages.map(m => this._renderMsg(m)).join("");
+    log.scrollTop = log.scrollHeight;
+  }
+
+  _renderModal(item) {
+    return `<div class="modal" data-act="modal-close" role="dialog" aria-modal="true" aria-label="Item detail">
+      <div class="card" data-stop>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="badge">${escapeHTML(item.kind)}</span>
+          <span class="badge">${escapeHTML(item.agency)}</span>
+          <span class="badge">${escapeHTML(item.releaseDate || "—")}</span>
+          <span style="flex:1"></span>
+          <button class="btn" data-act="modal-close" aria-label="Close">Close</button>
+        </div>
+        <h3 style="margin:10px 0 6px;">${escapeHTML(item.title)}</h3>
+        <p style="color:var(--ink-soft);">${escapeHTML(item.blurb)}</p>
+        <p><a href="${escapeAttr(safeUrl(item.url))}" target="_blank" rel="noopener noreferrer">Open source</a></p>
+        <div class="toolbar">
+          <button class="btn" data-act="ask-about" data-id="${escapeAttr(item.id)}">Ask assistant about this</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // -------- Bindings --------
+  _bind() {
+    const $ = sel => this._root.querySelector(sel);
+    const $$ = sel => this._root.querySelectorAll(sel);
+
+    $$("[data-tab]").forEach(b => b.addEventListener("click", () => { this._state.activeTab = b.dataset.tab; this._render(); }));
+    $$("[data-open]").forEach(b => {
+      b.addEventListener("click", () => { this._state.modalItem = this._state.items.find(i => i.id === b.dataset.open); this._render(); });
+      b.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); b.click(); } });
+    });
+
+    const filt = (k) => (e) => { this._state["filter" + k] = e.target.value; this._render(); };
+    $$("[data-filter=text]").forEach(el => el.addEventListener("input", filt("Text")));
+    $$("[data-filter=agency]").forEach(el => el.addEventListener("change", filt("Agency")));
+    $$("[data-filter=kind]").forEach(el => el.addEventListener("change", filt("Kind")));
+
+    $$("[data-act]").forEach(el => el.addEventListener("click", (e) => {
+      if (el.tagName === "FORM") return;
+      const act = el.dataset.act;
+      if (act === "refresh") return this._refresh();
+      if (act === "export-json") return ExportUtils.exportItems(this._filteredItems(), "json");
+      if (act === "export-csv")  return ExportUtils.exportItems(this._filteredItems(), "csv");
+      if (act === "clear-brush") { this._state.brush = null; this._render(); return; }
+      if (act === "add-note") {
+        const text = prompt("Analyst note (stored locally only):");
+        if (text) { this._state.analystNotes.unshift({ t: Date.now(), text }); ls.set("notes", this._state.analystNotes); AuditLog.add("note.add", { len: text.length }); this._render(); }
+        return;
+      }
+      if (act === "save-settings") return this._saveSettings();
+      if (act === "clear-cache")   return this._clearCache();
+      if (act === "clear-audit")   { AuditLog.clear(); this._render(); return; }
+      if (act === "chat-toggle")   { this._state.chat.open = !this._state.chat.open; this._render(); return; }
+      if (act === "chat-stop")     { this._state.chat.abort?.abort(); return; }
+      if (act === "chat-export")   return ExportUtils.exportTranscript(this._state.chat.messages);
+      if (act === "modal-close" && (e.target === el || el.dataset.act === "modal-close")) { this._state.modalItem = null; this._render(); return; }
+      if (act === "ask-about") {
+        const it = this._state.items.find(i => i.id === el.dataset.id);
+        if (it) { this._state.modalItem = null; this._state.chat.open = true; this._render(); this._sendChat(`Summarize and assess: "${it.title}" (${it.agency}, ${it.releaseDate}).`); }
+      }
+    }));
+
+    // Prevent modal close on inner click.
+    $$("[data-stop]").forEach(el => el.addEventListener("click", e => e.stopPropagation()));
+
+    // Chat form submit.
+    const form = $("form[data-act=chat-send]");
+    if (form) form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const inp = form.querySelector("input[name=q]");
+      const v = inp.value; inp.value = "";
+      this._sendChat(v);
+    });
+
+    // Timeline brush events bubble through shadow DOM (composed: true).
+    this._root.host.addEventListener("vis:brush", () => {});
+    this._root.addEventListener("vis:brush", (e) => { this._state.brush = e.detail; if (this._state.activeTab !== "feed") this._state.activeTab = "feed"; this._render(); });
+
+    // Keyboard: Esc closes modal/chat.
+    this._root.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (this._state.modalItem) { this._state.modalItem = null; this._render(); }
+        else if (this._state.chat.open) { this._state.chat.open = false; this._render(); }
+      }
+    });
+  }
+
+  async _mountTimeline() {
+    try { await Visualisations.timeline(this._root.getElementById("vis-timeline"), this._state.items, this._state.settings.cdn.d3); }
+    catch (e) { this._root.getElementById("vis-timeline").textContent = "Timeline unavailable: " + e.message; }
+  }
+  async _mountNetwork() {
+    try { await Visualisations.network(this._root.getElementById("vis-network"), this._state.items, this._state.settings.cdn.d3); }
+    catch (e) { this._root.getElementById("vis-network").textContent = "Network unavailable: " + e.message; }
+  }
+  async _mountStats() {
+    try { await Visualisations.stats(this._root.getElementById("vis-stats"), this._state.items, this._state.settings.cdn.chartjs); }
+    catch (e) { this._root.getElementById("vis-stats").textContent = "Charts unavailable: " + e.message; }
+  }
+
+  _saveSettings() {
+    const get = sel => this._root.querySelector(`[data-set="${sel}"]`);
+    const v = sel => get(sel)?.value;
+    const checked = sel => !!get(sel)?.checked;
+    this._cfg.dataSource = v("dataSource") || "";
+    this.setAttribute("data-source", this._cfg.dataSource);
+
+    const lines = (v("sources") || "").split(/\n+/).map(s => s.trim()).filter(Boolean);
+    this._state.settings.sources = lines; ls.set("sources", lines);
+
+    this._cfg.refreshInterval = Math.max(5000, parseInt(v("refreshInterval"), 10) || DEFAULTS.refreshInterval);
+    this.setAttribute("refresh-interval", this._cfg.refreshInterval);
+
+    this._cfg.theme = v("theme") || "dark"; this.setAttribute("theme", this._cfg.theme);
+    this._cfg.density = v("density") || "full"; this.setAttribute("density", this._cfg.density);
+
+    const provider = v("llmProvider") || "openai";
+    this._cfg.llmProvider = provider; this.setAttribute("llm-provider", provider);
+    this._state.settings.llmEndpoints[provider] = {
+      url: v("llmUrl") || DEFAULTS.llm[provider].url,
+      model: v("llmModel") || DEFAULTS.llm[provider].model,
+    };
+    ls.set("llmEndpoints", this._state.settings.llmEndpoints);
+    const key = v("apiKey") || "";
+    if (key) ls.set("apiKey:" + provider, key);
+    this._cfg.apiKey = ls.get("apiKey:" + provider, "");
+
+    this._state.settings.embeddingsModel = v("embeddingsModel") || DEFAULTS.embeddingsModel;
+    ls.set("embeddingsModel", this._state.settings.embeddingsModel);
+    this._state.settings.cdn = {
+      d3:           v("cdn.d3")           || DEFAULTS.cdn.d3,
+      chartjs:      v("cdn.chartjs")      || DEFAULTS.cdn.chartjs,
+      transformers: v("cdn.transformers") || DEFAULTS.cdn.transformers,
+    };
+    ls.set("cdn", this._state.settings.cdn);
+    ls.set("indexConsent", checked("indexConsent"));
+
+    AuditLog.add("settings.save", { provider, sources: lines.length });
+    clearInterval(this._timer);
+    this._timer = setInterval(() => this._refresh().catch(() => {}), this._cfg.refreshInterval);
+    this._refresh().catch(() => {});
+    this._render();
+  }
+
+  async _clearCache() {
+    try {
+      const db = await indexedDB.deleteDatabase("ufo-intel-widget");
+      EmbeddingsEngine.clear();
+      AuditLog.add("cache.clear", {});
+      this._render();
+      void db;
+    } catch (e) { this._pushAlert("warn", "Cache clear failed: " + e.message); }
+  }
+}
+
+/* ---------- small utilities (safe HTML, attribute escaping) ---------- */
+function escapeHTML(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function escapeAttr(s) { return escapeHTML(s); }
+function safeUrl(u) {
+  const s = String(u ?? "").trim();
+  if (!s || s === "#") return "#";
+  // Allow only http/https/mailto and relative URLs; block javascript:, data:, vbscript:.
+  if (/^(?:[a-z][a-z0-9+.-]*:)/i.test(s)) {
+    if (!/^(https?:|mailto:)/i.test(s)) return "#";
+  }
+  return s;
+}
+
+// Define the element. Idempotent in case the script is included twice.
+if (!customElements.get("ufo-intel-widget")) {
+  customElements.define("ufo-intel-widget", UFOIntelWidget);
+}
+</script>
+</body>
+</html>
