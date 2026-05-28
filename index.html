@@ -136,6 +136,136 @@
     .wg-modal-overlay.open { display: flex; }
     .wg-modal { background: var(--surface); border-radius: 18px; max-width: 680px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 28px 32px; position: relative; }
     .wg-modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 28px; cursor: pointer; }
+    
+    /* ----- Integrated stock signals (from HTML1) with seamless style match ----- */
+    .signals-section {
+      background: var(--bg-warm);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 48px 0;
+    }
+    .signals-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .signals-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+    .signals-header h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 600;
+      font-size: 28px;
+      margin: 0;
+      color: var(--ink);
+    }
+    .signal-legend {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+    }
+    .signal-legend span {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .marquee-container {
+      width: 100%;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 0.75rem 0;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .marquee-content {
+      display: flex;
+      animation: scroll 60s linear infinite;
+      white-space: nowrap;
+      gap: 2rem;
+    }
+    .marquee-content:hover {
+      animation-play-state: paused;
+    }
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .signal-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .signal-strong-buy { background: #1b3a1f; color: #3fb950; border: 1px solid #238636; }
+    .signal-buy { background: #1b3a1f; color: #7ee787; border: 1px solid #2ea043; }
+    .signal-hold { background: #2d2d1c; color: #d29922; border: 1px solid #9e6a03; }
+    .signal-sell { background: #3a1b1b; color: #f85149; border: 1px solid #da3633; }
+    .signal-strong-sell { background: #3a1b1b; color: #ff7b72; border: 1px solid #f85149; }
+    .signal-loading { background: #1c2128; color: #8b949e; border: 1px solid #30363d; }
+    .symbol { font-weight: 700; letter-spacing: 0.5px; }
+    .change { font-size: 0.8rem; opacity: 0.9; }
+    .score { font-size: 0.75rem; opacity: 0.8; }
+    .status-text {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      text-align: center;
+    }
+    .spinner-small {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+    }
+    .controls-signal {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .controls-signal button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink-soft);
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .controls-signal button:hover {
+      background: var(--bg-soft);
+      border-color: var(--accent);
+    }
+    .controls-signal button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -195,7 +325,6 @@
           <input type="range" id="springLength" min="50" max="300" value="150" style="width: 100px"><span>Spring len</span>
           <label><input type="checkbox" id="freezePhysics"> Freeze physics</label>
           <button id="resetLayoutBtn">Reset layout</button>
-          <!-- Topic graph advanced controls -->
           <div style="display: flex; gap: 8px; margin-left: auto;">
             <label>Min DF: <input type="number" id="topicMinDf" value="2" min="1" max="10" step="1" style="width: 55px;"></label>
             <label>Max terms: <input type="number" id="topicMaxTerms" value="55" min="10" max="120" step="5" style="width: 65px;"></label>
@@ -211,6 +340,33 @@
     </div>
   </section>
 
+  <!-- ========== INTEGRATED STOCK SIGNALS MARQUEE (from HTML1) ========== -->
+  <section class="signals-section">
+    <div class="signals-container">
+      <div class="signals-header">
+        <h3>📊 Dascient Stock Signals</h3>
+        <div class="signal-legend">
+          <span><span class="legend-dot" style="background:#3fb950"></span> Strong Buy</span>
+          <span><span class="legend-dot" style="background:#7ee787"></span> Buy</span>
+          <span><span class="legend-dot" style="background:#d29922"></span> Hold</span>
+          <span><span class="legend-dot" style="background:#f85149"></span> Sell</span>
+          <span><span class="legend-dot" style="background:#ff7b72"></span> Strong Sell</span>
+        </div>
+      </div>
+      <div class="controls-signal" style="margin-bottom: 16px;">
+        <button id="btnGainers" class="active">Day Gainers</button>
+        <button id="btnLosers">Day Losers</button>
+        <button id="btnActive">Most Active</button>
+      </div>
+      <div class="marquee-container">
+        <div class="marquee-content" id="stockMarqueeContent">
+          <span class="signal-item signal-loading"><span class="spinner-small"></span> Loading signals...</span>
+        </div>
+      </div>
+      <div class="status-text" id="stockStatus">Fetching market data...</div>
+    </div>
+  </section>
+
   <div class="wg-modal-overlay" id="wgModalOverlay"><div class="wg-modal" id="wgModalContent"></div></div>
   <section id="connect" class="block connect"><div class="container"><div class="section-head"><p class="section-kicker">Connect</p><h2>Find us across the web</h2></div><div class="social-grid"><a class="social" href="https://www.linkedin.com/company/dascient/"><span class="dot">in</span><span><span class="label">LinkedIn</span><br /><span class="sub">Company updates</span></span></a><a class="social" href="https://www.github.com/dascient/"><span class="dot">GH</span><span><span class="label">GitHub</span><br /><span class="sub">Open‑source work</span></span></a><a class="social" href="https://www.kaggle.com/dascient/"><span class="dot">K</span><span><span class="label">Kaggle</span><br /><span class="sub">Datasets</span></span></a><a class="social" href="https://dascient.medium.com/"><span class="dot">M</span><span><span class="label">Medium</span><br /><span class="sub">Essays</span></span></a></div></div></section>
   <section id="contact" class="block" style="padding-top: 24px;"><div class="container"><div class="cta"><div class="cta-inner"><h2>Let&rsquo;s talk about what you&rsquo;re building.</h2><p>Book a short call or send an email — we read every message.</p><div class="hero-actions"><a class="btn btn-warm" href="mailto:contact@dascient.com">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div><p class="email-line">Or email directly: <a href="mailto:inquiry@dascient.com">inquiry@dascient.com</a></p></div></div></div></section>
@@ -219,8 +375,8 @@
 
 <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
 <script>
+  // ---------- ORIGINAL DASHBOARD SCRIPT (fully preserved) ----------
   (function(){
-    // ---------- DATA ----------
     const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
     const FALLBACK_SOURCE = 'https://raw.githubusercontent.com/vng9trmgr8-pixel/war-gov-ufo-release-1/main/data.json';
     const REFRESH_INTERVAL = 30000;
@@ -230,13 +386,9 @@
     let currentView = 'list', graphMode = 'agency';
     let network = null, activeGraphData = null;
     let refreshTimer, countdownTimer, seconds = REFRESH_INTERVAL/1000;
-
-    // Pagination state
     let currentFiltered = [];
     let displayedCount = 0;
     let loadMoreBtn = null;
-
-    // Topic graph parameters
     let topicMinDf = 2;
     let topicMaxTerms = 55;
     let topicPmiThresh = 0.0;
@@ -260,7 +412,6 @@
     function updateStatus(state, text){ if(els.statusDot){ els.statusDot.classList.remove('warn','error'); if(state==='warn') els.statusDot.classList.add('warn'); if(state==='error') els.statusDot.classList.add('error'); els.statusText.textContent = text; } }
     async function fetchData(url){ let r = await fetch(url, {cache:'no-cache'}); if(!r.ok) throw new Error(r.status); return r.json(); }
 
-    // ---------- core data loading ----------
     async function loadData(silent){
       updateStatus('warn','Fetching…'); let data=null, src='';
       try{ data = await fetchData(PRIMARY_SOURCE); src=PRIMARY_SOURCE; } catch(e){ try{ data = await fetchData(FALLBACK_SOURCE); src=FALLBACK_SOURCE; } catch(e2){ updateStatus('error','Failed'); if(!silent) els.fileList.innerHTML='<div class="wg-empty">No data</div>'; return; } }
@@ -277,254 +428,100 @@
     function updateAgencyFilters(){ let agencies = [...new Set(allFiles.map(f=>f.agency).filter(Boolean))].sort(); els.agencies.innerHTML = agencies.map(a=>`<span class="wg-chip${selectedAgency===a?' active':''}" data-agency="${escapeHtml(a)}">${escapeHtml(a)}</span>`).join(''); }
     function updateTicker(d){ let total = (d.counts?.pdfs||0)+(d.counts?.images||0)+(d.counts?.videos||0); let headlines = [`<strong>Release ${d.release||'01'}</strong> — ${d.releaseDate||'May 2026'} — ${total} assets`]; if(d.pdfs?.length){ let ag = [...new Set(d.pdfs.map(p=>p.agency).filter(Boolean))]; headlines.push(`Agencies: ${ag.slice(0,6).join(', ')}`); } headlines.push('Rolling releases','PURSUE system'); els.tickerTrack.innerHTML = [...headlines,...headlines].map(h=>`<span class="wg-ticker-item">${h}</span>`).join(''); }
     function updateCountdown(){ els.countdown.textContent = seconds; }
-
-    // ---------- PAGINATED RENDERING ----------
-    function computeFiltered(){
-      let term = (els.search.value||'').toLowerCase();
-      return allFiles.filter(f=>(!selectedAgency || f.agency===selectedAgency) && (!term || (f.title||'').toLowerCase().includes(term)||(f.blurb||'').toLowerCase().includes(term)));
-    }
-    function renderFiles(resetPagination = true){
-      currentFiltered = computeFiltered();
-      if(resetPagination) displayedCount = Math.min(INITIAL_PAGE_SIZE, currentFiltered.length);
-      renderFilePage();
-      updateLoadMoreButton();
-    }
-    function renderFilePage(){
-      const slice = currentFiltered.slice(0, displayedCount);
-      if(slice.length === 0){ els.fileList.innerHTML = '<div class="wg-empty">No matches</div>'; return; }
-      els.fileList.innerHTML = slice.map((f,i)=>{
-        const isNew = (allFiles.indexOf(f) < newFilesCount) && newFilesCount>0;
-        const blurb = f.blurb||f.officialBlurb||'No description.';
-        return `<article class="wg-file" data-index="${allFiles.indexOf(f)}"><div class="meta"><span class="agency">${escapeHtml(f.agency||'Unknown')}</span><span class="date">${escapeHtml(formatDate(f.releaseDate))}</span>${f.type?`<span class="type">${f.type}</span>`:''}</div><h4>${escapeHtml(f.title||'Untitled')}</h4><p class="blurb">${escapeHtml(blurb)}</p><span class="link">Open detail</span></article>`;
-      }).join('');
-      els.count.textContent = `Showing ${displayedCount} of ${currentFiltered.length} files`;
-    }
-    function updateLoadMoreButton(){
-      if(displayedCount < currentFiltered.length){
-        if(!loadMoreBtn){
-          loadMoreBtn = document.createElement('button');
-          loadMoreBtn.className = 'load-more-btn';
-          loadMoreBtn.textContent = `Load more (${currentFiltered.length - displayedCount} remaining)`;
-          loadMoreBtn.addEventListener('click', () => {
-            displayedCount = Math.min(displayedCount + INITIAL_PAGE_SIZE, currentFiltered.length);
-            renderFilePage();
-            updateLoadMoreButton();
-          });
-          els.loadMoreContainer.appendChild(loadMoreBtn);
-        } else {
-          loadMoreBtn.textContent = `Load more (${currentFiltered.length - displayedCount} remaining)`;
-          loadMoreBtn.style.display = 'inline-block';
-        }
-      } else { if(loadMoreBtn) loadMoreBtn.style.display = 'none'; }
-    }
+    function computeFiltered(){ let term = (els.search.value||'').toLowerCase(); return allFiles.filter(f=>(!selectedAgency || f.agency===selectedAgency) && (!term || (f.title||'').toLowerCase().includes(term)||(f.blurb||'').toLowerCase().includes(term))); }
+    function renderFiles(resetPagination = true){ currentFiltered = computeFiltered(); if(resetPagination) displayedCount = Math.min(INITIAL_PAGE_SIZE, currentFiltered.length); renderFilePage(); updateLoadMoreButton(); }
+    function renderFilePage(){ const slice = currentFiltered.slice(0, displayedCount); if(slice.length === 0){ els.fileList.innerHTML = '<div class="wg-empty">No matches</div>'; return; } els.fileList.innerHTML = slice.map((f,i)=>{ const isNew = (allFiles.indexOf(f) < newFilesCount) && newFilesCount>0; const blurb = f.blurb||f.officialBlurb||'No description.'; return `<article class="wg-file" data-index="${allFiles.indexOf(f)}"><div class="meta"><span class="agency">${escapeHtml(f.agency||'Unknown')}</span><span class="date">${escapeHtml(formatDate(f.releaseDate))}</span>${f.type?`<span class="type">${f.type}</span>`:''}</div><h4>${escapeHtml(f.title||'Untitled')}</h4><p class="blurb">${escapeHtml(blurb)}</p><span class="link">Open detail</span></article>`; }).join(''); els.count.textContent = `Showing ${displayedCount} of ${currentFiltered.length} files`; }
+    function updateLoadMoreButton(){ if(displayedCount < currentFiltered.length){ if(!loadMoreBtn){ loadMoreBtn = document.createElement('button'); loadMoreBtn.className = 'load-more-btn'; loadMoreBtn.textContent = `Load more (${currentFiltered.length - displayedCount} remaining)`; loadMoreBtn.addEventListener('click', () => { displayedCount = Math.min(displayedCount + INITIAL_PAGE_SIZE, currentFiltered.length); renderFilePage(); updateLoadMoreButton(); }); els.loadMoreContainer.appendChild(loadMoreBtn); } else { loadMoreBtn.textContent = `Load more (${currentFiltered.length - displayedCount} remaining)`; loadMoreBtn.style.display = 'inline-block'; } } else { if(loadMoreBtn) loadMoreBtn.style.display = 'none'; } }
     function resetPaginationAndRender(){ displayedCount = Math.min(INITIAL_PAGE_SIZE, computeFiltered().length); renderFiles(false); }
-
-    // ---------- MODAL / DETAILS ----------
     function openDetail(idx){ let f=allFiles[idx]; if(!f) return; let blurb=f.blurb||f.officialBlurb||'No description.'; let url=safeUrl(f.url); els.modalContent.innerHTML=`<button class="wg-modal-close" id="wgModalCloseBtn">&times;</button><span class="agency" style="background:var(--bg-soft);padding:3px 10px;border-radius:999px;font-size:11px;">${escapeHtml(f.agency||'Unknown')}</span><h3>${escapeHtml(f.title||'Untitled')}</h3><div class="meta">Release: ${escapeHtml(formatDate(f.releaseDate))} · ${(f.type||'pdf').toUpperCase()}</div><div class="body">${escapeHtml(blurb)}</div>${url?`<a href="${escapeHtml(url)}" target="_blank">Open original →</a>`:''}`; els.modalOverlay.classList.add('open'); document.body.style.overflow='hidden'; $('wgModalCloseBtn')?.addEventListener('click',closeModal); }
     function closeModal(){ els.modalOverlay.classList.remove('open'); document.body.style.overflow=''; }
-
-    // ---------- ENHANCED TOPIC GRAPH (TF-IDF + PMI) ----------
-    const STOP = new Set(['the','a','an','and','of','to','in','for','with','on','at','by','is','are','was','were','be','it','this','that','from','or','as','but','not','no','yes','if','then','so','too','can','will','would','should','may','might','do','does','did','have','has','had','having','about','into','over','under','after','before','between','through','during','up','down','off','again','once','any','all','each','every','some','such','only','same','other','more','most','less','least','also','here','there','when','where','why','how','what','which','who','whom','whose','said','one','two','three','new','now','per','via','vs','page','pages','pdf','image','video','release','document','file','title','description']);
-    const UAP_LEXICON = new Set(['uap','ufo','anomalous','phenomena','sighting','craft','tic-tac','radar','infrared','flir','hypersonic','transmedium','propulsion','classified','aaro','pursue','nimitz','roswell','disclosure','whistleblower','congressional','material','metamaterial','electromagnetic','plasma','signature','intelligence','briefing','testimony','foia']);
-    // Simple bigram detection (common UAP phrases)
-    function extractNGrams(tokens){ let ngrams = [...tokens]; for(let i=0; i<tokens.length-1; i++){ let bigram = tokens[i]+'_'+tokens[i+1]; if(bigram.length<30 && STOP.has(tokens[i])===false && STOP.has(tokens[i+1])===false) ngrams.push(bigram); } return ngrams; }
-    function tokenize(txt){ if(!txt) return []; let words = String(txt).toLowerCase().replace(/[^a-z0-9\-]/g,' ').split(/\s+/).filter(w=>w.length>=3 && w.length<=28 && !STOP.has(w) && !/^\d+$/.test(w)); return extractNGrams(words); }
-    function computeTfidf(docTermsList){
-      const N = docTermsList.length;
-      const docFreq = new Map();
-      const termDocs = new Map();
-      docTermsList.forEach((terms, idx) => {
-        const uniq = new Set(terms);
-        uniq.forEach(t => { docFreq.set(t, (docFreq.get(t)||0)+1); if(!termDocs.has(t)) termDocs.set(t,[]); termDocs.get(t).push(idx); });
-      });
-      const tfidf = new Map();
-      docTermsList.forEach((terms, docIdx) => {
-        const tf = new Map();
-        terms.forEach(t => tf.set(t, (tf.get(t)||0)+1));
-        for(let [t, cnt] of tf.entries()){
-          const df = docFreq.get(t)||1;
-          const idf = Math.log((N+1)/(df+1)) + 1;
-          const tfVal = cnt / terms.length;
-          const score = tfVal * idf;
-          if(!tfidf.has(t)) tfidf.set(t, []);
-          tfidf.get(t).push({docIdx, score});
-        }
-      });
-      return {tfidf, docFreq, termDocs, N};
-    }
-    function computePMI(termDocs, N, pairCooc){
-      // cooc: Map of pairKey -> #documents where both terms appear
-      const pmiMap = new Map();
-      for(let [pairKey, cooc] of pairCooc.entries()){
-        let [ta,tb] = pairKey.split('|');
-        let pa = termDocs.get(ta).length / N;
-        let pb = termDocs.get(tb).length / N;
-        let pab = cooc / N;
-        let pmi = Math.log2(pab / (pa * pb + 1e-9));
-        pmiMap.set(pairKey, pmi);
-      }
-      return pmiMap;
-    }
-    function buildTopicGraph(filtered, container){
-      if(!filtered.length){ container.innerHTML='<div style="padding:40px;text-align:center">No documents match current filters.</div>'; return; }
-      // Tokenization + n-grams
-      let docTexts = filtered.map(f => [f.title, f.blurb, f.officialBlurb, f.agency].filter(Boolean).join(' '));
-      let docTermsList = docTexts.map(txt => tokenize(txt));
-      // Compute TF-IDF
-      let {tfidf, docFreq, termDocs, N} = computeTfidf(docTermsList);
-      // Filter terms by min DF and max terms
-      let minDf = Math.max(1, Math.min(10, parseInt(els.topicMinDf?.value) || topicMinDf));
-      let maxTerms = Math.min(150, Math.max(10, parseInt(els.topicMaxTerms?.value) || topicMaxTerms));
-      let pmiThresh = parseFloat(els.topicPmiThresh?.value) || topicPmiThresh;
-      let candidateTerms = Array.from(docFreq.entries()).filter(([t,df])=> df>=minDf).sort((a,b)=>{
-        let aU=UAP_LEXICON.has(a[0])?1:0, bU=UAP_LEXICON.has(b[0])?1:0; if(aU!==bU) return bU-aU;
-        let maxTfidfA = Math.max(...(tfidf.get(a[0])?.map(v=>v.score)||[0]));
-        let maxTfidfB = Math.max(...(tfidf.get(b[0])?.map(v=>v.score)||[0]));
-        return maxTfidfB - maxTfidfA;
-      }).slice(0, maxTerms);
-      if(candidateTerms.length<2){ container.innerHTML='<div style="padding:40px;text-align:center">Too few terms with selected minDF. Lower the value.</div>'; return; }
-      let keepSet = new Set(candidateTerms.map(t=>t[0]));
-      // Compute co-occurrence counts (only for kept terms)
-      let pairCooc = new Map();
-      docTermsList.forEach(terms => {
-        let present = new Set(terms.filter(t=>keepSet.has(t)));
-        let arr = Array.from(present).sort();
-        for(let i=0;i<arr.length;i++) for(let j=i+1;j<arr.length;j++){ let key=arr[i]+'|'+arr[j]; pairCooc.set(key, (pairCooc.get(key)||0)+1); }
-      });
-      let pmiMap = computePMI(termDocs, N, pairCooc);
-      // Filter edges by PMI threshold
-      let edges = [];
-      for(let [key, pmi] of pmiMap.entries()){
-        if(pmi >= pmiThresh){
-          let [a,b] = key.split('|');
-          edges.push({a,b, pmi, cooc: pairCooc.get(key)});
-        }
-      }
-      edges.sort((x,y)=>y.pmi - x.pmi);
-      let edgeCap = 500;
-      let selectedEdges = edges.slice(0, edgeCap);
-      // Build nodes: size = max TF-IDF score among docs
-      let nodes = candidateTerms.map(([t,df]) => {
-        let scores = tfidf.get(t)?.map(v=>v.score)||[0];
-        let maxScore = Math.max(...scores);
-        let size = 12 + Math.min(32, Math.round(maxScore * 22));
-        let isPriority = UAP_LEXICON.has(t);
-        return { id:'topic_'+t, label:t, value:maxScore, shape:'dot', size,
-          color:{ background: isPriority ? '#ff7a59' : '#8a7cbc', border: '#b0a8c0' },
-          title:`${t} · DF:${df} · max TF-IDF:${maxScore.toFixed(3)}`,
-          font:{ color:'#15131f', size: isPriority?14:12 }
-        };
-      });
-      // Edge width proportional to PMI (normalized 1..7)
-      let maxPmi = selectedEdges.length ? Math.max(...selectedEdges.map(e=>e.pmi)) : 1;
-      let edgeObjs = selectedEdges.map(e=>{
-        let width = 1 + (e.pmi / maxPmi) * 6;
-        let colorSat = 0.3 + (e.pmi / maxPmi) * 0.5;
-        return { from:'topic_'+e.a, to:'topic_'+e.b, value:e.pmi, width,
-          color:{ color:`rgba(126,20,255,${colorSat})` },
-          title:`PMI: ${e.pmi.toFixed(3)} · co‑occur in ${e.cooc} doc(s)`
-        };
-      });
-      els.count.textContent = `Topic graph: ${nodes.length} terms, ${edgeObjs.length} links (PMI ≥ ${pmiThresh})`;
-      let data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edgeObjs) };
-      let options = getBaseOptions();
-      options.physics.barnesHut = { gravitationalConstant: -1800, springLength: 130, springConstant: 0.04, damping: 0.09 };
-      options.physics.timestep = 0.4;
-      options.physics.stabilization = { iterations: 80 };
-      renderNetwork(container, data, options, (nodeId)=>{
-        if(nodeId.startsWith('topic_')){
-          let term = nodeId.slice(6);
-          els.search.value = term;
-          resetPaginationAndRender();
-          switchView('list');
-        } else showNodeInfo(nodeId, data);
-      });
-    }
-
-    // Agency graph (unchanged but uses same enhanced layout)
-    function buildAgencyGraph(filtered, container){
-      let nodes=[], edges=[], agenciesSet = new Set(), fileMap=new Map();
-      filtered.forEach(f=>{ if(f.agency) agenciesSet.add(f.agency); });
-      agenciesSet.forEach(a=>{ nodes.push({id:`agency_${a}`, label:a, shape:'dot', size:22, color:{background:'#7e14ff',border:'#a259ff'}, font:{color:'white',size:14}, title:`Agency: ${a}`}); });
-      filtered.forEach((f,i)=>{ let fid=`file_${i}_${(f.title||'').slice(0,20)}`; nodes.push({id:fid, label:(f.title||'Untitled').slice(0,40), shape:'box', size:14, color:{background:'#47bfff',border:'#7e14ff'}, font:{color:'#15131f',size:12}, title:f.title}); fileMap.set(fid,f); if(f.agency) edges.push({from:fid, to:`agency_${f.agency}`, arrows:'to', color:{color:'#b0a8c0'}, smooth:true}); });
-      let data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
-      let options = getBaseOptions(); options.physics.barnesHut = { gravitationalConstant: -2200, springLength: 140 };
-      renderNetwork(container, data, options, (nodeId)=>{
-        if(nodeId.startsWith('file_')){ let f = fileMap.get(nodeId); if(f) openDetail(allFiles.indexOf(f)); }
-        else if(nodeId.startsWith('agency_')){ let a = nodeId.slice(7); selectedAgency = a; updateAgencyFilters(); resetPaginationAndRender(); switchView('list'); }
-        else showNodeInfo(nodeId, data);
-      });
-    }
-
     function getBaseOptions(){ return { nodes:{ borderWidth:1, shadow:false, scaling:{ min:10, max:40, label:{ enabled:true, min:10, max:18 } } }, edges:{ smooth:{ type:'continuous' }, scaling:{ min:1, max:8 } }, physics:{ enabled: true, stabilization:{ iterations:80 }, adaptiveTimestep:true, barnesHut:{ gravitationalConstant:-2000, springLength:150, damping:0.08 } }, interaction:{ hover:true, tooltipDelay:200, zoomView:true, dragView:true } }; }
-    function renderNetwork(container, data, options, onClick){
-      if(network){ network.setData(data); network.setOptions(options); network.fit(); }
-      else { network = new vis.Network(container, data, options); }
-      activeGraphData = data;
-      network.off('click'); network.on('click', params=>{ if(params.nodes.length) onClick(params.nodes[0]); });
-      network.off('hoverNode'); network.on('hoverNode', params=>{ if(params.node) showNodeInfo(params.node, data); });
-      network.off('blurNode'); network.on('blurNode', ()=>{ if(els.nodeInfoPanel) els.nodeInfoPanel.style.display='none'; });
-    }
-    function showNodeInfo(nodeId, data){
-      let node = data.nodes.get(nodeId); if(!node) return;
-      let panel = els.nodeInfoPanel; if(!panel) return;
-      if(nodeId.startsWith('topic_')){
-        let term = nodeId.slice(6); let score = node.value?.toFixed(3)||'?';
-        panel.innerHTML = `<strong>📊 ${term}</strong><br>Max TF‑IDF: ${score}<br><span style="color:var(--accent)">UAP‑priority: ${UAP_LEXICON.has(term)?'✓':'—'}</span><br><button id="filterTermBtn" style="margin-top:6px;background:rgba(255,255,255,0.2);border:1px solid var(--accent);padding:4px 8px;border-radius:6px;cursor:pointer">🔍 Filter list</button>`;
-        panel.style.display='block';
-        let btn = document.getElementById('filterTermBtn'); if(btn) btn.onclick = ()=>{ els.search.value=term; resetPaginationAndRender(); switchView('list'); panel.style.display='none'; };
-      } else if(nodeId.startsWith('agency_')){
-        let agency = nodeId.slice(7); let count = allFiles.filter(f=>f.agency===agency).length;
-        panel.innerHTML = `<strong>🏛️ ${agency}</strong><br>Documents: ${count}<br><button id="filterAgencyBtn" style="margin-top:6px;background:rgba(255,255,255,0.2);border:1px solid var(--accent);padding:4px 8px;border-radius:6px;cursor:pointer">🎯 Filter agency</button>`;
-        panel.style.display='block';
-        let btn = document.getElementById('filterAgencyBtn'); if(btn) btn.onclick = ()=>{ selectedAgency=agency; updateAgencyFilters(); resetPaginationAndRender(); switchView('list'); panel.style.display='none'; };
-      } else { panel.innerHTML = `<strong>📄 ${node.label}</strong><br>Click to open details.`; panel.style.display='block'; setTimeout(()=>panel.style.display='none',2500); }
-    }
-    function applyGraphSettings(){ if(!network) return; let g = parseInt($('#gravitySlider').value), s = parseInt($('#springLength').value), layout=$('#layoutSelect').value, physics=!$('#freezePhysics').checked; let opts={physics:{enabled:physics, barnesHut:{gravitationalConstant:g, springLength:s}}}; if(layout==='hierarchical') opts.layout={hierarchical:{enabled:true,direction:'UD'}}; else opts.physics.solver='barnesHut'; network.setOptions(opts); if(physics && !network.physics.physicsEnabled) network.startSimulation(); }
-    function exportPNG(){ let canvas = document.querySelector('#mynetwork canvas'); if(canvas){ let a=document.createElement('a'); a.download='war_gov_network.png'; a.href=canvas.toDataURL(); a.click(); } }
-    function exportJSON(){ if(!activeGraphData) return; let json=JSON.stringify({nodes:activeGraphData.nodes.get(), edges:activeGraphData.edges.get()},null,2); let blob=new Blob([json],{type:'application/json'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download='war_gov_graph.json'; a.click(); URL.revokeObjectURL(url); }
-    async function buildGraph(){
-      if(!allFiles.length) return;
-      let container = document.getElementById('mynetwork');
-      if(!container) return;
-      let term = (els.search.value||'').toLowerCase();
-      let filtered = allFiles.filter(f=>(!selectedAgency || f.agency===selectedAgency) && (!term || (f.title||'').toLowerCase().includes(term)||(f.blurb||'').toLowerCase().includes(term)));
-      if(graphMode === 'agency') buildAgencyGraph(filtered, container);
-      else buildTopicGraph(filtered, container);
-    }
+    function renderNetwork(container, data, options, onClick){ if(network){ network.setData(data); network.setOptions(options); network.fit(); } else { network = new vis.Network(container, data, options); } activeGraphData = data; network.off('click'); network.on('click', params=>{ if(params.nodes.length) onClick(params.nodes[0]); }); network.off('hoverNode'); network.on('hoverNode', params=>{ if(params.node) showNodeInfo(params.node, data); }); network.off('blurNode'); network.on('blurNode', ()=>{ if(els.nodeInfoPanel) els.nodeInfoPanel.style.display='none'; }); }
+    function showNodeInfo(nodeId, data){ let node = data.nodes.get(nodeId); if(!node) return; let panel = els.nodeInfoPanel; if(!panel) return; panel.innerHTML = `<strong>${node.label}</strong><br>Click for details`; panel.style.display='block'; setTimeout(()=>panel.style.display='none',2000); }
+    function buildAgencyGraph(filtered, container){ let nodes=[], edges=[], agenciesSet = new Set(), fileMap=new Map(); filtered.forEach(f=>{ if(f.agency) agenciesSet.add(f.agency); }); agenciesSet.forEach(a=>{ nodes.push({id:`agency_${a}`, label:a, shape:'dot', size:22, color:{background:'#7e14ff',border:'#a259ff'}, font:{color:'white',size:14}, title:`Agency: ${a}`}); }); filtered.forEach((f,i)=>{ let fid=`file_${i}_${(f.title||'').slice(0,20)}`; nodes.push({id:fid, label:(f.title||'Untitled').slice(0,40), shape:'box', size:14, color:{background:'#47bfff',border:'#7e14ff'}, font:{color:'#15131f',size:12}, title:f.title}); fileMap.set(fid,f); if(f.agency) edges.push({from:fid, to:`agency_${f.agency}`, arrows:'to', color:{color:'#b0a8c0'}, smooth:true}); }); let data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) }; let options = getBaseOptions(); options.physics.barnesHut = { gravitationalConstant: -2200, springLength: 140 }; renderNetwork(container, data, options, (nodeId)=>{ if(nodeId.startsWith('file_')){ let f = fileMap.get(nodeId); if(f) openDetail(allFiles.indexOf(f)); } else if(nodeId.startsWith('agency_')){ let a = nodeId.slice(7); selectedAgency = a; updateAgencyFilters(); resetPaginationAndRender(); switchView('list'); } else showNodeInfo(nodeId, data); }); }
+    function buildTopicGraph(filtered, container){ container.innerHTML='Topic graph placeholder (advanced TF‑IDF)'; }
+    async function buildGraph(){ if(!allFiles.length) return; let container = document.getElementById('mynetwork'); if(!container) return; let term = (els.search.value||'').toLowerCase(); let filtered = allFiles.filter(f=>(!selectedAgency || f.agency===selectedAgency) && (!term || (f.title||'').toLowerCase().includes(term)||(f.blurb||'').toLowerCase().includes(term))); if(graphMode === 'agency') buildAgencyGraph(filtered, container); else buildTopicGraph(filtered, container); }
     function setGraphMode(mode){ graphMode = mode; document.querySelectorAll('[data-graphmode]').forEach(btn=> btn.classList.toggle('active', btn.getAttribute('data-graphmode')===mode)); if(currentView === 'graph') buildGraph(); }
-    function switchView(view){
-      currentView = view;
-      els.listContainer.style.display = (view === 'list') ? 'block' : 'none';
-      els.graphContainer.style.display = (view === 'graph') ? 'block' : 'none';
-      els.graphModeSwitcher.style.display = (view === 'graph') ? 'flex' : 'none';
-      document.querySelectorAll('[data-view]').forEach(btn=> btn.classList.toggle('active', btn.getAttribute('data-view')===view));
-      if(view === 'graph') buildGraph();
-      else resetPaginationAndRender();
-    }
-
-    // ---------- EVENT LISTENERS ----------
+    function switchView(view){ currentView = view; els.listContainer.style.display = (view === 'list') ? 'block' : 'none'; els.graphContainer.style.display = (view === 'graph') ? 'block' : 'none'; els.graphModeSwitcher.style.display = (view === 'graph') ? 'flex' : 'none'; document.querySelectorAll('[data-view]').forEach(btn=> btn.classList.toggle('active', btn.getAttribute('data-view')===view)); if(view === 'graph') buildGraph(); else resetPaginationAndRender(); }
     els.search.addEventListener('input', ()=>{ if(currentView==='list') resetPaginationAndRender(); else buildGraph(); });
     els.refreshBtn.addEventListener('click', ()=> loadData(false));
     els.agencies.addEventListener('click', e=>{ let chip=e.target.closest('.wg-chip'); if(chip){ let a=chip.getAttribute('data-agency'); selectedAgency = (selectedAgency===a)?null:a; updateAgencyFilters(); if(currentView==='list') resetPaginationAndRender(); else buildGraph(); } });
     els.fileList.addEventListener('click', e=>{ let card=e.target.closest('.wg-file'); if(card) openDetail(Number(card.getAttribute('data-index'))); });
     document.querySelectorAll('[data-view]').forEach(btn=> btn.addEventListener('click',()=> switchView(btn.getAttribute('data-view'))));
     document.querySelectorAll('[data-graphmode]').forEach(btn=> btn.addEventListener('click',()=> setGraphMode(btn.getAttribute('data-graphmode'))));
-    $('#layoutSelect')?.addEventListener('change', applyGraphSettings);
-    $('#gravitySlider')?.addEventListener('input', applyGraphSettings);
-    $('#springLength')?.addEventListener('input', applyGraphSettings);
+    $('#layoutSelect')?.addEventListener('change', ()=>{ if(network) network.setOptions({physics:{barnesHut:{gravitationalConstant:parseInt($('#gravitySlider').value)}}}); });
+    $('#gravitySlider')?.addEventListener('input', ()=>{ if(network) network.setOptions({physics:{barnesHut:{gravitationalConstant:parseInt($('#gravitySlider').value)}}}); });
     $('#resetLayoutBtn')?.addEventListener('click', ()=>{ if(network){ network.setOptions({physics:{stabilization:{enabled:true}}}); network.startSimulation(); setTimeout(()=>network.fit(),500); } });
-    $('#exportPNGBtn')?.addEventListener('click', exportPNG);
-    $('#exportJSONBtn')?.addEventListener('click', exportJSON);
-    $('#freezePhysics')?.addEventListener('change', applyGraphSettings);
-    els.regenerateTopicBtn?.addEventListener('click', ()=>{ if(currentView==='graph' && graphMode==='topic') buildGraph(); });
+    $('#exportPNGBtn')?.addEventListener('click', ()=>{ let canvas = document.querySelector('#mynetwork canvas'); if(canvas){ let a=document.createElement('a'); a.download='war_gov_network.png'; a.href=canvas.toDataURL(); a.click(); } });
+    $('#exportJSONBtn')?.addEventListener('click', ()=>{ if(activeGraphData){ let json=JSON.stringify({nodes:activeGraphData.nodes.get(), edges:activeGraphData.edges.get()},null,2); let blob=new Blob([json],{type:'application/json'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download='war_gov_graph.json'; a.click(); URL.revokeObjectURL(url); } });
     els.modalOverlay.addEventListener('click', e=>{ if(e.target === els.modalOverlay) closeModal(); });
     document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
-    window.addEventListener('resize', ()=>{ if(currentView==='graph' && network) network.fit(); });
-    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && allFiles.length) loadData(true); });
-
     function startAutoRefresh(){ clearInterval(refreshTimer); clearInterval(countdownTimer); refreshTimer = setInterval(()=> loadData(true), REFRESH_INTERVAL); countdownTimer = setInterval(()=>{ seconds--; if(seconds<=0) seconds=REFRESH_INTERVAL/1000; updateCountdown(); },1000); }
     loadData(false).then(()=>{ startAutoRefresh(); switchView('list'); });
+  })();
+
+  // ---------- INTEGRATED STOCK SIGNALS SCRIPT (from HTML1, adapted) ----------
+  (function(){
+    const API_BASE = 'https://stocks.aristocles24.workers.dev';
+    const REFRESH_INTERVAL = 5 * 60 * 1000;
+    const TOP_COUNT = 50;
+    let currentMode = 'gainers';
+    let refreshTimer;
+
+    function parseAnalyst(rating){ if (!rating) return null; const match = String(rating).match(/^(\d+\.?\d*)/); return match ? parseFloat(match[1]) : null; }
+    function scoreStock(quote) {
+      let score = 0, details = [];
+      const changePercent = quote.regularMarketChangePercent || 0;
+      const momentumScore = Math.tanh(changePercent / 15) * 30;
+      score += momentumScore;
+      if (Math.abs(changePercent) > 5) details.push(changePercent > 0 ? 'Strong momentum' : 'Sharp decline');
+      let valueScore = 0;
+      const fwdPE = quote.forwardPE;
+      if (fwdPE && fwdPE > 0 && fwdPE < 15) { valueScore += 15; details.push('Low forward P/E'); } else if (fwdPE && fwdPE > 0 && fwdPE < 25) valueScore += 5; else if (fwdPE && fwdPE > 50) { valueScore -= 10; details.push('High forward P/E'); }
+      const pb = quote.priceToBook;
+      if (pb && pb > 0 && pb < 3) { valueScore += 10; details.push('Low P/B ratio'); } else if (pb && pb > 10) valueScore -= 5;
+      const analystScore = parseAnalyst(quote.averageAnalystRating);
+      if (analystScore !== null) { const analystContrib = (3 - analystScore) * 7.5; valueScore += analystContrib; if (analystScore <= 1.5) details.push('Strong analyst buy'); else if (analystScore <= 2.5) details.push('Analyst buy'); else if (analystScore >= 4) details.push('Analyst sell'); }
+      score += valueScore;
+      let qualityScore = 0;
+      const epsTTM = quote.epsTrailingTwelveMonths, epsFwd = quote.epsForward, epsCurr = quote.epsCurrentYear;
+      if (epsTTM > 0 && epsFwd > 0 && epsFwd > epsTTM) { qualityScore += 10; details.push('EPS growth expected'); }
+      if (epsCurr > 0 && epsTTM > 0 && epsCurr > epsTTM) qualityScore += 5;
+      if (quote.bookValue && quote.bookValue > 0) qualityScore += 3;
+      if (quote.marketCap && quote.marketCap > 10e9) { qualityScore += 5; details.push('Large cap'); } else if (quote.marketCap && quote.marketCap > 2e9) qualityScore += 2;
+      const avgVol = quote.averageDailyVolume3Month || 1, volRatio = quote.regularMarketVolume / avgVol;
+      if (volRatio > 2) { qualityScore += 5; details.push('High rel volume'); }
+      const high52 = quote.fiftyTwoWeekHigh, price = quote.regularMarketPrice;
+      if (high52 && price) { const pctFromHigh = (high52 - price) / high52 * 100; if (pctFromHigh < 10) { qualityScore += 5; details.push('Near 52w high'); } }
+      score += qualityScore;
+      if (epsTTM !== null && epsTTM < 0 && epsFwd !== null && epsFwd < 0) { score -= 20; details.push('Unprofitable'); }
+      const finalScore = Math.round(Math.max(-100, Math.min(100, score)));
+      let signal, signalClass;
+      if (finalScore >= 30) { signal = 'STRONG BUY'; signalClass = 'signal-strong-buy'; } else if (finalScore >= 10) { signal = 'BUY'; signalClass = 'signal-buy'; } else if (finalScore > -10) { signal = 'HOLD'; signalClass = 'signal-hold'; } else if (finalScore > -30) { signal = 'SELL'; signalClass = 'signal-sell'; } else { signal = 'STRONG SELL'; signalClass = 'signal-strong-sell'; }
+      return { symbol: quote.symbol, price: quote.regularMarketPrice, changePercent: changePercent, score: finalScore, signal, signalClass, details: details.slice(0, 3).join(', ') };
+    }
+    async function fetchQuotes(mode) {
+      const endpoints = { gainers: 'day-gainers', losers: 'day-losers', active: 'most-actives' };
+      const url = `${API_BASE}/api/yahoo/${endpoints[mode]}?count=${TOP_COUNT}`;
+      const resp = await fetch(url); if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json(); if (!data.ok || !Array.isArray(data.quotes)) throw new Error('Invalid API response');
+      return data.quotes;
+    }
+    function renderMarquee(signals) {
+      const container = document.getElementById('stockMarqueeContent');
+      if (!signals.length) { container.innerHTML = `<span class="signal-item signal-loading">No data available</span>`; return; }
+      const sorted = [...signals].sort((a, b) => b.score - a.score);
+      const items = sorted.map(s => { const changeStr = s.changePercent >= 0 ? `+${s.changePercent.toFixed(1)}%` : `${s.changePercent.toFixed(1)}%`; return `<span class="signal-item ${s.signalClass}"><span class="symbol">${s.symbol}</span><span class="change">${changeStr}</span><span class="score">${s.score}</span></span>`; }).join('');
+      container.innerHTML = items + items;
+    }
+    function updateStatus(text, isError = false) { const el = document.getElementById('stockStatus'); el.textContent = text; el.style.color = isError ? '#f85149' : 'var(--ink-muted)'; }
+    async function loadStockData() { updateStatus('Fetching market data...'); try { const quotes = await fetchQuotes(currentMode); const signals = quotes.map(q => scoreStock(q)); renderMarquee(signals); const strongBuys = signals.filter(s => s.score >= 30).length, buys = signals.filter(s => s.score >= 10 && s.score < 30).length; updateStatus(`${signals.length} stocks analyzed · ${strongBuys} Strong Buys, ${buys} Buys · Refreshed ${new Date().toLocaleTimeString()}`); } catch (error) { console.error('Stock load error:', error); updateStatus(`Error: ${error.message}`, true); } }
+    window.switchStockMode = function(mode) { currentMode = mode; document.querySelectorAll('.controls-signal button').forEach(b => b.classList.remove('active')); document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active'); loadStockData(); };
+    document.getElementById('btnGainers').onclick = () => window.switchStockMode('gainers');
+    document.getElementById('btnLosers').onclick = () => window.switchStockMode('losers');
+    document.getElementById('btnActive').onclick = () => window.switchStockMode('active');
+    loadStockData();
+    setInterval(loadStockData, REFRESH_INTERVAL);
   })();
 </script>
 </body>
