@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dascient Daily Stock Opportunities</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f0f6fc;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+        button:hover {
+            background: #30363d;
+        }
+        button.primary {
+            background: #238636;
+            color: white;
+            border-color: #2ea043;
+        }
+        button.primary:hover {
+            background: #2ea043;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        button.active {
+            background: #1f6feb;
+            border-color: #388bfd;
+            color: white;
+        }
+        .status-bar {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #8b949e;
+            flex-wrap: wrap;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.3rem;
+        }
+        .dot-green { background: #3fb950; }
+        .dot-yellow { background: #d29922; }
+        .dot-red { background: #f85149; }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        th {
+            background: #21262d;
+            padding: 0.7rem 0.6rem;
+            text-align: left;
+            font-weight: 600;
+            color: #f0f6fc;
+            border-bottom: 1px solid #30363d;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        th:hover {
+            background: #30363d;
+        }
+        th .sort-icon {
+            margin-left: 0.2rem;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+        td {
+            padding: 0.6rem;
+            border-bottom: 1px solid #21262d;
+            white-space: nowrap;
+        }
+        tr:hover td {
+            background: #1c2128;
+        }
+        .symbol-cell {
+            font-weight: 600;
+        }
+        .symbol-link {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        .symbol-link:hover {
+            text-decoration: underline;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .score-strong-buy { background: #1b3a1f; color: #3fb950; }
+        .score-buy { background: #1b3a1f; color: #7ee787; }
+        .score-hold { background: #2d2d1c; color: #d29922; }
+        .score-sell { background: #3a1b1b; color: #f85149; }
+        .score-strong-sell { background: #3a1b1b; color: #ff7b72; }
+        
+        .data-source {
+            font-size: 0.7rem;
+            color: #8b949e;
+            font-style: italic;
+        }
+        .positive { color: #3fb950; }
+        .negative { color: #f85149; }
+        .neutral { color: #8b949e; }
+        
+        .loading-row td {
+            text-align: center;
+            padding: 2rem;
+            color: #8b949e;
+        }
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #30363d;
+            border-top-color: #58a6ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-banner {
+            background: #3a1b1b;
+            color: #f85149;
+            padding: 0.7rem 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #f8514966;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .error-banner button {
+            background: transparent;
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted #8b949e;
+        }
+        
+        footer {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #484f58;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: #21262d;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #238636;
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📈 Dascient Daily Opportunities</h1>
+                <div class="status-bar">
+                    <span><span class="status-dot dot-yellow" id="statusDot"></span><span id="statusText">Initializing...</span></span>
+                    <span id="lastUpdate"></span>
+                    <span id="dataSource"></span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width: 0%"></div></div>
+            </div>
+            <div class="controls">
+                <button id="btnGainers" class="active" onclick="switchMode('gainers')">📈 Day Gainers</button>
+                <button id="btnLosers" onclick="switchMode('losers')">📉 Day Losers</button>
+                <button id="btnActive" onclick="switchMode('active')">🔥 Most Active</button>
+                <button class="primary" id="refreshBtn" onclick="refreshData()">🔄 Refresh</button>
+            </div>
+        </header>
+        
+        <div id="errorContainer"></div>
+        
+        <div class="table-wrapper">
+            <table id="opportunityTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable('symbol')">Symbol <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('price')">Price <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('changePercent')">Change % <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('volume')">Volume <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('analystRating')">Analyst <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('valuationScore')">Valuation <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('momentumScore')">Momentum <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('opportunityScore')">Score <span class="sort-icon">⇅</span></th>
+                        <th onclick="sortTable('signal')">Signal <span class="sort-icon">⇅</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr class="loading-row"><td colspan="9"><span class="spinner"></span> Loading market data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <footer>
+            <span>Data: Yahoo Finance via stocks.aristocles24.workers.dev</span>
+            <span>Auto-refresh: 15 min · Scores: proprietary blend</span>
+            <span class="tooltip" title="Scores range -100 to +100. >25 = Opportunity">ℹ️ How to read scores</span>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            const API_BASE = 'https://stocks.aristocles24.workers.dev';
+            const REFRESH_INTERVAL = 15 * 60 * 1000;
+            const TOP_COUNT = 50;
+            
+            let currentData = [];
+            let currentMode = 'gainers';
+            let sortColumn = 'opportunityScore';
+            let sortDirection = -1;
+            let refreshTimer;
+            let useSummaryAPI = true; // Will auto-disable if too many failures
+
+            // ---- Utilities ----
+            const delay = ms => new Promise(r => setTimeout(r, ms));
+            
+            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+            
+            function parseAnalyst(rating) {
+                if (!rating) return null;
+                const match = String(rating).match(/^(\d+\.?\d*)/);
+                return match ? parseFloat(match[1]) : null;
+            }
+
+            // ---- Yahoo data scoring (when summary API fails) ----
+            function scoreFromYahoo(quote) {
+                const scores = {
+                    valuation: 0,
+                    momentum: 0,
+                    quality: 0,
+                    details: []
+                };
+                
+                // Valuation metrics
+                const pe = quote.trailingPE || quote.forwardPE;
+                const pb = quote.priceToBook;
+                const pegRatio = quote.pegRatio;
+                
+                if (pe && pe > 0 && pe < 15) {
+                    scores.valuation += 15;
+                    scores.details.push('Low P/E');
+                } else if (pe && pe > 0 && pe < 25) {
+                    scores.valuation += 5;
+                }
+                
+                if (pb && pb > 0 && pb < 3) {
+                    scores.valuation += 10;
+                    scores.details.push('Low P/B');
+                }
+                
+                // Momentum metrics
+                const changePercent = quote.regularMarketChangePercent || 0;
+                const volumeRatio = quote.regularMarketVolume / (quote.averageDailyVolume3Month || 1);
+                const above50day = quote.fiftyDayAverageChangePercent || 0;
+                const above200day = quote.twoHundredDayAverageChangePercent || 0;
+                
+                scores.momentum += clamp(changePercent * 3, -20, 30);
+                
+                if (volumeRatio > 1.5) {
+                    scores.momentum += 10;
+                    scores.details.push('High volume');
+                } else if (volumeRatio > 2) {
+                    scores.momentum += 15;
+                }
+                
+                if (above50day > 0) {
+                    scores.momentum += 5;
+                    scores.details.push('>50MA');
+                }
+                if (above200day > 0) {
+                    scores.momentum += 5;
+                    scores.details.push('>200MA');
+                }
+                
+                // Quality metrics
+                const analystScore = parseAnalyst(quote.averageAnalystRating);
+                if (analystScore && analystScore <= 2) {
+                    scores.quality += 10;
+                    scores.details.push('Strong analyst');
+                }
+                
+                if (quote.epsForward > 0 && quote.epsTrailingTwelveMonths > 0 && 
+                    quote.epsForward > quote.epsTrailingTwelveMonths) {
+                    scores.quality += 5;
+                    scores.details.push('EPS growth');
+                }
+                
+                // Overall
+                const total = scores.valuation + scores.momentum + scores.quality;
+                
+                return {
+                    score: clamp(Math.round(total), -100, 100),
+                    valuationScore: clamp(Math.round(scores.valuation), -50, 50),
+                    momentumScore: clamp(Math.round(scores.momentum), -50, 50),
+                    analystRating: analystScore ? `${analystScore.toFixed(1)}` : '--',
+                    details: scores.details.join(', '),
+                    source: 'yahoo'
+                };
+            }
+
+            // ---- Summary API scoring (richer data when available) ----
+            async function scoreFromSummary(summary, yahooScore) {
+                if (!summary || summary.error) return null;
+                
+                let score = 0;
+                let valuationBonus = 0;
+                let momentumBonus = 0;
+                
+                // Signal recommendation bonus
+                if (summary.signalRecommendation === 'BUY') score += 25;
+                else if (summary.signalRecommendation === 'SELL') score -= 25;
+                
+                // TA signal
+                if (summary.ta?.signal === 'BUY') score += 15;
+                else if (summary.ta?.signal === 'SELL') score -= 15;
+                
+                // Analyst recommendation
+                if (summary.recommendationKey === 'buy') score += 10;
+                else if (summary.recommendationKey === 'sell') score -= 10;
+                
+                // Target price upside
+                if (summary.price && summary.targetMeanPrice) {
+                    const upside = (summary.targetMeanPrice - summary.price) / summary.price * 100;
+                    score += clamp(upside, -15, 25);
+                }
+                
+                // Sentiment
+                if (summary.sentiment?.bullish != null) {
+                    const sentBias = summary.sentiment.bullish - summary.sentiment.bearish;
+                    score += clamp(sentBias / 2, -10, 15);
+                }
+                
+                return {
+                    score: clamp(Math.round(score + yahooScore.score * 0.3), -100, 100),
+                    valuationScore: yahooScore.valuationScore,
+                    momentumScore: yahooScore.momentumScore,
+                    analystRating: summary.recommendationKey || yahooScore.analystRating,
+                    details: [
+                        summary.signalRecommendation,
+                        summary.recommendationKey,
+                        summary.ta?.signal
+                    ].filter(Boolean).join(', '),
+                    source: 'summary+yahoo',
+                    raw: summary
+                };
+            }
+
+            function getSignal(score) {
+                if (score >= 30) return 'STRONG BUY';
+                if (score >= 15) return 'BUY';
+                if (score >= 5) return 'WEAK BUY';
+                if (score > -5) return 'HOLD';
+                if (score > -15) return 'WEAK SELL';
+                if (score > -30) return 'SELL';
+                return 'STRONG SELL';
+            }
+
+            function scoreClass(score) {
+                if (score >= 30) return 'score-strong-buy';
+                if (score >= 15) return 'score-buy';
+                if (score > -5) return 'score-hold';
+                if (score > -15) return 'score-sell';
+                return 'score-strong-sell';
+            }
+
+            // ---- API calls ----
+            async function fetchJSON(url) {
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                return resp.json();
+            }
+
+            async function fetchQuotes(mode) {
+                const endpoints = {
+                    gainers: 'day-gainers',
+                    losers: 'day-losers',
+                    active: 'most-actives'
+                };
+                const url = `${API_BASE}/api/yahoo/${endpoints[mode]}?count=${TOP_COUNT}`;
+                const data = await fetchJSON(url);
+                if (!data.ok || !Array.isArray(data.quotes)) {
+                    throw new Error('Invalid response from Yahoo endpoint');
+                }
+                return data.quotes;
+            }
+
+            async function fetchSummary(symbol) {
+                try {
+                    const url = `${API_BASE}/api/summary?symbol=${encodeURIComponent(symbol)}`;
+                    const data = await fetchJSON(url);
+                    return data;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            // ---- Main data loading ----
+            async function loadData() {
+                const errorContainer = document.getElementById('errorContainer');
+                const refreshBtn = document.getElementById('refreshBtn');
+                const progressBar = document.getElementById('progressBar');
+                
+                errorContainer.innerHTML = '';
+                refreshBtn.disabled = true;
+                updateStatus('loading', 'Fetching market data...');
+                progressBar.style.width = '10%';
+                
+                try {
+                    const quotes = await fetchQuotes(currentMode);
+                    updateStatus('loading', `Loaded ${quotes.length} stocks. Analyzing...`);
+                    progressBar.style.width = '30%';
+                    
+                    const results = [];
+                    let summarySuccesses = 0;
+                    let summaryFailures = 0;
+                    
+                    // Process in batches to show progress
+                    const batchSize = 5;
+                    for (let i = 0; i < quotes.length; i += batchSize) {
+                        const batch = quotes.slice(i, i + batchSize);
+                        const batchPromises = batch.map(async (quote) => {
+                            const yahooScore = scoreFromYahoo(quote);
+                            let finalResult = {
+                                symbol: quote.symbol,
+                                price: quote.regularMarketPrice,
+                                changePercent: quote.regularMarketChangePercent || 0,
+                                volume: quote.regularMarketVolume || 0,
+                                avgVolume: quote.averageDailyVolume3Month || 0,
+                                ...yahooScore
+                            };
+                            
+                            // Only try summary API if not too many failures
+                            if (useSummaryAPI && summaryFailures < 10) {
+                                try {
+                                    const summary = await fetchSummary(quote.symbol);
+                                    if (summary && !summary.error) {
+                                        const enriched = await scoreFromSummary(summary, yahooScore);
+                                        if (enriched) {
+                                            finalResult = {
+                                                ...finalResult,
+                                                ...enriched,
+                                                symbol: quote.symbol,
+                                                price: quote.regularMarketPrice,
+                                                changePercent: quote.regularMarketChangePercent || 0,
+                                                volume: quote.regularMarketVolume || 0,
+                                                avgVolume: quote.averageDailyVolume3Month || 0
+                                            };
+                                            summarySuccesses++;
+                                        }
+                                    } else {
+                                        summaryFailures++;
+                                    }
+                                } catch (e) {
+                                    summaryFailures++;
+                                }
+                            }
+                            
+                            return finalResult;
+                        });
+                        
+                        const batchResults = await Promise.all(batchPromises);
+                        results.push(...batchResults);
+                        
+                        // Update progress
+                        const progress = 30 + Math.round((i / quotes.length) * 60);
+                        progressBar.style.width = `${progress}%`;
+                        updateStatus('loading', `Analyzing... ${results.length}/${quotes.length}`);
+                    }
+                    
+                    // Disable summary API if too many failures
+                    if (summaryFailures > quotes.length * 0.7) {
+                        useSummaryAPI = false;
+                        console.warn('Summary API has high failure rate, using Yahoo-only scoring');
+                    }
+                    
+                    currentData = results;
+                    sortAndRender();
+                    progressBar.style.width = '100%';
+                    updateStatus('success', `${results.length} stocks analyzed${summarySuccesses > 0 ? ` (${summarySuccesses} with deep analysis)` : ' (Yahoo data only)'}`);
+                    updateLastUpdate();
+                    document.getElementById('dataSource').textContent = 
+                        summarySuccesses > 0 ? 'Source: Yahoo + Summary API' : 'Source: Yahoo Finance';
+                    
+                } catch (error) {
+                    console.error('Load error:', error);
+                    errorContainer.innerHTML = `<div class="error-banner">
+                        ⚠️ ${error.message}
+                        <button onclick="refreshData()">Retry</button>
+                    </div>`;
+                    updateStatus('error', 'Failed to load data');
+                } finally {
+                    refreshBtn.disabled = false;
+                    setTimeout(() => { progressBar.style.width = '0%'; }, 1000);
+                }
+            }
+
+            function sortAndRender() {
+                const sorted = [...currentData].sort((a, b) => {
+                    const valA = a[sortColumn] ?? 0;
+                    const valB = b[sortColumn] ?? 0;
+                    if (typeof valA === 'string') return sortDirection * valA.localeCompare(valB);
+                    return sortDirection * ((valA || 0) - (valB || 0));
+                });
+                renderTable(sorted);
+            }
+
+            function renderTable(data) {
+                const tbody = document.getElementById('tableBody');
+                if (!data.length) {
+                    tbody.innerHTML = '<tr class="loading-row"><td colspan="9">No data available</td></tr>';
+                    return;
+                }
+                
+                let html = '';
+                for (const stock of data) {
+                    const changeClass = stock.changePercent >= 0 ? 'positive' : 'negative';
+                    const volRatio = stock.avgVolume ? (stock.volume / stock.avgVolume).toFixed(1) + 'x' : '--';
+                    const signal = getSignal(stock.opportunityScore || stock.score);
+                    const cls = scoreClass(stock.opportunityScore || stock.score);
+                    
+                    html += `
+                    <tr>
+                        <td class="symbol-cell"><span class="symbol-link">${stock.symbol}</span></td>
+                        <td>$${(stock.price || 0).toFixed(2)}</td>
+                        <td class="${changeClass}">${(stock.changePercent || 0).toFixed(2)}%</td>
+                        <td>${stock.volume.toLocaleString()} <small>(${volRatio})</small></td>
+                        <td>${stock.analystRating || '--'}</td>
+                        <td>${stock.valuationScore != null ? stock.valuationScore : '--'}</td>
+                        <td>${stock.momentumScore != null ? stock.momentumScore : '--'}</td>
+                        <td><span class="badge ${cls}">${(stock.opportunityScore || stock.score || 0)}</span></td>
+                        <td><span class="badge ${cls}">${signal}</span></td>
+                    </tr>`;
+                }
+                tbody.innerHTML = html;
+            }
+
+            // ---- UI updates ----
+            function updateStatus(state, text) {
+                const dot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+                dot.className = 'status-dot ' + 
+                    (state === 'success' ? 'dot-green' : state === 'error' ? 'dot-red' : 'dot-yellow');
+                statusText.textContent = text;
+            }
+
+            function updateLastUpdate() {
+                document.getElementById('lastUpdate').textContent = 
+                    'Updated: ' + new Date().toLocaleTimeString();
+            }
+
+            // ---- Mode switching ----
+            window.switchMode = function(mode) {
+                currentMode = mode;
+                document.querySelectorAll('#btnGainers, #btnLosers, #btnActive')
+                    .forEach(b => b.classList.remove('active'));
+                document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`)
+                    .classList.add('active');
+                refreshData();
+            };
+
+            // ---- Sorting ----
+            window.sortTable = function(column) {
+                if (sortColumn === column) {
+                    sortDirection *= -1;
+                } else {
+                    sortColumn = column;
+                    sortDirection = -1;
+                }
+                sortAndRender();
+                
+                document.querySelectorAll('th .sort-icon').forEach(icon => icon.textContent = '⇅');
+                const th = document.querySelector(`th[onclick="sortTable('${column}')"]`);
+                if (th) {
+                    const icon = th.querySelector('.sort-icon');
+                    if (icon) icon.textContent = sortDirection === 1 ? '↑' : '↓';
+                }
+            };
+
+            window.refreshData = function() {
+                if (refreshTimer) clearTimeout(refreshTimer);
+                loadData().then(() => {
+                    refreshTimer = setTimeout(() => loadData(), REFRESH_INTERVAL);
+                });
+            };
+
+            // ---- Init ----
+            loadData().then(() => {
+                refreshTimer = setTimeout(() => loadData(), REFRESH_INTERVAL);
+            });
+        })();
+    </script>
+</body>
+</html>
