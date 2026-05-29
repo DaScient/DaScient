@@ -285,6 +285,43 @@
 
   <section id="books" class="block" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);"><div class="container"><div class="section-head"><p class="section-kicker">Library</p><h2>Books from our shelf</h2></div><div class="grid grid-3"><article class="card"><div class="book-cover violet"><span class="imprint">DaScient Press</span><span class="spine">Organoid<br />Intelligence</span></div><h3>Organoid Intelligence</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/organoid-intelligence-don-m-tadaya/1149944275" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover indigo"><span class="imprint">DaScient Press</span><span class="spine">AI In Modern<br />Psychology</span></div><h3>AI in Modern Psychology</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/ai-in-modern-psychology-don-m-tadaya/1150192942" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover sunset"><span class="imprint">DaScient Press</span><span class="spine">The Prompt<br />Atlas</span></div><h3>The Prompt Atlas</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/prompt-atlas-don-m-tadaya/1150171187?ean=2940185139004" target="_blank">Buy at BN</a></article></div></div></section>
 
+  <!-- ========== INTEGRATED STOCK SIGNALS MARQUEE (from HTML1) ========== -->
+  <section class="signals-section">
+    <div class="signals-container">
+      <div class="signals-header">
+        <h3>DaScient Stock Signals</h3>
+        <h4>Real-time market data analyses using multi-factor scoring algorithms that evaluate momentum (price change), value (P/E, P/B, analyst ratings), and quality (EPS growth, market cap, volume, 52-week proximity).</h4>
+        <div class="signal-legend">
+          <span><span class="legend-dot" style="background:#3fb950"></span> Strong Buy</span>
+          <span><span class="legend-dot" style="background:#7ee787"></span> Buy</span>
+          <span><span class="legend-dot" style="background:#d29922"></span> Hold</span>
+          <span><span class="legend-dot" style="background:#f85149"></span> Sell</span>
+          <span><span class="legend-dot" style="background:#ff7b72"></span> Strong Sell</span>
+        </div>
+      </div>
+      <div class="controls-signal" style="margin-bottom: 16px;">
+        <button id="btnGainers" class="active">Day Gainers</button>
+        <button id="btnLosers">Day Losers</button>
+        <button id="btnActive">Most Active</button>
+      </div>
+      <div class="marquee-container">
+        <div class="marquee-content" id="stockMarqueeContent">
+          <span class="signal-item signal-loading"><span class="spinner-small"></span> Loading signals...</span>
+        </div>
+      </div>
+      <div class="status-text" id="stockStatus">Fetching market data...</div>
+    </div>
+  </section>
+
+  <div class="wg-modal-overlay" id="wgModalOverlay"><div class="wg-modal" id="wgModalContent"></div></div>
+  <section id="connect" class="block connect"><div class="container"><div class="section-head"><p class="section-kicker">Connect</p><h2>Find us across the web</h2></div><div class="social-grid"><a class="social" href="https://www.linkedin.com/company/dascient/"><span class="dot">in</span><span><span class="label">LinkedIn</span><br /><span class="sub">Company updates</span></span></a><a class="social" href="https://www.github.com/dascient/"><span class="dot">GH</span><span><span class="label">GitHub</span><br /><span class="sub">Open‑source work</span></span></a><a class="social" href="https://www.kaggle.com/dascient/"><span class="dot">K</span><span><span class="label">Kaggle</span><br /><span class="sub">Datasets</span></span></a><a class="social" href="https://dascient.medium.com/"><span class="dot">M</span><span><span class="label">Medium</span><br /><span class="sub">Essays</span></span></a></div></div></section>
+  <section id="contact" class="block" style="padding-top: 24px;"><div class="container"><div class="cta"><div class="cta-inner"><h2>Let&rsquo;s talk about what you&rsquo;re building.</h2><p>Book a short call or send an email — we read every message.</p><div class="hero-actions"><a class="btn btn-warm" href="mailto:contact@dascient.com">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div><p class="email-line">Or email directly: <a href="mailto:inquiry@dascient.com">inquiry@dascient.com</a></p></div></div></div></section>
+</main>
+<footer class="footer"><div class="container">&copy; 2026 | DaScient, Inc. Build with intelligence. <a href="mailto:build@dascient.com">build@dascient.com</a></div></footer>
+
+<script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+<script>
+  
   <!-- FIELD DASHBOARD WITH ENHANCED TOPIC GRAPH -->
   <section id="field-dashboard" class="block dashboard">
     <div class="container">
@@ -340,42 +377,6 @@
     </div>
   </section>
 
-  <!-- ========== INTEGRATED STOCK SIGNALS MARQUEE (from HTML1) ========== -->
-  <section class="signals-section">
-    <div class="signals-container">
-      <div class="signals-header">
-        <h3>DaScient Stock Signals</h3>
-        <h4>Real-time market data analyses using multi-factor scoring algorithms that evaluate momentum (price change), value (P/E, P/B, analyst ratings), and quality (EPS growth, market cap, volume, 52-week proximity).</h4>
-        <div class="signal-legend">
-          <span><span class="legend-dot" style="background:#3fb950"></span> Strong Buy</span>
-          <span><span class="legend-dot" style="background:#7ee787"></span> Buy</span>
-          <span><span class="legend-dot" style="background:#d29922"></span> Hold</span>
-          <span><span class="legend-dot" style="background:#f85149"></span> Sell</span>
-          <span><span class="legend-dot" style="background:#ff7b72"></span> Strong Sell</span>
-        </div>
-      </div>
-      <div class="controls-signal" style="margin-bottom: 16px;">
-        <button id="btnGainers" class="active">Day Gainers</button>
-        <button id="btnLosers">Day Losers</button>
-        <button id="btnActive">Most Active</button>
-      </div>
-      <div class="marquee-container">
-        <div class="marquee-content" id="stockMarqueeContent">
-          <span class="signal-item signal-loading"><span class="spinner-small"></span> Loading signals...</span>
-        </div>
-      </div>
-      <div class="status-text" id="stockStatus">Fetching market data...</div>
-    </div>
-  </section>
-
-  <div class="wg-modal-overlay" id="wgModalOverlay"><div class="wg-modal" id="wgModalContent"></div></div>
-  <section id="connect" class="block connect"><div class="container"><div class="section-head"><p class="section-kicker">Connect</p><h2>Find us across the web</h2></div><div class="social-grid"><a class="social" href="https://www.linkedin.com/company/dascient/"><span class="dot">in</span><span><span class="label">LinkedIn</span><br /><span class="sub">Company updates</span></span></a><a class="social" href="https://www.github.com/dascient/"><span class="dot">GH</span><span><span class="label">GitHub</span><br /><span class="sub">Open‑source work</span></span></a><a class="social" href="https://www.kaggle.com/dascient/"><span class="dot">K</span><span><span class="label">Kaggle</span><br /><span class="sub">Datasets</span></span></a><a class="social" href="https://dascient.medium.com/"><span class="dot">M</span><span><span class="label">Medium</span><br /><span class="sub">Essays</span></span></a></div></div></section>
-  <section id="contact" class="block" style="padding-top: 24px;"><div class="container"><div class="cta"><div class="cta-inner"><h2>Let&rsquo;s talk about what you&rsquo;re building.</h2><p>Book a short call or send an email — we read every message.</p><div class="hero-actions"><a class="btn btn-warm" href="mailto:contact@dascient.com">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div><p class="email-line">Or email directly: <a href="mailto:inquiry@dascient.com">inquiry@dascient.com</a></p></div></div></div></section>
-</main>
-<footer class="footer"><div class="container">&copy; 2026 | DaScient, Inc. Build with intelligence. <a href="mailto:build@dascient.com">build@dascient.com</a></div></footer>
-
-<script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
-<script>
   // ---------- ORIGINAL DASHBOARD SCRIPT (fully preserved) ----------
   (function(){
     const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
