@@ -48,7 +48,7 @@
     .display { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; }
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
-    /* Top nav (unchanged) */
+    /* Top nav */
     .nav { position: sticky; top: 0; z-index: 20; background: rgba(251, 250, 247, 0.85); backdrop-filter: saturate(140%) blur(10px); border-bottom: 1px solid var(--line); }
     .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 16px; }
     .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 20px; }
@@ -67,7 +67,7 @@
     .nav-cta { padding: 10px 16px; font-size: 14px; }
     @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
 
-    /* Hero, products, books, connect, contact unchanged */
+    /* Hero, products, books, connect, contact */
     .hero { position: relative; padding: 88px 0 72px; overflow: hidden; }
     .hero-inner { position: relative; z-index: 1; max-width: 760px; }
     .eyebrow { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--bg-soft); color: var(--accent); font-size: 13px; font-weight: 500; margin-bottom: 20px; }
@@ -105,7 +105,7 @@
     .cta p { font-size: 18px; color: rgba(255, 255, 255, 0.82); margin: 0 0 28px; }
     .footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--ink-muted); font-size: 14px; text-align: center; }
 
-    /* Dashboard styles (with pagination additions) */
+    /* Dashboard styles (with pagination) */
     .wg-file-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
     @media (max-width: 880px) { .wg-file-list { grid-template-columns: 1fr; } }
     .wg-file { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: all 150ms ease; }
@@ -122,7 +122,7 @@
     .load-more-btn { background: var(--surface); border: 1px solid var(--line); padding: 12px 24px; border-radius: 999px; font-weight: 500; cursor: pointer; margin-top: 20px; width: fit-content; justify-self: center; transition: all 150ms ease; }
     .load-more-btn:hover { background: var(--bg-soft); border-color: var(--accent); }
 
-    /* Graph styles - enhanced */
+    /* Graph styles */
     .view-toggle { display: flex; gap: 12px; margin-bottom: 20px; }
     .toggle-btn { background: var(--surface); border: 1px solid var(--line); padding: 10px 20px; border-radius: 999px; font-weight: 500; cursor: pointer; }
     .toggle-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
@@ -137,7 +137,7 @@
     .wg-modal { background: var(--surface); border-radius: 18px; max-width: 680px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 28px 32px; position: relative; }
     .wg-modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 28px; cursor: pointer; }
     
-    /* ----- Integrated stock signals (from HTML1) with seamless style match ----- */
+    /* ----- Integrated stock signals ----- */
     .signals-section {
       background: var(--bg-warm);
       border-top: 1px solid var(--line);
@@ -279,13 +279,7 @@
   </div>
 </header>
 <main id="top">
-  <section class="hero"><div class="container hero-inner"><span class="eyebrow">Practical AI · Biological computing · Agentic systems</span><h1>Thoughtful AI, <span class="accent">made approachable.</span></h1><p class="lead">DaScient is a small, hands‑on studio building dependable apps and partnering with teams who want clear thinking instead of buzzwords.</p><div class="hero-actions"><a class="btn btn-primary" href="#contact">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div></div></section>
-
-  <section id="products" class="block"><div class="container"><div class="section-head"><p class="section-kicker">Products</p><h2>Tools we&rsquo;ve shipped</h2></div><div class="grid grid-2"><article class="card"><div class="product-icon">⌬</div><h3>Plan-Examiner</h3><p>Manifest‑driven workspace for structured proposal review and submission.</p><a class="card-link" href="https://plan-examiner.com/" target="_blank">Visit plan-examiner.com</a></article><article class="card"><div class="product-icon warm">🐾</div><h3>RoboVet 24/7</h3><p>AI veterinary companion in your pocket, clear guidance for pet questions.</p><a class="card-link" href="https://apps.apple.com/us/app/robovet-24-7-ai-veterinarian/id6753560467" target="_blank">Open in the App Store</a></article></div></div></section>
-
-  <section id="books" class="block" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);"><div class="container"><div class="section-head"><p class="section-kicker">Library</p><h2>Books from our shelf</h2></div><div class="grid grid-3"><article class="card"><div class="book-cover violet"><span class="imprint">DaScient Press</span><span class="spine">Organoid<br />Intelligence</span></div><h3>Organoid Intelligence</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/organoid-intelligence-don-m-tadaya/1149944275" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover indigo"><span class="imprint">DaScient Press</span><span class="spine">AI In Modern<br />Psychology</span></div><h3>AI in Modern Psychology</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/ai-in-modern-psychology-don-m-tadaya/1150192942" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover sunset"><span class="imprint">DaScient Press</span><span class="spine">The Prompt<br />Atlas</span></div><h3>The Prompt Atlas</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/prompt-atlas-don-m-tadaya/1150171187?ean=2940185139004" target="_blank">Buy at BN</a></article></div></div></section>
-
-  <!-- ========== INTEGRATED STOCK SIGNALS MARQUEE (from HTML1) ========== -->
+  <!-- ========== INTEGRATED STOCK SIGNALS MARQUEE ========== -->
   <section class="signals-section">
     <div class="signals-container">
       <div class="signals-header">
@@ -312,6 +306,11 @@
       <div class="status-text" id="stockStatus">Fetching market data...</div>
     </div>
   </section>
+  <section class="hero"><div class="container hero-inner"><span class="eyebrow">Practical AI · Biological computing · Agentic systems</span><h1>Thoughtful AI, <span class="accent">made approachable.</span></h1><p class="lead">DaScient is a small, hands‑on studio building dependable apps and partnering with teams who want clear thinking instead of buzzwords.</p><div class="hero-actions"><a class="btn btn-primary" href="#contact">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div></div></section>
+
+  <section id="products" class="block"><div class="container"><div class="section-head"><p class="section-kicker">Products</p><h2>Tools we&rsquo;ve shipped</h2></div><div class="grid grid-2"><article class="card"><div class="product-icon">⌬</div><h3>Plan-Examiner</h3><p>Manifest‑driven workspace for structured proposal review and submission.</p><a class="card-link" href="https://plan-examiner.com/" target="_blank">Visit plan-examiner.com</a></article><article class="card"><div class="product-icon warm">🐾</div><h3>RoboVet 24/7</h3><p>AI veterinary companion in your pocket, clear guidance for pet questions.</p><a class="card-link" href="https://apps.apple.com/us/app/robovet-24-7-ai-veterinarian/id6753560467" target="_blank">Open in the App Store</a></article></div></div></section>
+
+  <section id="books" class="block" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);"><div class="container"><div class="section-head"><p class="section-kicker">Library</p><h2>Books from our shelf</h2></div><div class="grid grid-3"><article class="card"><div class="book-cover violet"><span class="imprint">DaScient Press</span><span class="spine">Organoid<br />Intelligence</span></div><h3>Organoid Intelligence</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/organoid-intelligence-don-m-tadaya/1149944275" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover indigo"><span class="imprint">DaScient Press</span><span class="spine">AI In Modern<br />Psychology</span></div><h3>AI in Modern Psychology</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/ai-in-modern-psychology-don-m-tadaya/1150192942" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover sunset"><span class="imprint">DaScient Press</span><span class="spine">The Prompt<br />Atlas</span></div><h3>The Prompt Atlas</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/prompt-atlas-don-m-tadaya/1150171187?ean=2940185139004" target="_blank">Buy at BN</a></article></div></div></section>
 
   <div class="wg-modal-overlay" id="wgModalOverlay"><div class="wg-modal" id="wgModalContent"></div></div>
   <section id="connect" class="block connect"><div class="container"><div class="section-head"><p class="section-kicker">Connect</p><h2>Find us across the web</h2></div><div class="social-grid"><a class="social" href="https://www.linkedin.com/company/dascient/"><span class="dot">in</span><span><span class="label">LinkedIn</span><br /><span class="sub">Company updates</span></span></a><a class="social" href="https://www.github.com/dascient/"><span class="dot">GH</span><span><span class="label">GitHub</span><br /><span class="sub">Open‑source work</span></span></a><a class="social" href="https://www.kaggle.com/dascient/"><span class="dot">K</span><span><span class="label">Kaggle</span><br /><span class="sub">Datasets</span></span></a><a class="social" href="https://dascient.medium.com/"><span class="dot">M</span><span><span class="label">Medium</span><br /><span class="sub">Essays</span></span></a></div></div></section>
