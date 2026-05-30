@@ -401,7 +401,6 @@
       <!-- GRAPH CONTAINER (enhanced for topic discovery) -->
       <div id="graphContainer" style="display: none;">
         <div class="graph-container" id="networkContainer">
-          <!-- ENHANCED PLACEHOLDER for topic graph -->
           <div id="topicGraphPlaceholder" style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--ink-muted); font-size: 16px; background: var(--surface); border: 2px dashed var(--line); border-radius: 8px; text-align: center; padding: 40px;">
             <div>
               <div style="font-size: 32px; margin-bottom: 12px;">🧠</div>
@@ -412,7 +411,6 @@
           <div id="nodeInfoPanel" class="node-info-panel" style="display: none;"></div>
         </div>
 
-        <!-- Topic discovery side panel -->
         <div id="topicDiscoveryPanel" style="display: none; margin-top: 16px; padding: 16px; background: var(--surface); border-radius: 8px; border: 1px solid var(--line);">
           <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;">
             <h4 style="margin:0; font-size: 16px;">🔬 Topic Explorer</h4>
@@ -432,13 +430,11 @@
           </div>
         </div>
 
-        <!-- Inline topic legend -->
         <div id="topicLegendInline" style="display: none; margin-top: 12px; padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px;">
           <h5 style="margin:0 0 8px;">Topic colour key</h5>
           <div id="topicLegendColors" style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px;"></div>
         </div>
 
-        <!-- Glossary popup -->
         <div id="glossaryPopup" style="display: none; position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); background: var(--surface); border: 2px solid var(--ink); border-radius: 12px; padding: 20px; max-width: 400px; z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
           <h4 style="margin-top:0;">🧠 Graph terms explained</h4>
           <dl style="font-size:14px; line-height:1.5;">
@@ -496,7 +492,7 @@
 
 <script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
 <script>
-  // ---------- DASHBOARD SCRIPT (colors updated for professional palette) ----------
+  // ---------- DASHBOARD SCRIPT ----------
   (function(){
     const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
     const FALLBACK_SOURCE = 'https://raw.githubusercontent.com/vng9trmgr8-pixel/war-gov-ufo-release-1/main/data.json';
@@ -615,7 +611,6 @@
       }
     }
     
-    // Event listeners for enhancements
     els.showGlossaryBtn?.addEventListener('click', () => { if (els.glossaryPopup) els.glossaryPopup.style.display = 'block'; });
     els.closeGlossaryBtn?.addEventListener('click', () => { if (els.glossaryPopup) els.glossaryPopup.style.display = 'none'; });
     els.showTopicLegendBtn?.addEventListener('click', () => { if (els.topicLegendInline) els.topicLegendInline.style.display = els.topicLegendInline.style.display === 'none' ? 'block' : 'none'; });
@@ -638,43 +633,73 @@
     loadData(false).then(()=>{ startAutoRefresh(); switchView('list'); });
   })();
 
-  // ---------- STOCK SIGNALS (unchanged logic) ----------
+  // ---------- STOCK SIGNALS (FIXED: Losers get red/orange signals) ----------
   (function(){
     const API_BASE = 'https://stocks.aristocles24.workers.dev';
     const REFRESH_INTERVAL = 5 * 60 * 1000;
     const TOP_COUNT = 50;
     let currentMode = 'gainers';
+
     function parseAnalyst(rating){ if (!rating) return null; const match = String(rating).match(/^(\d+\.?\d*)/); return match ? parseFloat(match[1]) : null; }
-    function scoreStock(quote) {
+
+    // Scoring now accepts the mode to heavily penalize negative momentum for "losers"
+    function scoreStock(quote, mode = 'gainers') {
       let score = 0, details = [];
       const changePercent = quote.regularMarketChangePercent || 0;
-      score += Math.tanh(changePercent / 15) * 30;
-      if (Math.abs(changePercent) > 5) details.push(changePercent > 0 ? 'Strong momentum' : 'Sharp decline');
+
+      // Momentum component – much stronger for losers
+      if (mode === 'losers') {
+        // Losers: every negative percent point counts double, positive is ignored
+        const loserPenalty = changePercent < 0 ? changePercent * 3 : 0;
+        score += loserPenalty;
+        if (changePercent < -5) details.push('Sharp daily decline');
+      } else {
+        // Gainers / active: smooth tanh scaling
+        const momentumScore = Math.tanh(changePercent / 15) * 30;
+        score += momentumScore;
+        if (Math.abs(changePercent) > 5) details.push(changePercent > 0 ? 'Strong momentum' : 'Sharp decline');
+      }
+
+      // Value
       let valueScore = 0;
       const fwdPE = quote.forwardPE;
-      if (fwdPE && fwdPE > 0 && fwdPE < 15) { valueScore += 15; details.push('Low forward P/E'); } else if (fwdPE && fwdPE > 0 && fwdPE < 25) valueScore += 5; else if (fwdPE && fwdPE > 50) { valueScore -= 10; details.push('High forward P/E'); }
+      if (fwdPE && fwdPE > 0 && fwdPE < 15) { valueScore += 15; details.push('Low forward P/E'); }
+      else if (fwdPE && fwdPE > 0 && fwdPE < 25) valueScore += 5;
+      else if (fwdPE && fwdPE > 50) { valueScore -= 10; details.push('High forward P/E'); }
       const pb = quote.priceToBook;
-      if (pb && pb > 0 && pb < 3) { valueScore += 10; details.push('Low P/B ratio'); } else if (pb && pb > 10) valueScore -= 5;
+      if (pb && pb > 0 && pb < 3) { valueScore += 10; details.push('Low P/B ratio'); }
+      else if (pb && pb > 10) valueScore -= 5;
       const analystScore = parseAnalyst(quote.averageAnalystRating);
       if (analystScore !== null) { const analystContrib = (3 - analystScore) * 7.5; valueScore += analystContrib; if (analystScore <= 1.5) details.push('Strong analyst buy'); else if (analystScore <= 2.5) details.push('Analyst buy'); else if (analystScore >= 4) details.push('Analyst sell'); }
       score += valueScore;
+
+      // Quality
       let qualityScore = 0;
       const epsTTM = quote.epsTrailingTwelveMonths, epsFwd = quote.epsForward, epsCurr = quote.epsCurrentYear;
       if (epsTTM > 0 && epsFwd > 0 && epsFwd > epsTTM) { qualityScore += 10; details.push('EPS growth expected'); }
       if (epsCurr > 0 && epsTTM > 0 && epsCurr > epsTTM) qualityScore += 5;
       if (quote.bookValue && quote.bookValue > 0) qualityScore += 3;
-      if (quote.marketCap && quote.marketCap > 10e9) { qualityScore += 5; details.push('Large cap'); } else if (quote.marketCap && quote.marketCap > 2e9) qualityScore += 2;
+      if (quote.marketCap && quote.marketCap > 10e9) { qualityScore += 5; details.push('Large cap'); }
+      else if (quote.marketCap && quote.marketCap > 2e9) qualityScore += 2;
       const avgVol = quote.averageDailyVolume3Month || 1, volRatio = quote.regularMarketVolume / avgVol;
       if (volRatio > 2) { qualityScore += 5; details.push('High rel volume'); }
       const high52 = quote.fiftyTwoWeekHigh, price = quote.regularMarketPrice;
       if (high52 && price) { const pctFromHigh = (high52 - price) / high52 * 100; if (pctFromHigh < 10) { qualityScore += 5; details.push('Near 52w high'); } }
       score += qualityScore;
+
       if (epsTTM !== null && epsTTM < 0 && epsFwd !== null && epsFwd < 0) { score -= 20; details.push('Unprofitable'); }
+
       const finalScore = Math.round(Math.max(-100, Math.min(100, score)));
       let signal, signalClass;
-      if (finalScore >= 30) { signal = 'STRONG BUY'; signalClass = 'signal-strong-buy'; } else if (finalScore >= 10) { signal = 'BUY'; signalClass = 'signal-buy'; } else if (finalScore > -10) { signal = 'HOLD'; signalClass = 'signal-hold'; } else if (finalScore > -30) { signal = 'SELL'; signalClass = 'signal-sell'; } else { signal = 'STRONG SELL'; signalClass = 'signal-strong-sell'; }
+      if (finalScore >= 30) { signal = 'STRONG BUY'; signalClass = 'signal-strong-buy'; }
+      else if (finalScore >= 10) { signal = 'BUY'; signalClass = 'signal-buy'; }
+      else if (finalScore > -10) { signal = 'HOLD'; signalClass = 'signal-hold'; }
+      else if (finalScore > -30) { signal = 'SELL'; signalClass = 'signal-sell'; }
+      else { signal = 'STRONG SELL'; signalClass = 'signal-strong-sell'; }
+
       return { symbol: quote.symbol, price: quote.regularMarketPrice, changePercent, score: finalScore, signal, signalClass, details: details.slice(0, 3).join(', ') };
     }
+
     async function fetchQuotes(mode) {
       const endpoints = { gainers: 'day-gainers', losers: 'day-losers', active: 'most-actives' };
       const url = `${API_BASE}/api/yahoo/${endpoints[mode]}?count=${TOP_COUNT}`;
@@ -690,8 +715,25 @@
       container.innerHTML = items + items;
     }
     function updateStatus(text, isError = false) { const el = document.getElementById('stockStatus'); el.textContent = text; el.style.color = isError ? '#f85149' : 'var(--ink-muted)'; }
-    async function loadStockData() { updateStatus('Fetching market data...'); try { const quotes = await fetchQuotes(currentMode); const signals = quotes.map(q => scoreStock(q)); renderMarquee(signals); const strongBuys = signals.filter(s => s.score >= 30).length, buys = signals.filter(s => s.score >= 10 && s.score < 30).length; updateStatus(`${signals.length} stocks analyzed · ${strongBuys} Strong Buys, ${buys} Buys · Refreshed ${new Date().toLocaleTimeString()}`); } catch (error) { console.error('Stock load error:', error); updateStatus(`Error: ${error.message}`, true); } }
-    window.switchStockMode = function(mode) { currentMode = mode; document.querySelectorAll('.controls-signal button').forEach(b => b.classList.remove('active')); document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active'); loadStockData(); };
+    async function loadStockData() {
+      updateStatus('Fetching market data...');
+      try {
+        const quotes = await fetchQuotes(currentMode);
+        const signals = quotes.map(q => scoreStock(q, currentMode));  // pass mode
+        renderMarquee(signals);
+        const strongBuys = signals.filter(s => s.score >= 30).length, buys = signals.filter(s => s.score >= 10 && s.score < 30).length;
+        updateStatus(`${signals.length} stocks analyzed · ${strongBuys} Strong Buys, ${buys} Buys · Refreshed ${new Date().toLocaleTimeString()}`);
+      } catch (error) {
+        console.error('Stock load error:', error);
+        updateStatus(`Error: ${error.message}`, true);
+      }
+    }
+    window.switchStockMode = function(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.controls-signal button').forEach(b => b.classList.remove('active'));
+      document.getElementById(`btn${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active');
+      loadStockData();
+    };
     document.getElementById('btnGainers').onclick = () => window.switchStockMode('gainers');
     document.getElementById('btnLosers').onclick = () => window.switchStockMode('losers');
     document.getElementById('btnActive').onclick = () => window.switchStockMode('active');
@@ -699,8 +741,10 @@
     setInterval(loadStockData, REFRESH_INTERVAL);
   })();
 
-  // ---------- BREAKING NEWS RSS MARQUEE (unchanged) ----------
+  // ---------- BREAKING NEWS RSS MARQUEE (CORS fallback) ----------
   (function(){
+    // If you need to bypass CORS, uncomment the proxy URL below.
+    // const FEED_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://intel.aristocles24.workers.dev/api/feeds?sinceHours=24&limit=80');
     const FEED_URL = 'https://intel.aristocles24.workers.dev/api/feeds?sinceHours=24&limit=80';
     const REFRESH_MS = 5 * 60 * 1000;
     const MAX_ITEMS = 40;
