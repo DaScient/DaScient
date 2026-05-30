@@ -136,6 +136,27 @@
     .wg-modal-overlay.open { display: flex; }
     .wg-modal { background: var(--surface); border-radius: 18px; max-width: 680px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 28px 32px; position: relative; }
     .wg-modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 28px; cursor: pointer; }
+
+    /* Dashboard polish */
+    .wg-status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-muted); margin-top: 8px; }
+    .wg-status .dot { width: 10px; height: 10px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 0 3px rgba(63,185,80,0.15); }
+    .wg-status .dot.warn { background: #d29922; box-shadow: 0 0 0 3px rgba(210,153,34,0.15); }
+    .wg-status .dot.error { background: #f85149; box-shadow: 0 0 0 3px rgba(248,81,73,0.15); }
+    .wg-stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow-sm); }
+    .wg-stat .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
+    .wg-stat .value { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 28px; line-height: 1; color: var(--ink); }
+    .wg-stat .value.accent { color: var(--accent); }
+    .wg-ticker-item { display: inline-block; padding: 0 28px; font-size: 13px; color: var(--ink-soft); }
+    .wg-ticker-item::before { content: '◆'; color: var(--accent); margin-right: 10px; opacity: 0.6; }
+    .wg-chip { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 12px; color: var(--ink-soft); cursor: pointer; transition: all 150ms ease; }
+    .wg-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .wg-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .wg-file h4 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 20px; line-height: 1.2; margin: 8px 0 8px; color: var(--ink); }
+    .wg-file .meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--ink-muted); margin-bottom: 4px; }
+    .wg-file .meta .agency { background: var(--bg-soft); color: var(--accent); padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+    .wg-file .meta .type { background: var(--bg-warm); color: var(--accent-warm); padding: 2px 8px; border-radius: 999px; font-weight: 600; text-transform: uppercase; }
+    .wg-file .blurb { font-size: 14px; color: var(--ink-soft); margin: 0 0 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .wg-file .link { color: var(--accent); font-size: 13px; font-weight: 500; }
     
     /* ----- Integrated stock signals ----- */
     .signals-section {
@@ -313,15 +334,8 @@
   <section id="books" class="block" style="background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);"><div class="container"><div class="section-head"><p class="section-kicker">Library</p><h2>Books from our shelf</h2></div><div class="grid grid-3"><article class="card"><div class="book-cover violet"><span class="imprint">DaScient Press</span><span class="spine">Organoid<br />Intelligence</span></div><h3>Organoid Intelligence</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/organoid-intelligence-don-m-tadaya/1149944275" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover indigo"><span class="imprint">DaScient Press</span><span class="spine">AI In Modern<br />Psychology</span></div><h3>AI in Modern Psychology</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/ai-in-modern-psychology-don-m-tadaya/1150192942" target="_blank">Buy at BN</a></article><article class="card"><div class="book-cover sunset"><span class="imprint">DaScient Press</span><span class="spine">The Prompt<br />Atlas</span></div><h3>The Prompt Atlas</h3><p class="author">by Don D.M. Tadaya</p><a class="card-link" href="https://www.barnesandnoble.com/w/prompt-atlas-don-m-tadaya/1150171187?ean=2940185139004" target="_blank">Buy at BN</a></article></div></div></section>
 
   <div class="wg-modal-overlay" id="wgModalOverlay"><div class="wg-modal" id="wgModalContent"></div></div>
-  <section id="connect" class="block connect"><div class="container"><div class="section-head"><p class="section-kicker">Connect</p><h2>Find us across the web</h2></div><div class="social-grid"><a class="social" href="https://www.linkedin.com/company/dascient/"><span class="dot">in</span><span><span class="label">LinkedIn</span><br /><span class="sub">Company updates</span></span></a><a class="social" href="https://www.github.com/dascient/"><span class="dot">GH</span><span><span class="label">GitHub</span><br /><span class="sub">Open‑source work</span></span></a><a class="social" href="https://www.kaggle.com/dascient/"><span class="dot">K</span><span><span class="label">Kaggle</span><br /><span class="sub">Datasets</span></span></a><a class="social" href="https://dascient.medium.com/"><span class="dot">M</span><span><span class="label">Medium</span><br /><span class="sub">Essays</span></span></a></div></div></section>
-  <section id="contact" class="block" style="padding-top: 24px;"><div class="container"><div class="cta"><div class="cta-inner"><h2>Let&rsquo;s talk about what you&rsquo;re building.</h2><p>Book a short call or send an email — we read every message.</p><div class="hero-actions"><a class="btn btn-warm" href="mailto:contact@dascient.com">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div><p class="email-line">Or email directly: <a href="mailto:inquiry@dascient.com">inquiry@dascient.com</a></p></div></div></div></section>
-</main>
-<footer class="footer"><div class="container">&copy; 2026 | DaScient, Inc. Build with intelligence. <a href="mailto:build@dascient.com">build@dascient.com</a></div></footer>
 
-<script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
-<script>
-  
-  <!-- FIELD DASHBOARD WITH ENHANCED TOPIC GRAPH -->
+  <!-- ========== FIELD DASHBOARD WITH ENHANCED TOPIC GRAPH ========== -->
   <section id="field-dashboard" class="block dashboard">
     <div class="container">
       <div class="section-head"><p class="section-kicker">Field Dashboard</p><h2>WAR.GOV/UFO — Live PURSUE repository</h2><p>A live read on the U.S. Department of War&rsquo;s rolling PURSUE releases — declassified UAP documents, imagery, and video exhibits. Now includes interactive network graph with advanced topic modeling (TF‑IDF + PMI).</p><div class="wg-status"><span class="dot" id="wgStatusDot"></span><span id="wgStatusText">Initializing…</span></div></div>
@@ -334,7 +348,7 @@
         <button class="toggle-btn active" data-view="list">📋 List View</button>
         <button class="toggle-btn" data-view="graph">🕸️ Network Graph</button>
       </div>
-      <div id="graphModeSwitcher" style="display: none; margin-bottom: 12px; gap: 12px; display: flex;">
+      <div id="graphModeSwitcher" style="display: none; margin-bottom: 12px; gap: 12px;">
         <button class="toggle-btn active" data-graphmode="agency">🏛️ Agency Network</button>
         <button class="toggle-btn" data-graphmode="topic">🧠 Topic Co‑occurrence (TF‑IDF + PMI)</button>
         <span style="font-size: 12px; color: var(--ink-muted); margin-left: auto;">Node size = TF‑IDF · Edge width = PMI</span>
@@ -342,12 +356,12 @@
 
       <!-- LIST CONTAINER (with pagination) -->
       <div id="listContainer">
-        <div class="wg-toolbar" style="margin-bottom: 16px;">
-          <input type="text" class="wg-search" id="wgSearch" placeholder="Search files…" />
-          <span class="wg-count" id="wgCount"></span>
+        <div class="wg-toolbar" style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <input type="text" class="wg-search" id="wgSearch" placeholder="Search files…" style="flex: 1 1 220px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 14px;" />
+          <span class="wg-count" id="wgCount" style="font-size: 13px; color: var(--ink-muted);"></span>
           <button class="btn btn-ghost wg-refresh" id="wgRefreshBtn">Refresh now</button>
         </div>
-        <div class="wg-agencies" id="wgAgencies"></div>
+        <div class="wg-agencies" id="wgAgencies" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;"></div>
         <div class="wg-file-list" id="wgFileList"><div class="wg-loading"><div class="wg-spinner"></div> Loading data…</div></div>
         <div id="loadMoreContainer" style="display: flex; justify-content: center; margin-top: 20px;"></div>
       </div>
@@ -372,10 +386,17 @@
         </div>
       </div>
 
-      <div class="wg-meta-row"><span>Mirror: <span id="wgSourceUrl">—</span> · Origin: <a href="https://www.war.gov/UFO" target="_blank">war.gov/UFO</a></span><span>Last refresh: <span id="wgLastRefresh">—</span> · Next in <span id="wgCountdown">30</span>s</span></div>
+      <div class="wg-meta-row" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 20px; font-size: 13px; color: var(--ink-muted);"><span>Mirror: <span id="wgSourceUrl">—</span> · Origin: <a href="https://www.war.gov/UFO" target="_blank" rel="noopener">war.gov/UFO</a></span><span>Last refresh: <span id="wgLastRefresh">—</span> · Next in <span id="wgCountdown">30</span>s</span></div>
     </div>
   </section>
 
+  <section id="connect" class="block connect"><div class="container"><div class="section-head"><p class="section-kicker">Connect</p><h2>Find us across the web</h2></div><div class="social-grid"><a class="social" href="https://www.linkedin.com/company/dascient/"><span class="dot">in</span><span><span class="label">LinkedIn</span><br /><span class="sub">Company updates</span></span></a><a class="social" href="https://www.github.com/dascient/"><span class="dot">GH</span><span><span class="label">GitHub</span><br /><span class="sub">Open‑source work</span></span></a><a class="social" href="https://www.kaggle.com/dascient/"><span class="dot">K</span><span><span class="label">Kaggle</span><br /><span class="sub">Datasets</span></span></a><a class="social" href="https://dascient.medium.com/"><span class="dot">M</span><span><span class="label">Medium</span><br /><span class="sub">Essays</span></span></a></div></div></section>
+  <section id="contact" class="block" style="padding-top: 24px;"><div class="container"><div class="cta"><div class="cta-inner"><h2>Let&rsquo;s talk about what you&rsquo;re building.</h2><p>Book a short call or send an email — we read every message.</p><div class="hero-actions"><a class="btn btn-warm" href="mailto:contact@dascient.com">Schedule a call</a><a class="btn btn-ghost" href="mailto:contact@dascient.com">Send a business inquiry</a></div><p class="email-line">Or email directly: <a href="mailto:inquiry@dascient.com">inquiry@dascient.com</a></p></div></div></div></section>
+</main>
+<footer class="footer"><div class="container">&copy; 2026 | DaScient, Inc. Build with intelligence. <a href="mailto:build@dascient.com">build@dascient.com</a></div></footer>
+
+<script src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+<script>
   // ---------- ORIGINAL DASHBOARD SCRIPT (fully preserved) ----------
   (function(){
     const PRIMARY_SOURCE = 'https://war-gov-ufo-release-1.vercel.app/data.json';
@@ -450,11 +471,11 @@
     els.fileList.addEventListener('click', e=>{ let card=e.target.closest('.wg-file'); if(card) openDetail(Number(card.getAttribute('data-index'))); });
     document.querySelectorAll('[data-view]').forEach(btn=> btn.addEventListener('click',()=> switchView(btn.getAttribute('data-view'))));
     document.querySelectorAll('[data-graphmode]').forEach(btn=> btn.addEventListener('click',()=> setGraphMode(btn.getAttribute('data-graphmode'))));
-    $('#layoutSelect')?.addEventListener('change', ()=>{ if(network) network.setOptions({physics:{barnesHut:{gravitationalConstant:parseInt($('#gravitySlider').value)}}}); });
-    $('#gravitySlider')?.addEventListener('input', ()=>{ if(network) network.setOptions({physics:{barnesHut:{gravitationalConstant:parseInt($('#gravitySlider').value)}}}); });
-    $('#resetLayoutBtn')?.addEventListener('click', ()=>{ if(network){ network.setOptions({physics:{stabilization:{enabled:true}}}); network.startSimulation(); setTimeout(()=>network.fit(),500); } });
-    $('#exportPNGBtn')?.addEventListener('click', ()=>{ let canvas = document.querySelector('#mynetwork canvas'); if(canvas){ let a=document.createElement('a'); a.download='war_gov_network.png'; a.href=canvas.toDataURL(); a.click(); } });
-    $('#exportJSONBtn')?.addEventListener('click', ()=>{ if(activeGraphData){ let json=JSON.stringify({nodes:activeGraphData.nodes.get(), edges:activeGraphData.edges.get()},null,2); let blob=new Blob([json],{type:'application/json'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download='war_gov_graph.json'; a.click(); URL.revokeObjectURL(url); } });
+    $('layoutSelect')?.addEventListener('change', ()=>{ if(network) network.setOptions({physics:{barnesHut:{gravitationalConstant:parseInt($('gravitySlider').value)}}}); });
+    $('gravitySlider')?.addEventListener('input', ()=>{ if(network) network.setOptions({physics:{barnesHut:{gravitationalConstant:parseInt($('gravitySlider').value)}}}); });
+    $('resetLayoutBtn')?.addEventListener('click', ()=>{ if(network){ network.setOptions({physics:{stabilization:{enabled:true}}}); network.startSimulation(); setTimeout(()=>network.fit(),500); } });
+    $('exportPNGBtn')?.addEventListener('click', ()=>{ let canvas = document.querySelector('#mynetwork canvas'); if(canvas){ let a=document.createElement('a'); a.download='war_gov_network.png'; a.href=canvas.toDataURL(); a.click(); } });
+    $('exportJSONBtn')?.addEventListener('click', ()=>{ if(activeGraphData){ let json=JSON.stringify({nodes:activeGraphData.nodes.get(), edges:activeGraphData.edges.get()},null,2); let blob=new Blob([json],{type:'application/json'}); let url=URL.createObjectURL(blob); let a=document.createElement('a'); a.href=url; a.download='war_gov_graph.json'; a.click(); URL.revokeObjectURL(url); } });
     els.modalOverlay.addEventListener('click', e=>{ if(e.target === els.modalOverlay) closeModal(); });
     document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
     function startAutoRefresh(){ clearInterval(refreshTimer); clearInterval(countdownTimer); refreshTimer = setInterval(()=> loadData(true), REFRESH_INTERVAL); countdownTimer = setInterval(()=>{ seconds--; if(seconds<=0) seconds=REFRESH_INTERVAL/1000; updateCountdown(); },1000); }
