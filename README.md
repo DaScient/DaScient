@@ -1,5 +1,5 @@
 <div align="left">
-  <img src="http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=DaScient&theme=bear" width=750  alt="stats graph"/>
+  <img src="http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=DaScient&theme=transparent" width=750 alt="stats graph"/>
 </div>
 
 [<img align="center" alt="w  | Website" width="45px" src="https://raw.githubusercontent.com/iconic/open-iconic/master/svg/globe.svg" />][website]
