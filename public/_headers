@@ -8,7 +8,7 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.run; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://api.openai.com https://esm.run https://war-gov-ufo-release-1.vercel.app https://raw.githubusercontent.com; frame-ancestors 'none'; base-uri 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://esm.run; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://api.openai.com https://esm.run https://war-gov-ufo-release-1.vercel.app https://raw.githubusercontent.com https://intel.aristocles24.workers.dev; frame-ancestors 'none'; base-uri 'self'
 
 # Cache the immutable build output. index.html should always be revalidated.
 /assets/*
