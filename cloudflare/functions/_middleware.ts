@@ -46,7 +46,7 @@ const SECURITY_HEADERS: Record<string, string> = {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src https://fonts.gstatic.com data:",
     "img-src 'self' data:",
-    "connect-src 'self' https://api.openai.com https://esm.run https://war-gov-ufo-release-1.vercel.app https://raw.githubusercontent.com",
+    "connect-src 'self' https://api.openai.com https://esm.run https://war-gov-ufo-release-1.vercel.app https://raw.githubusercontent.com https://intel.aristocles24.workers.dev",
     "frame-ancestors 'none'",
     "base-uri 'self'",
   ].join('; '),
