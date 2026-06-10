@@ -11,7 +11,7 @@ function AnimatedOrbs() {
           height: '720px',
           top: '-200px',
           left: '-120px',
-          background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)',
           animation: 'float 9s ease-in-out infinite',
         }}
       />
@@ -23,7 +23,7 @@ function AnimatedOrbs() {
           height: '500px',
           bottom: '-100px',
           right: '-80px',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(99,102,241,0.09) 0%, transparent 70%)',
           animation: 'float 12s ease-in-out infinite reverse',
         }}
       />
@@ -36,7 +36,7 @@ function AnimatedOrbs() {
           top: '10%',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: 'radial-gradient(circle, rgba(34,211,238,0.05) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(34,211,238,0.04) 0%, transparent 70%)',
           animation: 'float 7s ease-in-out infinite 2s',
         }}
       />
@@ -51,7 +51,7 @@ function GridLines() {
         className="absolute inset-0"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(14,165,233,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.04) 1px, transparent 1px)',
+            'linear-gradient(rgba(14,165,233,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.035) 1px, transparent 1px)',
           backgroundSize: '80px 80px',
           maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%)',
         }}
@@ -90,16 +90,23 @@ export default function Hero() {
       className="relative min-h-screen flex flex-col items-center justify-center pt-20 pb-16 overflow-hidden"
       style={{
         background:
-          'radial-gradient(ellipse 80% 60% at 50% -5%, rgba(14,165,233,0.12) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 85% 70%, rgba(99,102,241,0.09) 0%, transparent 60%), #0A0A0A',
+          'radial-gradient(ellipse 80% 60% at 50% -5%, rgba(14,165,233,0.11) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 85% 70%, rgba(99,102,241,0.08) 0%, transparent 60%), #030810',
       }}
     >
       <AnimatedOrbs />
       <GridLines />
 
       <div className="section-container relative z-10 flex flex-col items-center text-center gap-8">
-        {/* Identity badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-500 uppercase tracking-widest text-accent-blue border border-[rgba(14,165,233,0.3)] bg-[rgba(14,165,233,0.07)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse-slow" />
+        {/* Identity badge — sharp corners */}
+        <div
+          className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-mono font-500 uppercase tracking-widest text-accent-blue"
+          style={{
+            border: '1px solid rgba(14,165,233,0.28)',
+            background: 'rgba(14,165,233,0.06)',
+            backdropFilter: 'blur(8px)',
+          }}
+        >
+          <span className="w-1.5 h-1.5 bg-accent-cyan animate-pulse-slow" />
           Strategic Quantum Intelligence &amp; Operations
         </div>
 
@@ -156,12 +163,12 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll indicator — sharp corners */}
         <div className="mt-4 flex flex-col items-center gap-2 opacity-40">
           <span className="text-xs text-slate-500 font-mono uppercase tracking-widest">Scroll</span>
           <svg width="16" height="24" viewBox="0 0 16 24" fill="none" className="animate-bounce">
-            <rect x="6.5" y="4" width="3" height="6" rx="1.5" fill="#64748b" />
-            <rect x="0.5" y="0.5" width="15" height="23" rx="7.5" stroke="#334155" />
+            <rect x="6.5" y="4" width="3" height="6" rx="0" fill="#64748b" />
+            <rect x="0.5" y="0.5" width="15" height="23" rx="0" stroke="#334155" />
           </svg>
         </div>
       </div>

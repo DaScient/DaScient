@@ -27,9 +27,15 @@ export default function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? 'bg-[rgba(10,10,10,0.85)] backdrop-blur-2xl border-b border-[rgba(255,255,255,0.07)]'
+          ? 'border-b border-[rgba(14,165,233,0.12)]'
           : 'bg-transparent'
       }`}
+      style={scrolled ? {
+        background: 'rgba(3, 8, 16, 0.88)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        boxShadow: 'inset 0 -1px 0 rgba(14,165,233,0.08), 0 8px 32px rgba(0,0,0,0.4)',
+      } : {}}
     >
       <div className="section-container">
         <nav className="flex items-center justify-between h-16 md:h-20">
@@ -39,7 +45,7 @@ export default function Header() {
             className="flex items-center gap-2.5 group"
             aria-label="DaScient home"
           >
-            {/* Minimal SVG wordmark */}
+            {/* Minimal SVG wordmark — sharp corners */}
             <svg
               width="32"
               height="32"
@@ -48,8 +54,8 @@ export default function Header() {
               xmlns="http://www.w3.org/2000/svg"
               className="flex-shrink-0"
             >
-              <rect width="32" height="32" rx="6" fill="rgba(14,165,233,0.12)" />
-              <rect width="32" height="32" rx="6" stroke="rgba(14,165,233,0.35)" strokeWidth="1" />
+              <rect width="32" height="32" rx="0" fill="rgba(14,165,233,0.10)" />
+              <rect width="32" height="32" rx="0" stroke="rgba(14,165,233,0.32)" strokeWidth="1" />
               <path
                 d="M8 10h8a6 6 0 0 1 0 12H8V10Z"
                 fill="none"
@@ -71,7 +77,7 @@ export default function Header() {
                 <a
                   href={href}
                   onClick={(e) => handleNavClick(e, href)}
-                  className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors duration-200 rounded-lg hover:bg-[rgba(255,255,255,0.05)]"
+                  className="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors duration-200 hover:bg-[rgba(255,255,255,0.04)]"
                 >
                   {label}
                 </a>
@@ -90,7 +96,7 @@ export default function Header() {
 
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+            className="md:hidden flex flex-col gap-1.5 p-2 hover:bg-[rgba(255,255,255,0.04)] transition-colors"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
@@ -116,14 +122,14 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="md:hidden glass-panel mx-4 mb-4 rounded-xl overflow-hidden">
+        <div className="md:hidden glass-panel mx-4 mb-4 overflow-hidden">
           <ul className="flex flex-col p-2" role="list">
             {NAV_LINKS.map(({ label, href }) => (
               <li key={href}>
                 <a
                   href={href}
                   onClick={(e) => handleNavClick(e, href)}
-                  className="flex items-center px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors"
+                  className="flex items-center px-4 py-3 text-sm font-medium text-slate-300 hover:text-white hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                 >
                   {label}
                 </a>

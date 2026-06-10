@@ -7,8 +7,8 @@ const TIERS = [
     title: 'Federal & Commercial Readiness',
     subtitle: 'The Foundation',
     color: '#0ea5e9',
-    colorMuted: 'rgba(14,165,233,0.12)',
-    colorBorder: 'rgba(14,165,233,0.25)',
+    colorMuted: 'rgba(14,165,233,0.10)',
+    colorBorder: 'rgba(14,165,233,0.22)',
     icon: (
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
         <rect x="4" y="8" width="20" height="14" rx="2" stroke="#0ea5e9" strokeWidth="1.5" />
@@ -29,8 +29,8 @@ const TIERS = [
     title: 'Technical Build-out & Security',
     subtitle: 'The Guardrails',
     color: '#22d3ee',
-    colorMuted: 'rgba(34,211,238,0.10)',
-    colorBorder: 'rgba(34,211,238,0.25)',
+    colorMuted: 'rgba(34,211,238,0.08)',
+    colorBorder: 'rgba(34,211,238,0.22)',
     icon: (
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
         <path d="M14 4l8 3v7c0 5-4 9-8 10C10 23 6 19 6 14V7l8-3Z" stroke="#22d3ee" strokeWidth="1.5" strokeLinejoin="round" />
@@ -50,8 +50,8 @@ const TIERS = [
     title: 'Funding & Capture Management',
     subtitle: 'The Growth',
     color: '#6366f1',
-    colorMuted: 'rgba(99,102,241,0.10)',
-    colorBorder: 'rgba(99,102,241,0.25)',
+    colorMuted: 'rgba(99,102,241,0.08)',
+    colorBorder: 'rgba(99,102,241,0.22)',
     icon: (
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
         <path d="M5 18l5-5 4 4 4-6 5 3" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -72,8 +72,8 @@ const TIERS = [
     title: 'Entrepreneurial Concierge',
     subtitle: 'The Game-Changer Suite',
     color: '#8b5cf6',
-    colorMuted: 'rgba(139,92,246,0.10)',
-    colorBorder: 'rgba(139,92,246,0.25)',
+    colorMuted: 'rgba(139,92,246,0.08)',
+    colorBorder: 'rgba(139,92,246,0.22)',
     icon: (
       <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
         <circle cx="14" cy="10" r="5" stroke="#8b5cf6" strokeWidth="1.5" />
@@ -138,7 +138,7 @@ export default function ServiceTiers() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 60% 40% at 80% 20%, rgba(14,165,233,0.05) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 10% 80%, rgba(139,92,246,0.06) 0%, transparent 60%)',
+            'radial-gradient(ellipse 60% 40% at 80% 20%, rgba(14,165,233,0.04) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 10% 80%, rgba(139,92,246,0.05) 0%, transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -146,7 +146,7 @@ export default function ServiceTiers() {
       <div className="section-container relative z-10">
         {/* Section header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest text-accent-blue border border-[rgba(14,165,233,0.25)] bg-[rgba(14,165,233,0.05)] mb-5">
+          <div className="section-badge mb-5">
             Service Architecture
           </div>
           <h2
@@ -163,23 +163,24 @@ export default function ServiceTiers() {
         </div>
 
         {/* Four-tier grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-20">
           {TIERS.map((tier, i) => (
             <article
               key={i}
-              className="relative rounded-xl overflow-hidden cursor-default transition-all duration-300"
+              className="relative overflow-hidden cursor-default transition-all duration-300"
               onMouseEnter={() => setActiveIdx(i)}
               onMouseLeave={() => setActiveIdx(null)}
               style={{
-                background: activeIdx === i ? tier.colorMuted : 'rgba(255,255,255,0.025)',
-                backdropFilter: 'blur(20px)',
+                background: activeIdx === i ? tier.colorMuted : 'rgba(255,255,255,0.02)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
                 border: activeIdx === i
                   ? `1px solid ${tier.colorBorder}`
-                  : '1px solid rgba(255,255,255,0.07)',
+                  : '1px solid rgba(255,255,255,0.06)',
                 boxShadow: activeIdx === i
-                  ? `0 16px 40px rgba(0,0,0,0.45), 0 0 0 1px ${tier.colorBorder}`
-                  : '0 4px 16px rgba(0,0,0,0.3)',
-                transform: activeIdx === i ? 'translateY(-4px)' : 'none',
+                  ? `inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(0,0,0,0.5), 0 20px 48px rgba(0,0,0,0.5), 0 0 24px ${tier.colorMuted}`
+                  : 'inset 0 1px 0 rgba(255,255,255,0.03), 0 4px 16px rgba(0,0,0,0.35)',
+                transform: activeIdx === i ? 'translateY(-3px)' : 'none',
                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
@@ -187,7 +188,7 @@ export default function ServiceTiers() {
               <div
                 className="absolute top-0 left-0 right-0 h-px transition-opacity duration-300"
                 style={{
-                  background: `linear-gradient(90deg, transparent, ${tier.color}99, transparent)`,
+                  background: `linear-gradient(90deg, transparent, ${tier.color}88, transparent)`,
                   opacity: activeIdx === i ? 1 : 0,
                 }}
               />
@@ -197,7 +198,7 @@ export default function ServiceTiers() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className="p-2.5 rounded-lg border"
+                      className="p-2.5 border"
                       style={{
                         background: tier.colorMuted,
                         borderColor: tier.colorBorder,
@@ -225,9 +226,9 @@ export default function ServiceTiers() {
                   </span>
                 </div>
 
-                {/* Subtitle badge */}
+                {/* Subtitle badge — sharp */}
                 <div
-                  className="inline-flex self-start items-center px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border"
+                  className="inline-flex self-start items-center px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest border"
                   style={{
                     color: tier.color,
                     borderColor: tier.colorBorder,
@@ -248,7 +249,7 @@ export default function ServiceTiers() {
                         fill="none"
                         className="mt-0.5 flex-shrink-0"
                       >
-                        <circle cx="7" cy="7" r="6" stroke={tier.color} strokeWidth="1" opacity="0.5" />
+                        <rect x="1" y="1" width="12" height="12" stroke={tier.color} strokeWidth="1" opacity="0.5" />
                         <path
                           d="M4.5 7l2 2 3-3"
                           stroke={tier.color}
@@ -269,7 +270,9 @@ export default function ServiceTiers() {
         {/* Entrepreneur Support strip */}
         <div id="entrepreneur-support" className="glass-panel p-10 md:p-14">
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest text-accent-cyan border border-[rgba(34,211,238,0.25)] bg-[rgba(34,211,238,0.05)] mb-4">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono uppercase tracking-widest text-accent-cyan border border-[rgba(34,211,238,0.22)] bg-[rgba(34,211,238,0.05)] mb-4"
+            >
               Entrepreneur Support
             </div>
             <h3
@@ -284,17 +287,19 @@ export default function ServiceTiers() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {ENTRY_POINTS.map((ep, i) => (
               <div
                 key={i}
-                className="rounded-xl p-6 flex flex-col gap-3 transition-all duration-300 hover:bg-[rgba(255,255,255,0.04)]"
+                className="p-6 flex flex-col gap-3 transition-all duration-300 hover:bg-[rgba(255,255,255,0.03)]"
                 style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.07)',
+                  background: 'rgba(255,255,255,0.015)',
+                  border: '1px solid rgba(255,255,255,0.06)',
                 }}
               >
-                <div className="p-2.5 rounded-lg bg-[rgba(14,165,233,0.07)] border border-[rgba(14,165,233,0.15)] w-fit">
+                <div
+                  className="p-2.5 bg-[rgba(14,165,233,0.06)] border border-[rgba(14,165,233,0.14)] w-fit"
+                >
                   {ep.icon}
                 </div>
                 <h4 className="font-display font-700 text-white text-sm">{ep.title}</h4>
