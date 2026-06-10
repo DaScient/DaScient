@@ -30,31 +30,33 @@ export default function Footer() {
 
   return (
     <footer
-      className="relative overflow-hidden border-t border-[rgba(255,255,255,0.06)]"
+      className="relative overflow-hidden border-t border-[rgba(14,165,233,0.10)]"
       style={{
-        background: 'rgba(0,0,0,0.6)',
-        backdropFilter: 'blur(40px)',
+        background: 'rgba(2, 6, 14, 0.92)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
       }}
     >
-      {/* Subtle top glow */}
+      {/* Subtle top glow line */}
       <div
         className="absolute top-0 left-0 right-0 h-px"
         style={{
           background:
-            'linear-gradient(90deg, transparent 0%, rgba(14,165,233,0.4) 40%, rgba(34,211,238,0.3) 60%, transparent 100%)',
+            'linear-gradient(90deg, transparent 0%, rgba(14,165,233,0.45) 40%, rgba(34,211,238,0.32) 60%, transparent 100%)',
         }}
         aria-hidden="true"
       />
 
       <div className="section-container py-16 md:py-20">
         {/* Top row */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b border-[rgba(255,255,255,0.05)]">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10 pb-12 border-b border-[rgba(255,255,255,0.04)]">
           {/* Brand */}
           <div className="md:col-span-1 flex flex-col gap-5">
             <a href="/" className="flex items-center gap-2.5 group w-fit">
+              {/* Logo — sharp corners */}
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect width="32" height="32" rx="6" fill="rgba(14,165,233,0.10)" />
-                <rect width="32" height="32" rx="6" stroke="rgba(14,165,233,0.30)" strokeWidth="1" />
+                <rect width="32" height="32" rx="0" fill="rgba(14,165,233,0.08)" />
+                <rect width="32" height="32" rx="0" stroke="rgba(14,165,233,0.28)" strokeWidth="1" />
                 <path
                   d="M8 10h8a6 6 0 0 1 0 12H8V10Z"
                   fill="none"
@@ -107,7 +109,7 @@ export default function Footer() {
         </div>
 
         {/* Locations strip */}
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 py-6 border-b border-[rgba(255,255,255,0.05)]">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 py-6 border-b border-[rgba(255,255,255,0.04)]">
           {['Los Angeles, CA', 'Denver, CO', 'Columbia, MD'].map((loc, i) => (
             <span key={loc} className="flex items-center gap-2 text-xs font-mono text-slate-600">
               {i > 0 && <span className="text-slate-800">·</span>}

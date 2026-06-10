@@ -111,7 +111,7 @@ export default function Services() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 70% 40% at 20% 80%, rgba(99,102,241,0.06) 0%, transparent 60%)',
+            'radial-gradient(ellipse 70% 40% at 20% 80%, rgba(99,102,241,0.05) 0%, transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -119,7 +119,7 @@ export default function Services() {
       <div className="section-container relative z-10">
         {/* Section header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest text-accent-blue border border-[rgba(14,165,233,0.25)] bg-[rgba(14,165,233,0.05)] mb-5">
+          <div className="section-badge mb-5">
             Core Specializations
           </div>
           <h2
@@ -135,34 +135,35 @@ export default function Services() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {SPECIALIZATIONS.map((spec, i) => (
             <article
               key={i}
-              className="group relative rounded-xl overflow-hidden cursor-default transition-all duration-400"
+              className="group relative overflow-hidden cursor-default"
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
               style={{
                 background:
                   hoveredIdx === i
-                    ? 'rgba(255,255,255,0.055)'
-                    : 'rgba(255,255,255,0.025)',
-                backdropFilter: hoveredIdx === i ? 'blur(32px)' : 'blur(16px)',
+                    ? 'rgba(255,255,255,0.045)'
+                    : 'rgba(255,255,255,0.02)',
+                backdropFilter: hoveredIdx === i ? 'blur(32px) saturate(200%)' : 'blur(16px)',
+                WebkitBackdropFilter: hoveredIdx === i ? 'blur(32px) saturate(200%)' : 'blur(16px)',
                 border: hoveredIdx === i
-                  ? '1px solid rgba(255,255,255,0.18)'
-                  : '1px solid rgba(255,255,255,0.07)',
+                  ? '1px solid rgba(255,255,255,0.14)'
+                  : '1px solid rgba(255,255,255,0.06)',
                 boxShadow: hoveredIdx === i
-                  ? '0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)'
-                  : '0 4px 16px rgba(0,0,0,0.3)',
-                transform: hoveredIdx === i ? 'translateY(-5px)' : 'none',
-                transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
+                  ? 'inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(0,0,0,0.5), 0 20px 48px rgba(0,0,0,0.55)'
+                  : 'inset 0 1px 0 rgba(255,255,255,0.02), 0 4px 16px rgba(0,0,0,0.3)',
+                transform: hoveredIdx === i ? 'translateY(-4px)' : 'none',
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
               {/* Top accent line */}
               <div
                 className="absolute top-0 left-0 right-0 h-px transition-opacity duration-300"
                 style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.6), transparent)',
+                  background: 'linear-gradient(90deg, transparent, rgba(14,165,233,0.55), transparent)',
                   opacity: hoveredIdx === i ? 1 : 0,
                 }}
               />
@@ -170,10 +171,10 @@ export default function Services() {
               <div className="p-7 flex flex-col gap-4 h-full">
                 {/* Icon + tag */}
                 <div className="flex items-center justify-between">
-                  <div className="p-2.5 rounded-lg bg-[rgba(14,165,233,0.08)] border border-[rgba(14,165,233,0.15)]">
+                  <div className="p-2.5 bg-[rgba(14,165,233,0.07)] border border-[rgba(14,165,233,0.14)]">
                     {spec.icon}
                   </div>
-                  <span className="text-[10px] font-mono font-500 uppercase tracking-widest text-accent-blue px-2.5 py-1 rounded-full border border-[rgba(14,165,233,0.25)] bg-[rgba(14,165,233,0.05)]">
+                  <span className="text-[10px] font-mono font-500 uppercase tracking-widest text-accent-blue px-2.5 py-1 border border-[rgba(14,165,233,0.22)] bg-[rgba(14,165,233,0.05)]">
                     {spec.tag}
                   </span>
                 </div>
@@ -187,9 +188,9 @@ export default function Services() {
                 </p>
 
                 {/* Funding note */}
-                <div className="flex items-center gap-2 pt-2 border-t border-[rgba(255,255,255,0.05)]">
+                <div className="flex items-center gap-2 pt-2 border-t border-[rgba(255,255,255,0.04)]">
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <circle cx="6" cy="6" r="5" stroke="#22d3ee" strokeWidth="1" />
+                    <rect x="1" y="1" width="10" height="10" stroke="#22d3ee" strokeWidth="1" />
                     <path d="M4 6l1.5 1.5L8 4" stroke="#22d3ee" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <span className="text-[11px] font-mono text-accent-cyan opacity-70">
@@ -203,7 +204,9 @@ export default function Services() {
 
         {/* Funding pathways CTA */}
         <div id="funding" className="mt-20 glass-panel p-10 md:p-14 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest text-accent-cyan border border-[rgba(34,211,238,0.25)] bg-[rgba(34,211,238,0.05)] mb-6">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono uppercase tracking-widest text-accent-cyan border border-[rgba(34,211,238,0.22)] bg-[rgba(34,211,238,0.04)] mb-6"
+          >
             Funding Pathways
           </div>
           <h3
@@ -222,7 +225,7 @@ export default function Services() {
               (tag) => (
                 <span
                   key={tag}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-mono text-slate-400 border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.03)]"
+                  className="px-3.5 py-1.5 text-xs font-mono text-slate-400 border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)]"
                 >
                   {tag}
                 </span>

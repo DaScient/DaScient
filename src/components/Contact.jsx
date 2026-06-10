@@ -30,7 +30,7 @@ function InputField({ label, id, type = 'text', required, placeholder, value, on
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-lg px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[rgba(14,165,233,0.5)] focus:bg-[rgba(14,165,233,0.04)] transition-all duration-200"
+        className="w-full bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.07)] px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[rgba(14,165,233,0.5)] focus:bg-[rgba(14,165,233,0.03)] transition-all duration-200"
       />
     </div>
   )
@@ -88,7 +88,7 @@ export default function Contact() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(14,165,233,0.06) 0%, transparent 60%)',
+            'radial-gradient(ellipse 60% 50% at 75% 20%, rgba(14,165,233,0.05) 0%, transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -98,7 +98,7 @@ export default function Contact() {
           {/* Left column — context */}
           <div className="lg:col-span-2 flex flex-col gap-8">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest text-accent-blue border border-[rgba(14,165,233,0.25)] bg-[rgba(14,165,233,0.05)] mb-5">
+              <div className="section-badge mb-5">
                 Contact
               </div>
               <h2
@@ -186,7 +186,9 @@ export default function Contact() {
             <div className="glass-panel p-8 md:p-10">
               {status === 'success' ? (
                 <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
-                  <div className="w-14 h-14 rounded-full bg-[rgba(34,211,238,0.1)] border border-[rgba(34,211,238,0.3)] flex items-center justify-center">
+                  <div
+                    className="w-14 h-14 bg-[rgba(34,211,238,0.08)] border border-[rgba(34,211,238,0.25)] flex items-center justify-center"
+                  >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M5 12l5 5L19 7" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
@@ -244,11 +246,11 @@ export default function Contact() {
                       required
                       value={formData.subject}
                       onChange={handleChange}
-                      className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[rgba(14,165,233,0.5)] focus:bg-[rgba(14,165,233,0.04)] transition-all duration-200 appearance-none cursor-pointer"
+                      className="w-full bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.07)] px-4 py-3 text-sm text-white focus:outline-none focus:border-[rgba(14,165,233,0.5)] focus:bg-[rgba(14,165,233,0.03)] transition-all duration-200 appearance-none cursor-pointer"
                       style={{ color: formData.subject ? '#fff' : '#475569' }}
                     >
                       {INQUIRY_SUBJECTS.map(({ value, label }) => (
-                        <option key={value} value={value} style={{ background: '#111', color: '#fff' }}>
+                        <option key={value} value={value} style={{ background: '#070f1e', color: '#fff' }}>
                           {label}
                         </option>
                       ))}
@@ -268,7 +270,7 @@ export default function Contact() {
                       placeholder="Describe your project, funding goals, or technical challenge…"
                       value={formData.message}
                       onChange={handleChange}
-                      className="w-full bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)] rounded-lg px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[rgba(14,165,233,0.5)] focus:bg-[rgba(14,165,233,0.04)] transition-all duration-200 resize-none"
+                      className="w-full bg-[rgba(255,255,255,0.025)] border border-[rgba(255,255,255,0.07)] px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-[rgba(14,165,233,0.5)] focus:bg-[rgba(14,165,233,0.03)] transition-all duration-200 resize-none"
                     />
                   </div>
 
@@ -285,7 +287,7 @@ export default function Contact() {
                   >
                     {status === 'sending' ? (
                       <>
-                        <span className="w-3 h-3 border border-accent-blue border-t-transparent rounded-full animate-spin" />
+                        <span className="w-3 h-3 border border-accent-blue border-t-transparent animate-spin" />
                         Transmitting…
                       </>
                     ) : (
@@ -309,7 +311,7 @@ export default function Contact() {
 function ContactRow({ icon, label, value, href }) {
   const inner = (
     <div className="flex items-start gap-3">
-      <div className="mt-0.5 p-1.5 rounded-md bg-[rgba(14,165,233,0.08)] border border-[rgba(14,165,233,0.15)] flex-shrink-0">
+      <div className="mt-0.5 p-1.5 bg-[rgba(14,165,233,0.07)] border border-[rgba(14,165,233,0.14)] flex-shrink-0">
         {icon}
       </div>
       <div>
@@ -334,7 +336,7 @@ function SocialLink({ href, label, children }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="p-2.5 rounded-lg text-slate-500 hover:text-accent-blue border border-[rgba(255,255,255,0.07)] hover:border-[rgba(14,165,233,0.35)] hover:bg-[rgba(14,165,233,0.05)] transition-all duration-200"
+      className="p-2.5 text-slate-500 hover:text-accent-blue border border-[rgba(255,255,255,0.06)] hover:border-[rgba(14,165,233,0.32)] hover:bg-[rgba(14,165,233,0.04)] transition-all duration-200"
     >
       {children}
     </a>

@@ -9,8 +9,8 @@ const PLANS = [
     period: '/ month',
     equity: '+ 2% equity / success fee on first contract',
     color: '#0ea5e9',
-    colorMuted: 'rgba(14,165,233,0.10)',
-    colorBorder: 'rgba(14,165,233,0.30)',
+    colorMuted: 'rgba(14,165,233,0.08)',
+    colorBorder: 'rgba(14,165,233,0.25)',
     featured: false,
     items: [
       'SAM.gov and UEI registration management',
@@ -29,8 +29,8 @@ const PLANS = [
     period: '/ month',
     equity: '+ 1% success fee on awarded contracts',
     color: '#22d3ee',
-    colorMuted: 'rgba(34,211,238,0.12)',
-    colorBorder: 'rgba(34,211,238,0.40)',
+    colorMuted: 'rgba(34,211,238,0.10)',
+    colorBorder: 'rgba(34,211,238,0.35)',
     featured: true,
     items: [
       'Everything in The Spark',
@@ -50,8 +50,8 @@ const PLANS = [
     period: '/ month',
     equity: null,
     color: '#8b5cf6',
-    colorMuted: 'rgba(139,92,246,0.10)',
-    colorBorder: 'rgba(139,92,246,0.35)',
+    colorMuted: 'rgba(139,92,246,0.08)',
+    colorBorder: 'rgba(139,92,246,0.30)',
     featured: false,
     items: [
       'Everything in The Ascent',
@@ -66,7 +66,7 @@ const PLANS = [
 function CheckIcon({ color }) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5">
-      <circle cx="7" cy="7" r="6" stroke={color} strokeWidth="1" opacity="0.5" />
+      <rect x="1" y="1" width="12" height="12" stroke={color} strokeWidth="1" opacity="0.5" />
       <path
         d="M4.5 7l2 2 3-3"
         stroke={color}
@@ -86,7 +86,7 @@ export default function Pricing() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 70% 50% at 50% 100%, rgba(99,102,241,0.07) 0%, transparent 65%)',
+            'radial-gradient(ellipse 70% 50% at 50% 100%, rgba(99,102,241,0.06) 0%, transparent 65%)',
         }}
         aria-hidden="true"
       />
@@ -94,7 +94,7 @@ export default function Pricing() {
       <div className="section-container relative z-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-widest text-accent-blue border border-[rgba(14,165,233,0.25)] bg-[rgba(14,165,233,0.05)] mb-5">
+          <div className="section-badge mb-5">
             Engagement Model
           </div>
           <h2
@@ -111,34 +111,37 @@ export default function Pricing() {
         </div>
 
         {/* Plans grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
           {PLANS.map((plan) => (
             <div
               key={plan.id}
-              className="relative rounded-xl overflow-hidden flex flex-col transition-all duration-300"
+              className="relative overflow-hidden flex flex-col transition-all duration-300"
               style={{
                 background: plan.featured
                   ? plan.colorMuted
-                  : 'rgba(255,255,255,0.025)',
-                border: `1px solid ${plan.featured ? plan.colorBorder : 'rgba(255,255,255,0.08)'}`,
+                  : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${plan.featured ? plan.colorBorder : 'rgba(255,255,255,0.06)'}`,
                 boxShadow: plan.featured
-                  ? `0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px ${plan.colorBorder}`
-                  : '0 4px 16px rgba(0,0,0,0.3)',
+                  ? `inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px rgba(0,0,0,0.5), 0 24px 56px rgba(0,0,0,0.55), 0 0 32px ${plan.colorMuted}`
+                  : 'inset 0 1px 0 rgba(255,255,255,0.02), 0 4px 16px rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(24px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(24px) saturate(180%)',
               }}
             >
-              {/* Featured badge */}
+              {/* Featured top accent line */}
               {plan.featured && (
                 <div
                   className="absolute top-0 left-0 right-0 h-px"
                   style={{
-                    background: `linear-gradient(90deg, transparent, ${plan.color}cc, transparent)`,
+                    background: `linear-gradient(90deg, transparent, ${plan.color}bb, transparent)`,
                   }}
                 />
               )}
+              {/* Featured badge — sharp */}
               {plan.featured && (
                 <div className="absolute top-4 right-4">
                   <span
-                    className="text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full border"
+                    className="text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 border"
                     style={{
                       color: plan.color,
                       borderColor: plan.colorBorder,
@@ -164,7 +167,7 @@ export default function Pricing() {
                 </div>
 
                 {/* Price */}
-                <div className="border-t border-b border-[rgba(255,255,255,0.06)] py-5">
+                <div className="border-t border-b border-[rgba(255,255,255,0.05)] py-5">
                   <div className="flex items-end gap-1">
                     <span
                       className="font-display font-800 leading-none"
