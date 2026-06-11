@@ -1,0 +1,138 @@
+# =========================================================
+# GoZaddy — Agentic Daily Digest feed list
+# ---------------------------------------------------------
+# FORMAT (easy to customize & reproduce):
+#   * One feed URL per line.
+#   * Blank lines and plain "# comment" lines are ignored.
+#   * A directive line sets the category for every feed below it
+#     until the next directive:
+#         #category: world
+#   * Accepted category keys (used by /rss?category= and the UI):
+#         world, global, economics, industry, technology,
+#         science, politics, entertainment
+#   * Anything you add inherits the category above it — just drop
+#     a URL under the right heading and redeploy. No code changes.
+# =========================================================
+
+# =========================================
+#category: global
+# GLOBAL / TOP WIRES
+# =========================================
+https://feeds.reuters.com/reuters/topNews
+https://feeds.reuters.com/Reuters/worldNews
+https://www.aljazeera.com/xml/rss/all.xml
+https://feeds.bbci.co.uk/news/rss.xml
+https://rss.dw.com/rdf/rss-en-all
+https://news.un.org/feed/subscribe/en/news/all/rss.xml
+https://www.npr.org/rss/rss.php?id=1001
+https://www.theguardian.com/world/rss
+https://www.wsj.com/xml/rss/3_7085.xml
+https://feeds.skynews.com/feeds/rss/world.xml
+
+# =========================================
+#category: world
+# AMERICAS
+# =========================================
+https://www.nytimes.com/services/xml/rss/nyt/HomePage.xml
+https://www.nytimes.com/services/xml/rss/nyt/World.xml
+https://feeds.washingtonpost.com/rss/national
+https://feeds.washingtonpost.com/rss/world
+https://www.latimes.com/world/rss2.0.xml
+https://www.theglobeandmail.com/arc/outboundfeeds/rss/?outputType=xml
+https://globalnews.ca/feed/
+https://www.mercopress.com/rss
+https://english.elpais.com/rss/
+
+# =========================================
+#category: world
+# EUROPE
+# =========================================
+https://www.spiegel.de/international/index.rss
+https://www.lemonde.fr/en/rss/full.xml
+https://www.politico.eu/feed/
+https://www.euronews.com/rss?level=theme&name=News
+
+# =========================================
+#category: world
+# AFRICA / MIDDLE EAST
+# =========================================
+https://feeds.bbci.co.uk/news/world/africa/rss.xml
+https://www.africanews.com/feed/
+https://www.middleeasteye.net/rss.xml
+https://english.alarabiya.net/.mrss/en.xml
+
+# =========================================
+#category: world
+# ASIA-PACIFIC
+# =========================================
+https://www3.nhk.or.jp/rss/news/catenglish.xml
+https://www.scmp.com/rss/91/feed
+https://www.thehindu.com/news/national/?service=rss
+https://www.thehindu.com/news/international/?service=rss
+https://www.abc.net.au/news/feed/51120/rss.xml
+
+# =========================================
+#category: economics
+# BUSINESS / MARKETS / ECONOMY
+# =========================================
+https://feeds.reuters.com/reuters/businessNews
+https://www.cnbc.com/id/100003114/device/rss/rss.html
+https://www.marketwatch.com/feeds/topstories
+https://finance.yahoo.com/news/rss
+https://www.imf.org/external/rss/whatsnewRss.aspx
+https://www.federalreserve.gov/feeds/press_all.xml
+https://www.sec.gov/rss/news/pressreleases.xml
+https://www.economist.com/finance-and-economics/rss.xml
+
+# =========================================
+#category: politics
+# POLICY / POLITICS
+# =========================================
+https://www.politico.com/rss/politics-news.xml
+https://thehill.com/rss/syndicator/19110
+https://www.whitehouse.gov/briefing-room/feed/
+https://www.europarl.europa.eu/news/en/headlines/rss.xml
+
+# =========================================
+#category: science
+# SCIENCE / HEALTH / CLIMATE
+# =========================================
+https://www.who.int/feeds/entity/mediacentre/news/en/rss.xml
+https://www.science.org/rss/news_current.xml
+https://www.nature.com/nature.rss
+https://www.nasa.gov/rss/dyn/breaking_news.rss
+https://www.economist.com/science-and-technology/rss.xml
+https://www.carbonbrief.org/feed/
+
+# =========================================
+#category: technology
+# TECHNOLOGY / AI
+# =========================================
+https://www.theverge.com/rss/index.xml
+https://techcrunch.com/feed/
+https://feeds.arstechnica.com/arstechnica/index
+https://www.wired.com/feed/rss
+https://www.theregister.com/headlines.atom
+https://github.blog/feed/
+https://hnrss.org/frontpage
+
+# =========================================
+#category: industry
+# INDUSTRY / BUSINESS STRATEGY
+# =========================================
+https://www.economist.com/the-world-this-week/rss.xml
+https://hbr.org/feed
+https://www.fastcompany.com/feed
+https://www.forbes.com/most-popular/feed/
+
+# =========================================
+#category: entertainment
+# ENTERTAINMENT / CULTURE / MEDIA
+# =========================================
+https://variety.com/feed/
+https://www.hollywoodreporter.com/feed/
+https://www.rollingstone.com/feed/
+https://deadline.com/feed/
+https://pitchfork.com/rss/news/
+https://www.theguardian.com/culture/rss
+https://www.billboard.com/feed/
