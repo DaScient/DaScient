@@ -790,8 +790,7 @@
   // ---------- BREAKING NEWS RSS MARQUEE (CORS fallback) ----------
   (function(){
     // Bypass CORS, uncomment the proxy URL below.
-    const FEED_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://gozaddy.aristocles24.workers.dev/?refresh=120000');
-    // const FEED_URL = 'https://gozaddy-rss.aristocles24.workers.dev/?refresh=120000';
+    const FEED_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://intel.aristocles24.workers.dev/api/feeds?sinceHours=24&limit=80');
     const REFRESH_MS = 5 * 60 * 1000;
     const MAX_ITEMS = 40;
     const track = document.getElementById('bnTrack');
