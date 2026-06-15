@@ -20,4 +20,4 @@ MAIL_FROM=concierge@dascient.com
 
 # Comma-separated list of origins permitted to call /api/* (CORS allow-list).
 # Defaults are baked in to _middleware.ts; this just augments them.
-ALLOWED_ORIGINS=https://dascient.com,https://www.dascient.com
+# ALLOWED_ORIGINS=https://dascient.com,https://www.dascient.com
